@@ -73,4 +73,5 @@ private:
 #pragma mark - data
 private:
     void init_dsc();
+    void init_boundary();
 };

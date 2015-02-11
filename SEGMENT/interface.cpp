@@ -139,7 +139,8 @@ void interface::draw()
 {
     Painter::begin();
     
-    draw_image();
+ //   draw_image();
+    tex->drawImage();
 
     
     if (dsc)
@@ -280,6 +281,8 @@ interface::interface(int &argc, char** argv){
     
     init_dsc();
     
+    init_boundary();
+    
     reshape(WIN_SIZE_X, WIN_SIZE_Y);
     display();
 }
@@ -306,5 +309,9 @@ void interface::init_dsc(){
                             new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
 //    vel_fun = std::unique_ptr<VelocityFunc<>>(new RotateFunc(VELOCITY, ACCURACY));
     
-    ObjectGenerator::create_square(*dsc, vec2(150., 150.), vec2(200., 200.), 1);
+//    ObjectGenerator::create_square(*dsc, vec2(150., 150.), vec2(200., 200.), 1);
+}
+
+void interface::init_boundary(){
+    
 }

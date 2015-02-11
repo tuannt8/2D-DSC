@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include "define.h"
+#include "CImg.h"
 
 #ifdef WIN32
 #include <GL/glew.h>
@@ -36,12 +37,23 @@ public:
     void map_texture(int tex_id);
     void end();
     
+    void drawImage();
+    
+    unsigned int R(int x, int y);
+    unsigned int G(int x, int y);
+    unsigned int B(int x, int y);
+    
 private:
     std::vector<Vec2> tex_sizes;
     std::vector<GLuint> texture;
     
     // Load texture
     GLuint LoadTexture( const char * filename );
+    
+private:
+    double * gray_image_;
+    cimg_library::CImg<unsigned int> *image_;
+    Vec2 _size;
 };
 
 
