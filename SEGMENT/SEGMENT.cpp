@@ -11,7 +11,7 @@
 //#include "DSC.h"
 
 int main(int argc, char ** argv) {
-    UI ui(argc, argv);
+    interface ui(argc, argv);
     glutMainLoop();
     return 0;
 }

@@ -19,8 +19,8 @@
 #include "DSC.h"
 #include "velocity_function.h"
 
-const static double POINT_SIZE = 0.2;
-const static double LINE_WIDTH = 0.1;
+const static double POINT_SIZE = 0.05;
+const static double LINE_WIDTH = 0.03;
 
 const static DSC2D::vec3 BACKGROUND_COLOR = DSC2D::vec3(0.7);
 const static DSC2D::vec3 INVISIBLE = DSC2D::vec3(-1.);
@@ -33,6 +33,8 @@ const static DSC2D::vec3 ORANGE = DSC2D::vec3(0.9,0.4,0.);
 const static DSC2D::vec3 BLACK = DSC2D::vec3(0.);
 const static DSC2D::vec3 DARK_GRAY = DSC2D::vec3(0.5);
 const static DSC2D::vec3 GRAY = DSC2D::vec3(0.8);
+
+
 
 /**
  A painter handles all draw functionality using OpenGL.

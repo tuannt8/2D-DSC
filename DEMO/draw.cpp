@@ -68,7 +68,7 @@ void Painter::end()
 
 void Painter::draw_complex(const DeformableSimplicialComplex& dsc)
 {
-    draw_domain(*dsc.get_design_domain());
+//    draw_domain(*dsc.get_design_domain());
     draw_faces(dsc);
     draw_edges(dsc);
     draw_vertices(dsc);
