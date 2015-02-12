@@ -42,6 +42,7 @@
 		A6B45F471A88F3D80091F5A6 /* GEL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A51F3B417D638B500A8F8F2 /* GEL.framework */; };
 		A6B460A91A8B649C0091F5A6 /* texture_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B460A71A8B649C0091F5A6 /* texture_helper.cpp */; };
 		A6B460EC1A8BC01B0091F5A6 /* CImg.h in Headers */ = {isa = PBXBuildFile; fileRef = A6B460EB1A8BC01B0091F5A6 /* CImg.h */; };
+		A6B460EF1A8CADF30091F5A6 /* helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B460ED1A8CADF30091F5A6 /* helper.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -103,6 +104,8 @@
 		A6B460AA1A8B6B530091F5A6 /* define.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = define.h; sourceTree = "<group>"; };
 		A6B460AF1A8B896D0091F5A6 /* SOIL.a */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = SOIL.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6B460EB1A8BC01B0091F5A6 /* CImg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CImg.h; path = CImg/CImg.h; sourceTree = SOURCE_ROOT; };
+		A6B460ED1A8CADF30091F5A6 /* helper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = helper.cpp; sourceTree = "<group>"; };
+		A6B460EE1A8CADF30091F5A6 /* helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = helper.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -217,6 +220,8 @@
 				A6B460A71A8B649C0091F5A6 /* texture_helper.cpp */,
 				A6B460A81A8B649C0091F5A6 /* texture_helper.h */,
 				A6B460AA1A8B6B530091F5A6 /* define.h */,
+				A6B460ED1A8CADF30091F5A6 /* helper.cpp */,
+				A6B460EE1A8CADF30091F5A6 /* helper.h */,
 			);
 			path = SEGMENT;
 			sourceTree = "<group>";
@@ -391,6 +396,7 @@
 				A6B45F291A88EE190091F5A6 /* SEGMENT.cpp in Sources */,
 				A6B45F411A88F1AF0091F5A6 /* log.cpp in Sources */,
 				A6B45F401A88F1AD0091F5A6 /* draw.cpp in Sources */,
+				A6B460EF1A8CADF30091F5A6 /* helper.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

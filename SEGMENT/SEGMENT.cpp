@@ -12,6 +12,7 @@
 
 int main(int argc, char ** argv) {
     interface ui(argc, argv);
+    std::cout<<"GL ver: " << glGetString(GL_VERSION)<<std::endl;
     glutMainLoop();
     return 0;
 }

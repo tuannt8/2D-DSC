@@ -145,7 +145,12 @@ void interface::draw()
     
     if (dsc)
     {
+        glEnable(GL_BLEND);
+        glBlendFunc (GL_ONE, GL_ONE);
+        
         Painter::draw_complex(*dsc);
+        
+        glDisable(GL_BLEND);
     }
     
     draw_coord();
@@ -313,5 +318,14 @@ void interface::init_dsc(){
 }
 
 void interface::init_boundary(){
+    std::vector<DSC2D::DeformableSimplicialComplex::face_key> faceKeys;
+    for (auto p = dsc->faces_begin(); p != dsc->faces_end(); p++) {
+        // Compute average intensity inside triangle
+        auto pts = dsc->get_pos(*p);
+        if (tex->is_tri_intersect_phase(pts)) {
+            faceKeys.push_back(*p);
+        }
+    }
     
+    ObjectGenerator::label_tris(*dsc, faceKeys, 1);
 }

@@ -39,6 +39,13 @@ public:
     
     void drawImage();
     
+    double average_intensity(std::vector<Vec2> pts);
+    bool is_tri_intersect_phase(std::vector<Vec2> pts);
+
+    int phase(int x, int y);
+    double grayd(int x, int y);
+    unsigned int gray(int x, int y);
+    
     unsigned int R(int x, int y);
     unsigned int G(int x, int y);
     unsigned int B(int x, int y);
@@ -52,8 +59,8 @@ private:
     
 private:
     double * gray_image_;
-    cimg_library::CImg<unsigned int> *image_;
-    Vec2 _size;
+    cimg_library::CImg<unsigned int> image_;
+    Vec2 size_;
 };
 
 
