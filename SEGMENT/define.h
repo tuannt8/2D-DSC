@@ -15,8 +15,10 @@
 
 #else
 #define DATA_PATH "../../../DATA/"
+#define LOG_PATH "../../../LOG/"
 #endif
 
 typedef DSC2D::vec2 Vec2;
+typedef DSC2D::DeformableSimplicialComplex dsc_obj;
 
 #endif // File protection

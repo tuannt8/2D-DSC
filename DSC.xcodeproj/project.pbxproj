@@ -29,6 +29,7 @@
 		7A82D64F17E272BB00C19874 /* design_domain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A82D64D17E272BB00C19874 /* design_domain.cpp */; };
 		7A82D65017E272BB00C19874 /* design_domain.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A82D64E17E272BB00C19874 /* design_domain.h */; };
 		7A9C20DB17DFBE080064171E /* draw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A9C20D917DFBE070064171E /* draw.cpp */; };
+		A6A6E2531A8CEC0300E56E95 /* curve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6A6E2511A8CEC0300E56E95 /* curve.cpp */; };
 		A6B45F1F1A88CE120091F5A6 /* interface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B45F1E1A88CE120091F5A6 /* interface.cpp */; };
 		A6B45F201A88E9230091F5A6 /* libDSC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A51F3D517D6399200A8F8F2 /* libDSC.a */; };
 		A6B45F291A88EE190091F5A6 /* SEGMENT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B45F271A88EE190091F5A6 /* SEGMENT.cpp */; };
@@ -43,6 +44,7 @@
 		A6B460A91A8B649C0091F5A6 /* texture_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B460A71A8B649C0091F5A6 /* texture_helper.cpp */; };
 		A6B460EC1A8BC01B0091F5A6 /* CImg.h in Headers */ = {isa = PBXBuildFile; fileRef = A6B460EB1A8BC01B0091F5A6 /* CImg.h */; };
 		A6B460EF1A8CADF30091F5A6 /* helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B460ED1A8CADF30091F5A6 /* helper.cpp */; };
+		A6C4F6101A8CDA930015A4BD /* dynamics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6C4F60E1A8CDA930015A4BD /* dynamics.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -95,6 +97,8 @@
 		7A82D64E17E272BB00C19874 /* design_domain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = design_domain.h; path = src/design_domain.h; sourceTree = SOURCE_ROOT; };
 		7A9C20D917DFBE070064171E /* draw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = draw.cpp; sourceTree = "<group>"; };
 		7A9C20DA17DFBE080064171E /* draw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = draw.h; sourceTree = "<group>"; };
+		A6A6E2511A8CEC0300E56E95 /* curve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = curve.cpp; sourceTree = "<group>"; };
+		A6A6E2521A8CEC0300E56E95 /* curve.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = curve.h; sourceTree = "<group>"; };
 		A6B45F131A88CC9B0091F5A6 /* SEGMENT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SEGMENT; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6B45F1D1A88CDFD0091F5A6 /* interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = interface.h; sourceTree = "<group>"; };
 		A6B45F1E1A88CE120091F5A6 /* interface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = interface.cpp; sourceTree = "<group>"; };
@@ -106,6 +110,8 @@
 		A6B460EB1A8BC01B0091F5A6 /* CImg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CImg.h; path = CImg/CImg.h; sourceTree = SOURCE_ROOT; };
 		A6B460ED1A8CADF30091F5A6 /* helper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = helper.cpp; sourceTree = "<group>"; };
 		A6B460EE1A8CADF30091F5A6 /* helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = helper.h; sourceTree = "<group>"; };
+		A6C4F60E1A8CDA930015A4BD /* dynamics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dynamics.cpp; sourceTree = "<group>"; };
+		A6C4F60F1A8CDA930015A4BD /* dynamics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dynamics.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -222,6 +228,10 @@
 				A6B460AA1A8B6B530091F5A6 /* define.h */,
 				A6B460ED1A8CADF30091F5A6 /* helper.cpp */,
 				A6B460EE1A8CADF30091F5A6 /* helper.h */,
+				A6C4F60E1A8CDA930015A4BD /* dynamics.cpp */,
+				A6C4F60F1A8CDA930015A4BD /* dynamics.h */,
+				A6A6E2511A8CEC0300E56E95 /* curve.cpp */,
+				A6A6E2521A8CEC0300E56E95 /* curve.h */,
 			);
 			path = SEGMENT;
 			sourceTree = "<group>";
@@ -390,9 +400,11 @@
 			files = (
 				A6B45F441A88F1BE0091F5A6 /* rotate_function.cpp in Sources */,
 				A6B45F431A88F1BB0091F5A6 /* normal_function.cpp in Sources */,
+				A6A6E2531A8CEC0300E56E95 /* curve.cpp in Sources */,
 				A6B45F1F1A88CE120091F5A6 /* interface.cpp in Sources */,
 				A6B460A91A8B649C0091F5A6 /* texture_helper.cpp in Sources */,
 				A6B45F421A88F1B40091F5A6 /* average_function.cpp in Sources */,
+				A6C4F6101A8CDA930015A4BD /* dynamics.cpp in Sources */,
 				A6B45F291A88EE190091F5A6 /* SEGMENT.cpp in Sources */,
 				A6B45F411A88F1AF0091F5A6 /* log.cpp in Sources */,
 				A6B45F401A88F1AD0091F5A6 /* draw.cpp in Sources */,

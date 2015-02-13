@@ -65,11 +65,17 @@ void interface::display(){
     draw();
     update_title();
     
+    // Dynamics
+    if(RUN){
+        dynamics_image_seg();
+        RUN = false;
+    }
+    
     check_gl_error();
 }
 
 void interface::animate(){
-    
+    glutPostRedisplay();
 }
 
 void interface::reshape(int width, int height){
@@ -102,6 +108,21 @@ void interface::visible(int v){
 
 void interface::keyboard(unsigned char key, int x, int y){
     
+    switch (key) {
+        case ' ':
+            RUN = !RUN;
+            break;
+        case '\t':
+            Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, LOG_PATH);
+            break;
+        default:
+            break;
+    }
+    
+    int dis = (int)key - 48;
+    if (dis <= 10 and dis >= 0) {
+        bDiplay_[dis] = ! bDiplay_[dis];
+    }
 }
 
 void interface::initGL(){
@@ -140,20 +161,37 @@ void interface::draw()
     Painter::begin();
     
  //   draw_image();
-    tex->drawImage();
-
-    
-    if (dsc)
-    {
-        glEnable(GL_BLEND);
-        glBlendFunc (GL_ONE, GL_ONE);
-        
-        Painter::draw_complex(*dsc);
-        
-        glDisable(GL_BLEND);
+    if (bDiplay_[1]) {
+        tex->drawImage(WIN_SIZE_X);
     }
     
-    draw_coord();
+    if (bDiplay_[2]) {
+        if (dsc)
+        {
+            glEnable(GL_BLEND);
+            glBlendFunc (GL_ONE, GL_ONE);
+            
+            Painter::draw_complex(*dsc);
+            
+            glDisable(GL_BLEND);
+        }
+    }
+    
+    if (bDiplay_[3]) {
+        draw_coord();
+    }
+    
+    if(bDiplay_[4]){
+        dyn_->draw_curve(*dsc);
+    }
+    
+    if(bDiplay_[5]){
+        Painter::draw_internal_force(*dsc);
+    }
+    
+    if(bDiplay_[6]){
+        Painter::draw_external_force(*dsc);
+    }
     
     Painter::end();
 }
@@ -275,11 +313,15 @@ interface::interface(int &argc, char** argv){
     WIN_SIZE_X = 900;
     WIN_SIZE_Y = 600;
     
+    bDiplay_.resize(10);
+    std::fill(bDiplay_.begin(), bDiplay_.end(), true);
+    
     glutInit(&argc, argv);
     initGL();
     
     tex = std::unique_ptr<texture_helper>(new texture_helper);
     imageSize = tex->get_tex_size(0);
+    dyn_ = std::unique_ptr<dynamics>(new dynamics);
     dsc = nullptr;
     
     check_gl_error();
@@ -328,4 +370,8 @@ void interface::init_boundary(){
     }
     
     ObjectGenerator::label_tris(*dsc, faceKeys, 1);
+}
+
+void interface:: dynamics_image_seg(){
+    dyn_->update_dsc(*dsc, *tex);
 }

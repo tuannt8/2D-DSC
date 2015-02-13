@@ -19,10 +19,12 @@
 #include "DSC.h"
 #include "velocity_function.h"
 
+#define FORCE_SCALE 10
+
 const static double POINT_SIZE = 0.05;
 const static double LINE_WIDTH = 0.03;
 
-const static DSC2D::vec3 BACKGROUND_COLOR = DSC2D::vec3(0.7);
+const static DSC2D::vec3 BACKGROUND_COLOR = DSC2D::vec3(1.0);//DSC2D::vec3(0.7);
 const static DSC2D::vec3 INVISIBLE = DSC2D::vec3(-1.);
 const static DSC2D::vec3 DARK_RED = DSC2D::vec3(0.66,0.11,0.15);
 const static DSC2D::vec3 RED = DSC2D::vec3(0.96,0.11,0.15);
@@ -48,6 +50,8 @@ public:
      */
     static void save_painting(int width, int height, std::string folder = std::string(""), int time_step = -1);
     
+    static void save_painting_no_overwite(int width, int height, std::string folder = std::string(""));
+    
     /**
      Begins drawing.
      */
@@ -57,6 +61,12 @@ public:
      Ends drawing.
      */
     static void end();
+    
+    /**
+     Draw force
+     */
+    static void draw_internal_force(const DSC2D::DeformableSimplicialComplex& complex);
+    static void draw_external_force(const DSC2D::DeformableSimplicialComplex& complex);
     
     /**
      Draws the simplicial complex.

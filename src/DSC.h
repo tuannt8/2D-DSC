@@ -89,6 +89,9 @@ namespace DSC2D {
         
         HMesh::VertexAttributeVector<vec2> destination;
         
+        HMesh::VertexAttributeVector<vec2> internal_node_forces;
+        HMesh::VertexAttributeVector<vec2> external_node_forces;
+        
         HMesh::VertexAttributeVector<int> vertex_labels;
         HMesh::HalfEdgeAttributeVector<int> edge_labels;
         HMesh::FaceAttributeVector<int> face_labels;
@@ -113,6 +116,7 @@ namespace DSC2D {
         void create_simplicial_complex(const std::vector<real>& points, const std::vector<int>& faces);
         
         //************** DISPLAY FUNCTIONS ***************
+#pragma mark - Display fuctions
     public:
         /**
          Returns the vertex colors.
@@ -128,8 +132,10 @@ namespace DSC2D {
          Returns the face colors.
          */
         virtual HMesh::FaceAttributeVector<vec3> get_face_colors() const;
+    
         
         //************** ATTRIBUTE FUNCTIONS ***************
+#pragma mark - attribute functions
     protected:
         
         /**
@@ -188,6 +194,7 @@ namespace DSC2D {
         
         
         //************** GETTERS ***************
+#pragma mark - Getters
     public:
         
         /**
@@ -308,8 +315,27 @@ namespace DSC2D {
          */
         std::vector<int> get_interface_labels(node_key vid) const;
         
+        /**
+         Node force
+         */
+        vec2 get_node_internal_force(node_key vid) const{
+            return internal_node_forces[vid];
+        }
+        
+        vec2 get_node_external_force(node_key vid) const{
+            return external_node_forces[vid];
+        }
+        
+        const HMesh::VertexAttributeVector<vec2> & get_internal_force () const{
+            return internal_node_forces;
+        }
+        
+        const HMesh::VertexAttributeVector<vec2> & get_external_force () const{
+            return external_node_forces;
+        }
         
         //************** SETTERS ***************
+#pragma mark - Setter
     protected:
         
         /**
@@ -318,6 +344,20 @@ namespace DSC2D {
         void set_pos(node_key vid, vec2 p);
         
     public:
+        /**
+         Internal force
+         */
+        void set_node_internal_force(node_key vid, vec2 force){
+            internal_node_forces[vid] = force;
+        }
+        
+        /**
+         External force
+         */
+        void set_node_external_force(node_key vid, vec2 force){
+            external_node_forces[vid] = force;
+        }
+        
         /**
          Sets the destination of the vertex with ID vid to dest.
          To actually move the vertices to their destination, call the deform function.
@@ -334,6 +374,7 @@ namespace DSC2D {
         }
         
         //************** ITERATORS ***************
+#pragma mark - Iterators
     public:
         HMesh::VertexIDIterator vertices_begin() const
         {
@@ -381,6 +422,7 @@ namespace DSC2D {
         }
         
         //************** PRECONDITIONS ***************
+#pragma mark - Preconditions
     public:
         /**
          Returns whether the vertex with ID vid is situated at a crossing of interfaces.
@@ -511,6 +553,7 @@ namespace DSC2D {
         virtual bool safe_editable(edge_key eid) const;
         
         //************** MESH FUNCTIONS ***************
+#pragma mark - Mesh functions
     public:
         /**
          Move the vertices in the simplicial complex to their new position. The new position is set by the update_pos function.
@@ -551,6 +594,7 @@ namespace DSC2D {
         
         
         //************** QUALITY CONTROL ***************
+#pragma mark - Quality control
         
     protected:
         /**
@@ -600,6 +644,7 @@ namespace DSC2D {
         void remove_degenerate_faces();
         
         //************** DETAIL CONTROL ***************
+#pragma mark - Detail control
         
     public:
         /**
@@ -630,6 +675,7 @@ namespace DSC2D {
         void thickening();
         
         //************** UTIL ***************
+#pragma mark - Utilities
     private:
         
         /**

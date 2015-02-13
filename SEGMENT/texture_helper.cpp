@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "helper.h"
+#include <math.h>
 
 #ifdef WIN32
 #include <GL/glew.h>
@@ -81,7 +82,9 @@ void texture_helper::end(){
 
 #pragma mark - Public
 
-void texture_helper::drawImage(){
+void texture_helper::drawImage(int window_x){
+    double pointSize = (double)window_x / image_.width();
+    glPointSize(pointSize);
     glBegin(GL_POINTS);
     for (int i = 0; i < image_.width(); i++) {
         for (int j = 0; j < image_.height(); j++) {
@@ -91,6 +94,7 @@ void texture_helper::drawImage(){
         }
     }
     glEnd();
+    glPointSize(1.0);
 }
 
 bool texture_helper::is_tri_intersect_phase(std::vector<Vec2> pts){
@@ -113,6 +117,30 @@ bool texture_helper::is_tri_intersect_phase(std::vector<Vec2> pts){
     }
     
     return  false;
+}
+
+void texture_helper::get_triangle_intensity(std::vector<Vec2> pts,
+                                            int &pixel_count, int &total_i){
+    Vec2 min(INFINITY, INFINITY), max(-INFINITY, -INFINITY);
+    for (auto p: pts){
+        min[0] = std::min(min[0], p[0]);
+        min[1] = std::min(min[1], p[1]);
+        max[0] = std::max(max[0], p[0]);
+        max[1] = std::max(max[1], p[1]);
+    }
+    
+    
+    //Convert to int
+    total_i = 0.0;
+    pixel_count = 0;
+    for (int i = floor(min[0]); i < ceil(max[0]); i++) {
+        for (int j = floor(min[1]); j < ceil(max[1]); j++) {
+            if (helper_t::is_point_in_tri(Vec2(i,j), pts)) {
+                pixel_count ++;
+                total_i += phase(i, j);
+            }
+        }
+    }
 }
 
 double texture_helper:: average_intensity(std::vector<Vec2> pts){
@@ -147,6 +175,10 @@ unsigned int texture_helper::gray(int x, int y){
     int r = image_.height() - y;
     int c = x;
     return image_.data()[r * image_.width() + c];
+}
+
+int texture_helper::phase(double x, double y){
+    return phase((int)std::floor(x), (int)std::floor(y));
 }
 
 int texture_helper::phase(int x, int y){

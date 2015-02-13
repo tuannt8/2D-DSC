@@ -52,6 +52,47 @@ void Painter::save_painting(int width, int height, std::string folder, int time_
     }
 }
 
+void Painter::save_painting_no_overwite(int width, int height, std::string folder){
+    std::ostringstream s;
+    if (folder.length() == 0) {
+        s << "scr";
+    }
+    else {
+        s << folder << "/scr";
+    }
+    
+    // protect old file
+    int count = 0;
+    while (1) {
+        count ++;
+        std::ostringstream temp, name;
+        name << "_" << count << ".png";
+        temp << s.str() << name.str();
+        FILE *f = fopen(temp.str().c_str(), "r");
+        if (f) { // Existed
+            fclose(f);
+            continue;
+        }
+        else{
+            s << name.str();
+            break;
+        }
+        
+        if (count > 100) {
+            std::cout << "Name identical" << std::endl;
+            return;
+        }
+    }
+    
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    int success = SOIL_save_screenshot(s.str().c_str(), SOIL_SAVE_TYPE_PNG, 0, 0, width, height);
+    if(!success)
+    {
+        std::cout << "ERROR: Failed to take screen shot: " << s.str().c_str() << std::endl;
+        return;
+    }
+}
+
 
 void Painter::begin()
 {
@@ -65,6 +106,14 @@ void Painter::end()
     glutSwapBuffers();
 }
 
+void Painter::draw_internal_force(const DSC2D::DeformableSimplicialComplex& complex){
+    
+    draw_arrows(complex, complex.get_internal_force(), ORANGE);
+}
+
+void Painter::draw_external_force(const DSC2D::DeformableSimplicialComplex& complex){
+    draw_arrows(complex, complex.get_external_force(), DARK_BLUE);
+}
 
 void Painter::draw_complex(const DeformableSimplicialComplex& dsc)
 {
@@ -168,11 +217,11 @@ void Painter::draw_arrows(const DeformableSimplicialComplex& dsc, const HMesh::V
         {
             a_hat = vec3(-arrow[1], arrow[0], 0.f);
             p = vec3(dsc.get_pos(*vi)[0], dsc.get_pos(*vi)[1], 0.);
-#ifdef DEBUG
-            if (dsc.is_movable(*vi)) {
-                p = vec3(dsc.get_destination(*vi)[0], dsc.get_destination(*vi)[1], 0.);
-            }
-#endif
+//#ifdef DEBUG
+//            if (dsc.is_movable(*vi)) {
+//                p = vec3(dsc.get_destination(*vi)[0], dsc.get_destination(*vi)[1], 0.);
+//            }
+//#endif
             glBegin(GL_LINES);
             glVertex3d(static_cast<double>(p[0]), static_cast<double>(p[1]), static_cast<double>(p[2]));
             glVertex3d(static_cast<double>((p + 0.7*arrow)[0]), static_cast<double>((p + 0.7*arrow)[1]), static_cast<double>((p + 0.7*arrow)[2]));

@@ -23,16 +23,20 @@
 #include <GLUT/glut.h>
 #endif
 
+#include "dynamics.h"
+
 class interface{
 #pragma mark - Local variable
     std::unique_ptr<DSC2D::DeformableSimplicialComplex> dsc;
 
     
     // Windows size
-    int WIN_SIZE_X;
-    int WIN_SIZE_Y;
-    double SCALE;
-    Vec2 imageSize;
+    int     WIN_SIZE_X;
+    int     WIN_SIZE_Y;
+    double  SCALE;
+    Vec2    imageSize;
+    std::vector<bool> bDiplay_;
+    bool    RUN = false;
     
     // triangle size
     double DISCRETIZATION;
@@ -40,6 +44,7 @@ class interface{
     static interface *instance;
     
     std::unique_ptr<texture_helper> tex;
+    std::unique_ptr<dynamics> dyn_;
     
 #pragma mark - Glut display
 public:
@@ -74,4 +79,5 @@ private:
 private:
     void init_dsc();
     void init_boundary();
+    void dynamics_image_seg();
 };

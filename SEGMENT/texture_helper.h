@@ -37,12 +37,14 @@ public:
     void map_texture(int tex_id);
     void end();
     
-    void drawImage();
+    void drawImage(int window_x = 0);
     
+    void get_triangle_intensity(std::vector<Vec2> pts, int &pixel_count, int &total_i);
     double average_intensity(std::vector<Vec2> pts);
     bool is_tri_intersect_phase(std::vector<Vec2> pts);
 
     int phase(int x, int y);
+    int phase(double x, double y);
     double grayd(int x, int y);
     unsigned int gray(int x, int y);
     
