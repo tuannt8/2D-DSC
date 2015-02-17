@@ -9,6 +9,22 @@
 #include "dynamics.h"
 
 bool dynamics:: update_dsc(DSC2D::DeformableSimplicialComplex &dsc, texture_helper &tex){
+//    // 1. Process interface vertices
+//    curve_list_ = extract_curve(dsc);
+//    
+//    // 2. Internal forces
+//    compute_internal_force(curve_list_, dsc);
+//    
+//    // 3. External forces
+//    compute_external_force(curve_list_, dsc, tex);
+//    
+//    // 4. Compute displacement
+//    compute_displacement(dsc);
+    
+    // 5. Update DSC
+    deform(dsc);
+    
+    // Debug
     // 1. Process interface vertices
     curve_list_ = extract_curve(dsc);
     
@@ -20,18 +36,6 @@ bool dynamics:: update_dsc(DSC2D::DeformableSimplicialComplex &dsc, texture_help
     
     // 4. Compute displacement
     compute_displacement(dsc);
-    
-    // 5. Update DSC
-    deform(dsc);
-    
-    curve_list_ = extract_curve(dsc); // Update
-    
-    // Debug
-    // 2. Internal forces
-    compute_internal_force(curve_list_, dsc);
-    
-    // 3. External forces
-    compute_external_force(curve_list_, dsc, tex);
     
     return  true;
 }
@@ -57,7 +61,18 @@ dynamics::~dynamics(){
 
 std::vector<curve> dynamics::extract_curve(DSC2D::DeformableSimplicialComplex &dsc){
     curve new_curve;
-    for (auto ni = dsc.vertices_begin(); ni != dsc.vertices_end(); ni++) {
+ /*
+    for (auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei) {
+        if (dsc.is_interface(*hei)) {
+            auto hew = dsc.walker(*hei);
+            
+        }
+        
+
+        
+    }
+ */
+  for (auto ni = dsc.vertices_begin(); ni != dsc.vertices_end(); ni++) {
         if (dsc.is_interface(*ni)) {
             // Note: We make hard code here
             // TODO: Fix it later
@@ -79,6 +94,7 @@ std::vector<curve> dynamics::extract_curve(DSC2D::DeformableSimplicialComplex &d
             
         }
     }
+
     
     std::vector<curve> curve_list;
     curve_list.push_back(new_curve);
@@ -120,11 +136,14 @@ void dynamics::compute_external_force(std::vector<curve> &curve_list
     cu0.update_mean_intensity(complex, tex);
     
     for (int i = 0; i < cu0.size(); i++) {
-        Vec2 norm = complex.get_normal(cu0[i]);
+  //      Vec2 norm = complex.get_normal(cu0[i]);
+        
+        
         Vec2 pt = complex.get_pos(cu0[i]);
         double inten = tex.phase(pt[0], pt[1]);
-        Vec2 force = norm*( (cu0.m_out() - cu0.m_in())*
-                           (inten - cu0.m_out() + inten - cu0.m_in()) ) * d_param_.gamma * -1;
+        double scale = (cu0.m_out() - cu0.m_in())* (inten - cu0.m_out() + inten - cu0.m_in());
+        Vec2 norm = tex.get_local_norm(complex, cu0[i], scale < 0);
+        Vec2 force = norm*std::abs(scale) * d_param_.gamma;
         
         complex.set_node_external_force(cu0[i], force);
     }
@@ -147,7 +166,7 @@ void dynamics::compute_displacement(dsc_obj &dsc){
     }
     
     // To force maximum displacement winthin 1 edge length
-    std::cout << "Max displacement: " << max <<", Average edge length: " << el <<std::endl;
+//    std::cout << "Max displacement: " << max <<", Average edge length: " << el <<std::endl;
     
     if (max > el) {
         double scale = el / max;

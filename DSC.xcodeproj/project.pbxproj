@@ -29,7 +29,9 @@
 		7A82D64F17E272BB00C19874 /* design_domain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A82D64D17E272BB00C19874 /* design_domain.cpp */; };
 		7A82D65017E272BB00C19874 /* design_domain.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A82D64E17E272BB00C19874 /* design_domain.h */; };
 		7A9C20DB17DFBE080064171E /* draw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A9C20D917DFBE070064171E /* draw.cpp */; };
+		A61F33181A937CDF00C5C2F8 /* gl_debug_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F33161A937CDF00C5C2F8 /* gl_debug_helper.cpp */; };
 		A6A6E2531A8CEC0300E56E95 /* curve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6A6E2511A8CEC0300E56E95 /* curve.cpp */; };
+		A6A6E2571A92255F00E56E95 /* gradient_f.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6A6E2551A92255F00E56E95 /* gradient_f.cpp */; };
 		A6B45F1F1A88CE120091F5A6 /* interface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B45F1E1A88CE120091F5A6 /* interface.cpp */; };
 		A6B45F201A88E9230091F5A6 /* libDSC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A51F3D517D6399200A8F8F2 /* libDSC.a */; };
 		A6B45F291A88EE190091F5A6 /* SEGMENT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B45F271A88EE190091F5A6 /* SEGMENT.cpp */; };
@@ -97,8 +99,12 @@
 		7A82D64E17E272BB00C19874 /* design_domain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = design_domain.h; path = src/design_domain.h; sourceTree = SOURCE_ROOT; };
 		7A9C20D917DFBE070064171E /* draw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = draw.cpp; sourceTree = "<group>"; };
 		7A9C20DA17DFBE080064171E /* draw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = draw.h; sourceTree = "<group>"; };
+		A61F33161A937CDF00C5C2F8 /* gl_debug_helper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gl_debug_helper.cpp; sourceTree = "<group>"; };
+		A61F33171A937CDF00C5C2F8 /* gl_debug_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gl_debug_helper.h; sourceTree = "<group>"; };
 		A6A6E2511A8CEC0300E56E95 /* curve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = curve.cpp; sourceTree = "<group>"; };
 		A6A6E2521A8CEC0300E56E95 /* curve.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = curve.h; sourceTree = "<group>"; };
+		A6A6E2551A92255F00E56E95 /* gradient_f.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gradient_f.cpp; sourceTree = "<group>"; };
+		A6A6E2561A92255F00E56E95 /* gradient_f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gradient_f.h; sourceTree = "<group>"; };
 		A6B45F131A88CC9B0091F5A6 /* SEGMENT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SEGMENT; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6B45F1D1A88CDFD0091F5A6 /* interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = interface.h; sourceTree = "<group>"; };
 		A6B45F1E1A88CE120091F5A6 /* interface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = interface.cpp; sourceTree = "<group>"; };
@@ -216,9 +222,19 @@
 			path = DEMO;
 			sourceTree = "<group>";
 		};
+		A6A6E2541A8E2F7C00E56E95 /* Force */ = {
+			isa = PBXGroup;
+			children = (
+				A6A6E2551A92255F00E56E95 /* gradient_f.cpp */,
+				A6A6E2561A92255F00E56E95 /* gradient_f.h */,
+			);
+			name = Force;
+			sourceTree = "<group>";
+		};
 		A6B45F141A88CC9B0091F5A6 /* SEGMENT */ = {
 			isa = PBXGroup;
 			children = (
+				A6A6E2541A8E2F7C00E56E95 /* Force */,
 				A6B460EB1A8BC01B0091F5A6 /* CImg.h */,
 				A6B45F1D1A88CDFD0091F5A6 /* interface.h */,
 				A6B45F1E1A88CE120091F5A6 /* interface.cpp */,
@@ -232,6 +248,8 @@
 				A6C4F60F1A8CDA930015A4BD /* dynamics.h */,
 				A6A6E2511A8CEC0300E56E95 /* curve.cpp */,
 				A6A6E2521A8CEC0300E56E95 /* curve.h */,
+				A61F33161A937CDF00C5C2F8 /* gl_debug_helper.cpp */,
+				A61F33171A937CDF00C5C2F8 /* gl_debug_helper.h */,
 			);
 			path = SEGMENT;
 			sourceTree = "<group>";
@@ -408,7 +426,9 @@
 				A6B45F291A88EE190091F5A6 /* SEGMENT.cpp in Sources */,
 				A6B45F411A88F1AF0091F5A6 /* log.cpp in Sources */,
 				A6B45F401A88F1AD0091F5A6 /* draw.cpp in Sources */,
+				A6A6E2571A92255F00E56E95 /* gradient_f.cpp in Sources */,
 				A6B460EF1A8CADF30091F5A6 /* helper.cpp in Sources */,
+				A61F33181A937CDF00C5C2F8 /* gl_debug_helper.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

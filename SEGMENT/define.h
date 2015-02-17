@@ -20,5 +20,8 @@
 
 typedef DSC2D::vec2 Vec2;
 typedef DSC2D::DeformableSimplicialComplex dsc_obj;
+typedef dsc_obj::node_key Node_key;
+
+extern int debug_num[10];
 
 #endif // File protection

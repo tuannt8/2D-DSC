@@ -112,7 +112,7 @@ void Painter::draw_internal_force(const DSC2D::DeformableSimplicialComplex& comp
 }
 
 void Painter::draw_external_force(const DSC2D::DeformableSimplicialComplex& complex){
-    draw_arrows(complex, complex.get_external_force(), DARK_BLUE);
+    draw_arrows(complex, complex.get_external_force(), GREEN);
 }
 
 void Painter::draw_complex(const DeformableSimplicialComplex& dsc)

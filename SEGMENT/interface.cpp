@@ -11,6 +11,10 @@
 #include "object_generator.h"
 #include "draw.h"
 
+#include "gl_debug_helper.h"
+
+int debug_num[10] = {-1};
+
 void _check_gl_error(const char *file, int line)
 {
     GLenum err (glGetError());
@@ -54,6 +58,14 @@ void animate_(){
     interface::get_instance()->animate();
 }
 
+void glutMouseFunc_(int button, int state, int x, int y){
+    gl_debug_helper::mouseDown(button, state, x, y);
+};
+
+void glutMotion_(int x, int y){
+    gl_debug_helper::mouseMove(x, y);
+};
+
 interface* interface::instance = NULL;
 
 #pragma mark - Glut display
@@ -95,7 +107,12 @@ void interface::reshape(int width, int height){
 
 
         glViewport((WIN_SIZE_X - lx)/2, (WIN_SIZE_Y - ly)/2, lx, ly);
-        glutReshapeWindow(WIN_SIZE_X, WIN_SIZE_Y);        
+        glutReshapeWindow(WIN_SIZE_X, WIN_SIZE_Y);
+        
+        
+        gl_debug_helper::coord_transform(Vec2((WIN_SIZE_X - lx)/2, (WIN_SIZE_Y - ly)/2),
+                                         Vec2(imageSize[0] / lx, imageSize[1] / ly),
+                                         WIN_SIZE_Y);
     }
 }
 
@@ -109,6 +126,16 @@ void interface::visible(int v){
 void interface::keyboard(unsigned char key, int x, int y){
     
     switch (key) {
+        case 'd':
+            gl_debug_helper::change_state();
+            break;
+        case 'p':
+            gl_debug_helper::print_debug_info(*dsc);
+            break;
+        case 'i':
+            std::cout << "Input debug number: ";
+            std::cin >> debug_num[0];
+            break;
         case ' ':
             RUN = !RUN;
             break;
@@ -147,6 +174,8 @@ void interface::initGL(){
     glutKeyboardFunc(keyboard_);
     glutVisibilityFunc(visible_);
     glutReshapeFunc(reshape_);
+    glutMouseFunc(glutMouseFunc_);
+    glutMotionFunc(glutMotion_);
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -192,6 +221,8 @@ void interface::draw()
     if(bDiplay_[6]){
         Painter::draw_external_force(*dsc);
     }
+    
+    gl_debug_helper::draw();
     
     Painter::end();
 }
@@ -328,7 +359,8 @@ interface::interface(int &argc, char** argv){
     
     init_dsc();
     
-    init_boundary();
+    init_sqaure_boundary();
+   // init_boundary();
     
     reshape(WIN_SIZE_X, WIN_SIZE_Y);
     display();
@@ -341,7 +373,7 @@ void interface::init_dsc(){
     int width = imageSize[0];
     int height = imageSize[1];
     
-    DISCRETIZATION = (double) height / 30.0;
+    DISCRETIZATION = (double) height / 15.0;
     
     width -= 2*DISCRETIZATION;
     height -= 2*DISCRETIZATION;
@@ -355,8 +387,11 @@ void interface::init_dsc(){
     dsc = std::unique_ptr<DeformableSimplicialComplex>(
                             new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
 //    vel_fun = std::unique_ptr<VelocityFunc<>>(new RotateFunc(VELOCITY, ACCURACY));
-    
-//    ObjectGenerator::create_square(*dsc, vec2(150., 150.), vec2(200., 200.), 1);
+}
+
+void interface::init_sqaure_boundary(){
+    Vec2 s = tex->get_image_size();
+    ObjectGenerator::create_square(*dsc, vec2(0.3*s[0], 0.3*s[1]), vec2(0.4*s[0], 0.4*s[1]), 1);
 }
 
 void interface::init_boundary(){

@@ -46,6 +46,9 @@ class interface{
     std::unique_ptr<texture_helper> tex;
     std::unique_ptr<dynamics> dyn_;
     
+private:
+    int debug_num_[10];
+    
 #pragma mark - Glut display
 public:
     void display();
@@ -78,6 +81,7 @@ private:
 #pragma mark - data
 private:
     void init_dsc();
+    void init_sqaure_boundary();
     void init_boundary();
     void dynamics_image_seg();
 };

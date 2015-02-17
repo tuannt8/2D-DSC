@@ -33,11 +33,14 @@ public:
     ~texture_helper();
     
     Vec2 get_tex_size(int tex_id){return tex_sizes[tex_id];};
+    Vec2 get_image_size(){return size_;}
     
     void map_texture(int tex_id);
     void end();
     
     void drawImage(int window_x = 0);
+    
+    Vec2 get_local_norm(dsc_obj &complex, Node_key key, bool outside);
     
     void get_triangle_intensity(std::vector<Vec2> pts, int &pixel_count, int &total_i);
     double average_intensity(std::vector<Vec2> pts);

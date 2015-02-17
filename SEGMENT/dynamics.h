@@ -17,9 +17,9 @@
 #include "velocity_function.h"
 
 struct dynamics_param{
-    double alpha = 2.0; // Second derivative. Keep the curve short
-    double beta = 0.1; // Forth derivative. Keep the curve straight
-    double gamma = 10; // External force scale
+    double alpha = 0.1; // Second derivative. Keep the curve short
+    double beta = 0.01; // Forth derivative. Keep the curve straight
+    double gamma = 40; // External force scale
     double mass = 50;
 };
 
@@ -37,7 +37,8 @@ public:
     }
     
     /**
-     Computes the motion of each interface vertex and stores the destination in the simplicial complex class.
+     Computes the motion of each interface vertex and stores the destination in 
+     the simplicial complex class.
      */
     virtual void deform(DSC2D::DeformableSimplicialComplex& dsc);
     
