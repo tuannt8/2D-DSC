@@ -20,7 +20,7 @@
 struct dynamics_param{
     double alpha = 0.00; // Second derivative. Keep the curve short
     double beta = 0.0; // Forth derivative. Keep the curve straight
-    double gamma = 20; // External force scale
+    double gamma = 0.005; // External force scale
     double mass = 50;
 };
 
@@ -44,7 +44,7 @@ public:
     virtual void deform(DSC2D::DeformableSimplicialComplex& dsc);
     
 public:
-    bool update_dsc(DSC2D::DeformableSimplicialComplex &dsc, texture_helper &tex);
+    bool update_dsc(DSC2D::DeformableSimplicialComplex &dsc, image &img);
     
 #pragma mark - Debug
 public:
@@ -62,7 +62,7 @@ private:
                                 DSC2D::DeformableSimplicialComplex &dsc);
     void compute_external_force(std::vector<curve> &curve_list
                                 ,dsc_obj &complex
-                                ,texture_helper &tex);
+                                ,image &tex);
     void compute_displacement(dsc_obj &dsc);
     
 private: // Utility

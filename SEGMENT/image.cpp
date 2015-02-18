@@ -81,3 +81,58 @@ int image::get_triangle_intensity_count(Vec2_array tris, int *nb_pixel){
     
     return total_intensity;
 }
+
+Vec2 image::get_local_norm(dsc_obj &complex, Node_key key, bool outside){
+    
+    Vec2 norm(0.0);
+    int phase = outside? 0 : 1;
+    
+    if (debug_num[0] == key.get_index()) {
+        
+    }
+    
+    for (auto hew = complex.walker(key); !hew.full_circle(); hew = hew.circulate_vertex_cw()) {
+        auto fid = hew.face();
+        
+        if (complex.get_label(fid) == phase) { // Currently take only outward pointer
+            auto vids = complex.get_verts(fid);
+            
+            // Get bisector vector
+            Vec2 bisector(0.0);
+            Vec2 e[2];int num = 0;
+            for (auto vid : vids) {
+                if (vid != key) {
+                    Vec2 n = complex.get_pos(vid) - complex.get_pos(key);
+                    n.normalize();
+                    bisector += n;
+                    e[num++] = n;
+                }
+            }
+            bisector.normalize();
+            double cos_angle = std::sin( std::acos( DSC2D::Util::dot(e[0], e[1]) ) );
+            
+            auto pts = complex.get_pos(fid);
+            int pixel_count = 0;
+            int sum_intensity = get_triangle_intensity_count(pts, &pixel_count);
+            
+            double intsity = ( outside? (double)sum_intensity :
+                                        (double)(pixel_count*MAX_BYTE - sum_intensity)
+                              ) / (double)pixel_count;
+            
+            intsity = 255 - intsity; //Black - white exchange
+            
+            norm += bisector * intsity * cos_angle;
+        }
+    }
+    if (norm.length() > 0) {
+        norm.normalize();
+        
+        norm = norm * 0.7 + complex.get_normal(key)*(outside? 1:-1);
+        
+        norm.normalize();
+        return norm;
+    }
+    else{
+        return complex.get_normal(key)*(outside? 1:-1);
+    }
+}

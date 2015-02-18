@@ -122,6 +122,7 @@ void gl_debug_helper::print_debug_info(dsc_obj &complex){
             
             if (temp_gdh::is_greater(p, ld) && temp_gdh::is_greater(ru, p)) {
                 std::cout << nid->get_index() << " ";
+                debug_num[0] = (int)nid->get_index();
             }
         }
         std::cout << std::endl;

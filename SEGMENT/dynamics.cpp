@@ -8,7 +8,7 @@
 
 #include "dynamics.h"
 
-bool dynamics:: update_dsc(DSC2D::DeformableSimplicialComplex &dsc, texture_helper &tex){
+bool dynamics:: update_dsc(DSC2D::DeformableSimplicialComplex &dsc, image &img){
     // 1. Process interface vertices
     curve_list_ = extract_curve(dsc);
     
@@ -16,7 +16,7 @@ bool dynamics:: update_dsc(DSC2D::DeformableSimplicialComplex &dsc, texture_help
     compute_internal_force(curve_list_, dsc);
     
     // 3. External forces
-    compute_external_force(curve_list_, dsc, tex);
+    compute_external_force(curve_list_, dsc, img);
     
     // 4. Compute displacement
     compute_displacement(dsc);
@@ -32,7 +32,7 @@ bool dynamics:: update_dsc(DSC2D::DeformableSimplicialComplex &dsc, texture_help
     compute_internal_force(curve_list_, dsc);
 //    
 //    // 3. External forces
-    compute_external_force(curve_list_, dsc, tex);
+    compute_external_force(curve_list_, dsc, img);
 //    
 //    // 4. Compute displacement
 //    compute_displacement(dsc);
@@ -130,19 +130,20 @@ void dynamics::compute_internal_force(std::vector<curve> &curve_list,
 
 void dynamics::compute_external_force(std::vector<curve> &curve_list
                                       ,dsc_obj &complex
-                                      ,texture_helper &tex){
+                                      ,image &img){
     curve & cu0 = curve_list[0]; //TODO: Multiple curve
     
-    cu0.update_mean_intensity(complex, tex);
+    cu0.update_mean_intensity(complex, img);
     
     for (int i = 0; i < cu0.size(); i++) {
   //      Vec2 norm = complex.get_normal(cu0[i]);
         
         
         Vec2 pt = complex.get_pos(cu0[i]);
-        double inten = tex.phase(pt[0], pt[1]);
+        double inten = img.get_intensity_i(pt[0], pt[1]);
         double scale = (cu0.m_out() - cu0.m_in())* (inten - cu0.m_out() + inten - cu0.m_in());
-        Vec2 norm = tex.get_local_norm(complex, cu0[i], scale < 0);
+        
+        Vec2 norm = img.get_local_norm(complex, cu0[i], scale < 0);
         Vec2 force = norm*std::abs(scale) * d_param_.gamma;
         
         complex.set_node_external_force(cu0[i], force);

@@ -75,15 +75,15 @@ curve::node_key curve::cycle_at(int idx){
     return at(idx);
 }
 
-void curve::update_mean_intensity(dsc_obj &complex, texture_helper &tex){
+void curve::update_mean_intensity(dsc_obj &complex, image &img){
     m_in_ = 0.0;
     m_out_ = 0.0;
     int count_in = 0, count_out = 0;
+    
     for (auto fi = complex.faces_begin(); fi != complex.faces_end(); fi++) {
         auto pts = complex.get_pos(*fi);
         int count;
-        int total_i;
-        tex.get_triangle_intensity(pts, count, total_i);
+        int total_i = img.get_triangle_intensity_count(pts, &count);
         
         if (complex.get_label(*fi) == 0) { // Outside
             m_out_ += total_i;

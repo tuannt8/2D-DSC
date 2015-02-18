@@ -79,6 +79,10 @@ void interface::display(){
     
     // Dynamics
     if(RUN){
+        if (gl_debug_helper::is_debugging()) {
+            gl_debug_helper::print_debug_info(*dsc);
+        }
+        
         dynamics_image_seg();
         RUN = false;
     }
@@ -411,5 +415,5 @@ void interface::init_boundary(){
 }
 
 void interface:: dynamics_image_seg(){
-    dyn_->update_dsc(*dsc, *tex);
+    dyn_->update_dsc(*dsc, *image_);
 }

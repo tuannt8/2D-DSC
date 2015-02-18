@@ -13,6 +13,7 @@
 #include "define.h"
 #include "DSC.h"
 #include "texture_helper.h"
+#include "image.h"
 
 // Parametric curve
 class curve:public std::vector<DSC2D::DeformableSimplicialComplex::node_key>{
@@ -34,7 +35,7 @@ public:
     
     // Compute second and forth derivative
     void update_derivative(DSC2D::DeformableSimplicialComplex &dsc);
-    void update_mean_intensity(dsc_obj &complex, texture_helper &tex);
+    void update_mean_intensity(dsc_obj &complex, image &img);
     
     // Get derivative
     Vec2 derive2(int idx){

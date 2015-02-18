@@ -38,6 +38,7 @@ private:
     
     Vec2 to_gl_coord(Vec2 win_coord);
 public:
+    static bool is_debugging(){return get_instance().active_;};
     static void change_state();
     static void begin();
     static void end();
