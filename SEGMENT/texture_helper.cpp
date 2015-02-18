@@ -22,6 +22,8 @@
 #include <GEL/GLGraphics/SOIL.h>
 #endif
 
+#define IMAGE_NAME  "square1.bmp"
+
 GLuint texture_helper::LoadTexture( const char * filename ){
     std::string filePath = std::string(DATA_PATH) + std::string(filename);
 
@@ -60,7 +62,7 @@ GLuint texture_helper::LoadTexture( const char * filename ){
 }
 
 texture_helper::texture_helper(){
-    LoadTexture("square.bmp");
+    LoadTexture(IMAGE_NAME);
 }
 
 texture_helper::~texture_helper(){
@@ -98,25 +100,11 @@ void texture_helper::drawImage(int window_x){
 }
 
 bool texture_helper::is_tri_intersect_phase(std::vector<Vec2> pts){
-    Vec2 min(INFINITY, INFINITY), max(-INFINITY, -INFINITY);
-    for (auto p: pts){
-        min[0] = std::min(min[0], p[0]);
-        min[1] = std::min(min[1], p[1]);
-        max[0] = std::max(max[0], p[0]);
-        max[1] = std::max(max[1], p[1]);
-    }
     
-    //Convert to int
-    for (int i = floor(min[0]); i < ceil(max[0]); i++) {
-        for (int j = floor(min[1]); j < ceil(max[1]); j++) {
-            if (helper_t::is_point_in_tri(Vec2(i,j), pts)) {
-                if(phase(i, j) == 1)
-                    return  true;
-            }
-        }
-    }
+    int pixel_cont = 0, phase_count = 0;
+    get_triangle_intensity(pts, pixel_cont, phase_count);
     
-    return  false;
+    return  (double)phase_count/pixel_cont > 0.7;
 }
 
 void texture_helper::get_triangle_intensity(std::vector<Vec2> pts,
@@ -221,7 +209,7 @@ Vec2 texture_helper::get_local_norm(dsc_obj &complex, Node_key key, bool outside
             auto pts = complex.get_pos(fid);
             int pixel_cont = 0, phase_count = 0;
             get_triangle_intensity(pts, pixel_cont, phase_count);
-            double intsity = outside? (double)phase_count : (double)(pixel_cont - phase_count);// / pixel_cont;
+            double intsity = (outside? (double)phase_count : (double)(pixel_cont - phase_count) )/ pixel_cont;
             
             norm += bisector * intsity * cos_angle;
         }
@@ -229,7 +217,7 @@ Vec2 texture_helper::get_local_norm(dsc_obj &complex, Node_key key, bool outside
     if (norm.length() > 0) {
         norm.normalize();
         
-        norm = norm * 1 + complex.get_normal(key)*(outside? 1:-1);
+        norm = norm * 0.7 + complex.get_normal(key)*(outside? 1:-1);
         
         norm.normalize();
         return norm;

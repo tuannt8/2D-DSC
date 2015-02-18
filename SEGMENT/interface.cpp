@@ -191,7 +191,7 @@ void interface::draw()
     
  //   draw_image();
     if (bDiplay_[1]) {
-        tex->drawImage(WIN_SIZE_X);
+        image_->draw_image(WIN_SIZE_X);
     }
     
     if (bDiplay_[2]) {
@@ -207,7 +207,7 @@ void interface::draw()
     }
     
     if (bDiplay_[3]) {
-        draw_coord();
+    //    draw_coord();
     }
     
     if(bDiplay_[4]){
@@ -355,12 +355,15 @@ interface::interface(int &argc, char** argv){
     dyn_ = std::unique_ptr<dynamics>(new dynamics);
     dsc = nullptr;
     
+    image_ = std::unique_ptr<image>(new image);
+    image_->load_image(std::string(DATA_PATH) + std::string(IMAGE_NAME));
+    
     check_gl_error();
     
     init_dsc();
     
-    init_sqaure_boundary();
-   // init_boundary();
+    //init_sqaure_boundary();
+    init_boundary();
     
     reshape(WIN_SIZE_X, WIN_SIZE_Y);
     display();

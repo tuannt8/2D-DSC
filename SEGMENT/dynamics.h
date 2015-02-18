@@ -15,11 +15,12 @@
 #include "texture_helper.h"
 #include "curve.h"
 #include "velocity_function.h"
+#include "image.h"
 
 struct dynamics_param{
-    double alpha = 0.1; // Second derivative. Keep the curve short
-    double beta = 0.01; // Forth derivative. Keep the curve straight
-    double gamma = 40; // External force scale
+    double alpha = 0.00; // Second derivative. Keep the curve short
+    double beta = 0.0; // Forth derivative. Keep the curve straight
+    double gamma = 20; // External force scale
     double mass = 50;
 };
 

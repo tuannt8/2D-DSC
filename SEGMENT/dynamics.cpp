@@ -9,22 +9,6 @@
 #include "dynamics.h"
 
 bool dynamics:: update_dsc(DSC2D::DeformableSimplicialComplex &dsc, texture_helper &tex){
-//    // 1. Process interface vertices
-//    curve_list_ = extract_curve(dsc);
-//    
-//    // 2. Internal forces
-//    compute_internal_force(curve_list_, dsc);
-//    
-//    // 3. External forces
-//    compute_external_force(curve_list_, dsc, tex);
-//    
-//    // 4. Compute displacement
-//    compute_displacement(dsc);
-    
-    // 5. Update DSC
-    deform(dsc);
-    
-    // Debug
     // 1. Process interface vertices
     curve_list_ = extract_curve(dsc);
     
@@ -36,6 +20,22 @@ bool dynamics:: update_dsc(DSC2D::DeformableSimplicialComplex &dsc, texture_help
     
     // 4. Compute displacement
     compute_displacement(dsc);
+    
+    // 5. Update DSC
+    deform(dsc);
+    
+//    // Debug
+//    // 1. Process interface vertices
+    curve_list_ = extract_curve(dsc);
+//    
+//    // 2. Internal forces
+    compute_internal_force(curve_list_, dsc);
+//    
+//    // 3. External forces
+    compute_external_force(curve_list_, dsc, tex);
+//    
+//    // 4. Compute displacement
+//    compute_displacement(dsc);
     
     return  true;
 }
@@ -123,7 +123,7 @@ void dynamics::compute_internal_force(std::vector<curve> &curve_list,
     
     cu0.update_derivative(dsc);
     for (int i = 0; i < cu0.size(); i++) {
-        Vec2 force = cu0.derive2(i)*d_param_.alpha + cu0.derive4(i)*d_param_.beta;
+        Vec2 force = cu0.derive2(i)*d_param_.alpha - cu0.derive4(i)*d_param_.beta;
         dsc.set_node_internal_force(cu0[i], force);
     }
 }

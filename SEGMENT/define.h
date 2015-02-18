@@ -18,9 +18,12 @@
 #define LOG_PATH "../../../LOG/"
 #endif
 
+#define IMAGE_NAME "square1.bmp"
+
 typedef DSC2D::vec2 Vec2;
 typedef DSC2D::DeformableSimplicialComplex dsc_obj;
 typedef dsc_obj::node_key Node_key;
+typedef std::vector<Vec2> Vec2_array;
 
 extern int debug_num[10];
 

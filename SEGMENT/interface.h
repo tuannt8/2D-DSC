@@ -45,6 +45,7 @@ class interface{
     
     std::unique_ptr<texture_helper> tex;
     std::unique_ptr<dynamics> dyn_;
+    std::unique_ptr<image> image_;
     
 private:
     int debug_num_[10];
