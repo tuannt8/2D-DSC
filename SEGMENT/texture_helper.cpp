@@ -22,8 +22,6 @@
 #include <GEL/GLGraphics/SOIL.h>
 #endif
 
-#define IMAGE_NAME  "square1.bmp"
-
 GLuint texture_helper::LoadTexture( const char * filename ){
     std::string filePath = std::string(DATA_PATH) + std::string(filename);
 

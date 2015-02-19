@@ -136,13 +136,13 @@ void dynamics::compute_external_force(std::vector<curve> &curve_list
     cu0.update_mean_intensity(complex, img);
     
     for (int i = 0; i < cu0.size(); i++) {
-  //      Vec2 norm = complex.get_normal(cu0[i]);
+ 
         
         
         Vec2 pt = complex.get_pos(cu0[i]);
         double inten = img.get_intensity_i(pt[0], pt[1]);
         double scale = (cu0.m_out() - cu0.m_in())* (inten - cu0.m_out() + inten - cu0.m_in());
-        
+        //Vec2 norm = complex.get_normal(cu0[i]);
         Vec2 norm = img.get_local_norm(complex, cu0[i], scale < 0);
         Vec2 force = norm*std::abs(scale) * d_param_.gamma;
         
@@ -169,15 +169,15 @@ void dynamics::compute_displacement(dsc_obj &dsc){
     // To force maximum displacement winthin 1 edge length
 //    std::cout << "Max displacement: " << max <<", Average edge length: " << el <<std::endl;
     
-    if (max > el) {
-        double scale = el / max;
-        for (auto ni = dsc.vertices_begin(); ni != dsc.vertices_end(); ni++) {
-            Vec2 dis = dsc.get_destination(*ni) - dsc.get_pos(*ni);
-            
-            if (dis.length() > 0.0001*el) {
-                dis = dis * scale;
-                dsc.set_destination(*ni, dsc.get_pos(*ni) + dis);
-            }
-        }
-    }
+//    if (max > el) {
+//        double scale = el / max;
+//        for (auto ni = dsc.vertices_begin(); ni != dsc.vertices_end(); ni++) {
+//            Vec2 dis = dsc.get_destination(*ni) - dsc.get_pos(*ni);
+//            
+//            if (dis.length() > 0.0001*el) {
+//                dis = dis * scale;
+//                dsc.set_destination(*ni, dsc.get_pos(*ni) + dis);
+//            }
+//        }
+//    }
 }

@@ -18,7 +18,7 @@
 #define LOG_PATH "../../../LOG/"
 #endif
 
-#define IMAGE_NAME "square1.bmp"
+
 
 typedef DSC2D::vec2 Vec2;
 typedef DSC2D::DeformableSimplicialComplex dsc_obj;
@@ -26,5 +26,26 @@ typedef dsc_obj::node_key Node_key;
 typedef std::vector<Vec2> Vec2_array;
 
 extern int debug_num[10];
+
+#define H_BMP
+
+#pragma mark - Difference image
+#ifdef H_BMP // H.bmp
+    struct dynamics_param{
+        double alpha = 0.00; // Second derivative. Keep the curve short
+        double beta = 0.0; // Forth derivative. Keep the curve straight
+        double gamma = 0.001; // External force scale
+        double mass = 50;
+    };
+    #define IMAGE_NAME "H.bmp"
+#elif SQUARE_BMP
+    struct dynamics_param{
+        double alpha = 0.00; // Second derivative. Keep the curve short
+        double beta = 0.0; // Forth derivative. Keep the curve straight
+        double gamma = 0.005; // External force scale
+        double mass = 50;
+    };
+    #define IMAGE_NAME "square.bmp"
+#endif
 
 #endif // File protection

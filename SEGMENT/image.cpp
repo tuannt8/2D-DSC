@@ -33,7 +33,7 @@ void image::draw_image(int window_width){
     glBegin(GL_POINTS);
     for (int i = 0; i < width(); i++) {
         for (int j = 0; j < height(); j++) {
-            double g =get_intensity_d(i, j);
+            double g = 1.0 - get_intensity_d(i, j);
             glColor3f(g, g, g);
             glVertex2d((double)i, (double)j);
         }
@@ -49,7 +49,7 @@ double image::get_intensity_d(int x, int y){
 
 // 0 - 255
 int image::get_intensity_i(int x, int y){
-    return (*this)(x, height() - y);
+    return MAX_BYTE - (*this)(x, height() - y);
 }
 
 // total intensity inside a triangle
@@ -119,20 +119,17 @@ Vec2 image::get_local_norm(dsc_obj &complex, Node_key key, bool outside){
                                         (double)(pixel_count*MAX_BYTE - sum_intensity)
                               ) / (double)pixel_count;
             
-            intsity = 255 - intsity; //Black - white exchange
+//            intsity = 255 - intsity; //Black - white exchange
             
             norm += bisector * intsity * cos_angle;
         }
     }
+    
     if (norm.length() > 0) {
         norm.normalize();
-        
-        norm = norm * 0.7 + complex.get_normal(key)*(outside? 1:-1);
-        
-        norm.normalize();
-        return norm;
     }
-    else{
-        return complex.get_normal(key)*(outside? 1:-1);
-    }
+    
+    norm = norm * 0.7 + complex.get_normal(key)*(outside? 1:-1);
+    norm.normalize();
+    return norm;
 }

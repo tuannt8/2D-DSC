@@ -28,7 +28,6 @@
 class interface{
 #pragma mark - Local variable
     std::unique_ptr<DSC2D::DeformableSimplicialComplex> dsc;
-
     
     // Windows size
     int     WIN_SIZE_X;

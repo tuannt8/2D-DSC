@@ -361,6 +361,7 @@ interface::interface(int &argc, char** argv){
     
     image_ = std::unique_ptr<image>(new image);
     image_->load_image(std::string(DATA_PATH) + std::string(IMAGE_NAME));
+  // imageSize = image_->size();
     
     check_gl_error();
     
@@ -380,7 +381,7 @@ void interface::init_dsc(){
     int width = imageSize[0];
     int height = imageSize[1];
     
-    DISCRETIZATION = (double) height / 15.0;
+    DISCRETIZATION = (double) height / 13.0;
     
     width -= 2*DISCRETIZATION;
     height -= 2*DISCRETIZATION;
@@ -406,7 +407,7 @@ void interface::init_boundary(){
     for (auto p = dsc->faces_begin(); p != dsc->faces_end(); p++) {
         // Compute average intensity inside triangle
         auto pts = dsc->get_pos(*p);
-        if (tex->is_tri_intersect_phase(pts)) {
+        if(image_->get_triangle_intensity_count(pts) > 0 ){
             faceKeys.push_back(*p);
         }
     }

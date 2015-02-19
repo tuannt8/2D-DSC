@@ -17,13 +17,6 @@
 #include "velocity_function.h"
 #include "image.h"
 
-struct dynamics_param{
-    double alpha = 0.00; // Second derivative. Keep the curve short
-    double beta = 0.0; // Forth derivative. Keep the curve straight
-    double gamma = 0.005; // External force scale
-    double mass = 50;
-};
-
 class dynamics : public DSC2D::VelocityFunc<> {
 public:
     dynamics();
