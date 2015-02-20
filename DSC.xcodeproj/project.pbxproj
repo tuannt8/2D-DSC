@@ -31,6 +31,7 @@
 		7A9C20DB17DFBE080064171E /* draw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A9C20D917DFBE070064171E /* draw.cpp */; };
 		A61F33181A937CDF00C5C2F8 /* gl_debug_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F33161A937CDF00C5C2F8 /* gl_debug_helper.cpp */; };
 		A61F331B1A94860D00C5C2F8 /* image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F33191A94860D00C5C2F8 /* image.cpp */; };
+		A61F331D1A97745800C5C2F8 /* define.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F331C1A97745800C5C2F8 /* define.cpp */; };
 		A6A6E2531A8CEC0300E56E95 /* curve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6A6E2511A8CEC0300E56E95 /* curve.cpp */; };
 		A6A6E2571A92255F00E56E95 /* gradient_f.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6A6E2551A92255F00E56E95 /* gradient_f.cpp */; };
 		A6B45F1F1A88CE120091F5A6 /* interface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B45F1E1A88CE120091F5A6 /* interface.cpp */; };
@@ -103,6 +104,7 @@
 		A61F33171A937CDF00C5C2F8 /* gl_debug_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gl_debug_helper.h; sourceTree = "<group>"; };
 		A61F33191A94860D00C5C2F8 /* image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = image.cpp; sourceTree = "<group>"; };
 		A61F331A1A94860D00C5C2F8 /* image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = image.h; sourceTree = "<group>"; };
+		A61F331C1A97745800C5C2F8 /* define.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = define.cpp; sourceTree = "<group>"; };
 		A6A6E2511A8CEC0300E56E95 /* curve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = curve.cpp; sourceTree = "<group>"; };
 		A6A6E2521A8CEC0300E56E95 /* curve.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = curve.h; sourceTree = "<group>"; };
 		A6A6E2551A92255F00E56E95 /* gradient_f.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gradient_f.cpp; sourceTree = "<group>"; };
@@ -245,6 +247,7 @@
 				A61F33171A937CDF00C5C2F8 /* gl_debug_helper.h */,
 				A61F33191A94860D00C5C2F8 /* image.cpp */,
 				A61F331A1A94860D00C5C2F8 /* image.h */,
+				A61F331C1A97745800C5C2F8 /* define.cpp */,
 			);
 			path = SEGMENT;
 			sourceTree = "<group>";
@@ -385,6 +388,7 @@
 				A6B45F441A88F1BE0091F5A6 /* rotate_function.cpp in Sources */,
 				A61F331B1A94860D00C5C2F8 /* image.cpp in Sources */,
 				A6B45F431A88F1BB0091F5A6 /* normal_function.cpp in Sources */,
+				A61F331D1A97745800C5C2F8 /* define.cpp in Sources */,
 				A6A6E2531A8CEC0300E56E95 /* curve.cpp in Sources */,
 				A6B45F1F1A88CE120091F5A6 /* interface.cpp in Sources */,
 				A6B460A91A8B649C0091F5A6 /* texture_helper.cpp in Sources */,

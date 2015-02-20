@@ -13,8 +13,6 @@
 
 #include "gl_debug_helper.h"
 
-int debug_num[10] = {-1};
-
 void _check_gl_error(const char *file, int line)
 {
     GLenum err (glGetError());
@@ -360,7 +358,7 @@ interface::interface(int &argc, char** argv){
     dsc = nullptr;
     
     image_ = std::unique_ptr<image>(new image);
-    image_->load_image(std::string(DATA_PATH) + std::string(IMAGE_NAME));
+    image_->load_image(std::string(DATA_PATH) + IMAGE_NAME);
   // imageSize = image_->size();
     
     check_gl_error();

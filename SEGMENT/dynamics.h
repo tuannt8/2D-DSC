@@ -46,7 +46,7 @@ public:
 #pragma mark - Data
 private:
     std::vector<curve> curve_list_;
-    dynamics_param d_param_;
+    dynamics_param d_param_ = g_param;
     
 #pragma mark - private
 private:

@@ -60,7 +60,7 @@ GLuint texture_helper::LoadTexture( const char * filename ){
 }
 
 texture_helper::texture_helper(){
-    LoadTexture(IMAGE_NAME);
+    LoadTexture(IMAGE_NAME.c_str());
 }
 
 texture_helper::~texture_helper(){
