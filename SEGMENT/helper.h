@@ -17,6 +17,14 @@ namespace helper_t {
     float sign(Vec2 p1, Vec2 p2, Vec2 p3);
     bool is_point_in_tri(Vec2 p, std::vector<Vec2> const & pts);
     bool is_point_in_tri(Vec2 p, Vec2 t1, Vec2 t2, Vec2 t3);
+    
+    class autoColor{
+    public:
+        autoColor(){};
+        ~autoColor(){};
+        int index = 0;
+        Vec3 next();
+    };
 }
 
 #endif /* defined(__DSC__helper__) */

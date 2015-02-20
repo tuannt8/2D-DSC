@@ -381,7 +381,7 @@ void interface::init_dsc(){
     int width = imageSize[0];
     int height = imageSize[1];
     
-    DISCRETIZATION = (double) height / 13.0;
+    DISCRETIZATION = (double) height / DISCRETIZE_RES;
     
     width -= 2*DISCRETIZATION;
     height -= 2*DISCRETIZATION;
@@ -407,7 +407,8 @@ void interface::init_boundary(){
     for (auto p = dsc->faces_begin(); p != dsc->faces_end(); p++) {
         // Compute average intensity inside triangle
         auto pts = dsc->get_pos(*p);
-        if(image_->get_triangle_intensity_count(pts) > 0 ){
+        int count;
+        if(image_->get_triangle_intensity_count(pts, &count) > 0.5*count*MAX_BYTE ){
             faceKeys.push_back(*p);
         }
     }

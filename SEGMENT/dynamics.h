@@ -60,6 +60,15 @@ private:
     
 private: // Utility
     curve::node_key get_next_key(curve & cu, std::vector<curve::node_key> pt_keys);
+    bool is_in_array(std::vector<curve> &curve_list, Node_key nk);
+    bool is_in_array(std::vector<std::vector<Face_key>> &regions, Face_key fk);
+    bool is_in_array(std::vector<Face_key> &region, Face_key fk);
+    bool is_in_array(std::vector<std::vector<HMesh::HalfEdgeID>> curves_edge, HMesh::HalfEdgeID fk);
+    void grow_region(dsc_obj& dsc, std::vector<Face_key> &region, Face_key fk);
+    
+    HMesh::Walker next_edge(dsc_obj &dsc, HMesh::Walker hew, bool is_CCW);
+    HMesh::Walker next_edge_interface(dsc_obj &dsc, HMesh::Walker hew);
+    HMesh::HalfEdgeID get_next_edge(dsc_obj &dsc, std::vector<HMesh::HalfEdgeID> newCurve);
 };
 
 #endif /* defined(__DSC__dynamics__) */

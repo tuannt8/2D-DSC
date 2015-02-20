@@ -23,3 +23,20 @@ bool helper_t::is_point_in_tri(Vec2 pt, Vec2 t1, Vec2 t2, Vec2 t3){
 bool helper_t::is_point_in_tri(Vec2 p, std::vector<Vec2> const & pts){
     return is_point_in_tri(p, pts[0], pts[1], pts[2]);
 }
+
+namespace helper_t {
+    Vec3 autoColor::next(){
+        static std::vector<Vec3> colorList =
+        {
+            Vec3(1,0,0)     // red
+            ,Vec3(0,1,0)    // green
+            , Vec3(0,0,1)  // Blue
+            , Vec3(1, 1, 0)
+            , Vec3(1, 0, 1)
+            , Vec3(0, 1, 1)
+            , Vec3(0.3, 0.3, 0.3)
+        };
+        
+        return colorList[index++];
+    }
+}

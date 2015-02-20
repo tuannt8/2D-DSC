@@ -7,17 +7,34 @@
 //
 
 #include "dynamics.h"
+#include "helper.h"
+
+#define IS_IN_ARRAY_LIST(a, b, c) \
+{ \
+    c = false; \
+    for (auto & it : a) { \
+        if(c) break; \
+        for (auto &n : it) { \
+            if (n == b) { \
+                c = true; break; \
+            } \
+        } \
+    } \
+}
+
+
 
 bool dynamics:: update_dsc(DSC2D::DeformableSimplicialComplex &dsc, image &img){
     // 1. Process interface vertices
     curve_list_ = extract_curve(dsc);
-    
+    assert(curve_list_.size() > 0);
+
     // 2. Internal forces
     compute_internal_force(curve_list_, dsc);
     
     // 3. External forces
     compute_external_force(curve_list_, dsc, img);
-    
+
     // 4. Compute displacement
     compute_displacement(dsc);
     
@@ -59,45 +76,117 @@ dynamics::~dynamics(){
     
 }
 
-std::vector<curve> dynamics::extract_curve(DSC2D::DeformableSimplicialComplex &dsc){
-    curve new_curve;
- /*
-    for (auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei) {
-        if (dsc.is_interface(*hei)) {
-            auto hew = dsc.walker(*hei);
-            
+bool dynamics::is_in_array(std::vector<curve> &curve_list, Node_key nk){
+    for (auto & c : curve_list) {
+        for (auto &n : c) {
+            if (n == nk) {
+                return true;
+            }
         }
-        
-
-        
     }
- */
-  for (auto ni = dsc.vertices_begin(); ni != dsc.vertices_end(); ni++) {
-        if (dsc.is_interface(*ni)) {
-            // Note: We make hard code here
-            // TODO: Fix it later
-            new_curve.push_back(*ni);
+    return false;
+}
+
+bool dynamics::is_in_array(std::vector<std::vector<Face_key>> &regions, Face_key fk){
+    for (auto & fs : regions) {
+        for (auto f : fs) {
+            if (f == fk) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool dynamics::is_in_array(std::vector<std::vector<HMesh::HalfEdgeID>> curves_edge, HMesh::HalfEdgeID fk){
+    bool out;
+    IS_IN_ARRAY_LIST(curves_edge, fk, out);
+    return out;
+}
+
+bool dynamics::is_in_array(std::vector<Face_key> &region, Face_key fk){
+    for (auto f : region) {
+        if (f == fk) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void dynamics::grow_region(dsc_obj& dsc, std::vector<Face_key> &region, Face_key fk){
+    // Check if this triangle existed
+    if (is_in_array(region, fk)) {
+        return;
+    }
+    
+    region.push_back(fk);
+    
+    // Get all neightbor share edge
+    for (auto hew = dsc.walker(fk); hew.full_circle(); hew = hew.circulate_face_cw()) {
+        auto nb = hew.opp().face();
+        if (dsc.get_label(nb) != 0) {
+            grow_region(dsc, region, nb);
+        }
+    }
+}
+
+HMesh::Walker dynamics::next_edge(dsc_obj &dsc, HMesh::Walker hew, bool is_CCW){
+    
+    if (is_CCW) {
+        return hew.next().opp();
+    }else{
+        return hew.opp().prev();
+    }
+}
+
+HMesh::Walker dynamics::next_edge_interface(dsc_obj &dsc, HMesh::Walker hew){
+#ifdef DEBUG
+    assert(dsc.is_interface(hew.halfedge()));
+#endif
+    bool isCCW = dsc.get_label(hew.face()) != 0;
+    
+    while (1) {
+        hew = next_edge(dsc, hew, isCCW);
+        if (dsc.is_interface(hew.halfedge())) {
+            return hew.opp();
+        }
+    }
+}
+
+std::vector<curve> dynamics::extract_curve(DSC2D::DeformableSimplicialComplex &dsc){
+    
+    std::vector<std::vector<HMesh::HalfEdgeID>> curves_edge;
+    std::vector<curve> curve_list;
+
+    for(auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei)
+    {
+        auto hew = dsc.walker(*hei);
+        if (dsc.is_interface(hew.halfedge())
+            && !is_in_array(curves_edge, hew.halfedge())
+            && !is_in_array(curves_edge, hew.opp().halfedge()))
+        {
+            // Start growing this guy
+            std::vector<HMesh::HalfEdgeID> newCurve;
+            newCurve.push_back(hew.halfedge());
+            curve new_curve;
+            new_curve.push_back(hew.vertex());
             
             while (1) {
-                // Get vertex on same interface
-                auto pt_keys = dsc.get_verts(new_curve.back(), true);
-                assert(pt_keys.size() == 2);
-                
-                curve::node_key next_key = get_next_key(new_curve, pt_keys);
-                if (next_key != new_curve[0]) {
-                    new_curve.push_back(next_key);
-                }else{
+                hew =  next_edge_interface(dsc, hew);
+                assert(dsc.is_interface(hew.halfedge()));
+                if (hew.halfedge() == newCurve[0]) {
                     break;
                 }
+                else{
+                    newCurve.push_back(hew.halfedge());
+                    new_curve.push_back(hew.vertex());
+                }
             }
-            break; //TODO: hard code
             
+            curves_edge.push_back(newCurve);
+            curve_list.push_back(new_curve);
         }
     }
-
-    
-    std::vector<curve> curve_list;
-    curve_list.push_back(new_curve);
     
     return curve_list;
 }
@@ -112,42 +201,45 @@ curve::node_key dynamics::get_next_key(curve & cu, std::vector<curve::node_key> 
 }
 
 void dynamics::draw_curve(DSC2D::DeformableSimplicialComplex &dsc){
-    for(auto & c : curve_list_){
-        c.draw(dsc);
+    helper_t::autoColor co;
+    for (int i = 0; i < curve_list_.size(); i++) {
+        curve_list_[i].draw(dsc, co.next());
     }
 }
 
 void dynamics::compute_internal_force(std::vector<curve> &curve_list,
                             DSC2D::DeformableSimplicialComplex &dsc){
-    curve & cu0 = curve_list[0]; //TODO: Multiple curves
-    
-    cu0.update_derivative(dsc);
-    for (int i = 0; i < cu0.size(); i++) {
-        Vec2 force = cu0.derive2(i)*d_param_.alpha - cu0.derive4(i)*d_param_.beta;
-        dsc.set_node_internal_force(cu0[i], force);
+    for (auto & cu : curve_list) {
+        cu.update_derivative(dsc);
+        for (int i = 0; i < cu.size(); i++) {
+            if (dsc.is_crossing(cu[i])) {
+                continue; // By pass crossing vertex
+            }
+            Vec2 force = cu.derive2(i)*d_param_.alpha - cu.derive4(i)*d_param_.beta;
+            dsc.set_node_internal_force(cu[i], force);
+        }
     }
 }
 
 void dynamics::compute_external_force(std::vector<curve> &curve_list
                                       ,dsc_obj &complex
                                       ,image &img){
-    curve & cu0 = curve_list[0]; //TODO: Multiple curve
-    
-    cu0.update_mean_intensity(complex, img);
-    
-    for (int i = 0; i < cu0.size(); i++) {
- 
+    for(auto &cu : curve_list){
+        cu.update_mean_intensity(complex, img);
         
-        
-        Vec2 pt = complex.get_pos(cu0[i]);
-        double inten = img.get_intensity_i(pt[0], pt[1]);
-        double scale = (cu0.m_out() - cu0.m_in())* (inten - cu0.m_out() + inten - cu0.m_in());
-        //Vec2 norm = complex.get_normal(cu0[i]);
-        Vec2 norm = img.get_local_norm(complex, cu0[i], scale < 0);
-        Vec2 force = norm*std::abs(scale) * d_param_.gamma;
-        
-        complex.set_node_external_force(cu0[i], force);
+        for (int i = 0; i < cu.size(); i++) {
+            
+            Vec2 pt = complex.get_pos(cu[i]);
+            double inten = img.get_intensity_i(pt[0], pt[1]);
+            double scale = (cu.m_out() - cu.m_in())* (inten - cu.m_out() + inten - cu.m_in());
+            //Vec2 norm = complex.get_normal(cu0[i]);
+            Vec2 norm = img.get_local_norm(complex, cu[i], scale < 0);
+            Vec2 force = norm*std::abs(scale) * d_param_.gamma;
+            
+            complex.set_node_external_force(cu[i], force);
+        }
     }
+
 }
 
 void dynamics::compute_displacement(dsc_obj &dsc){
@@ -160,7 +252,8 @@ void dynamics::compute_displacement(dsc_obj &dsc){
             max = dis.length();
         }
         
-        if (dis.length() > 0.0001*el) {
+        if (dis.length() > 0.0001*el
+            && !dsc.is_crossing(*ni)) {
             dsc.set_destination(*ni, dsc.get_pos(*ni) + dis);
         }
         

@@ -29,10 +29,10 @@ curve::~curve(){
 
 #define POS(i) dsc.get_pos(cycle_at(i))
 
-void curve::draw(DSC2D::DeformableSimplicialComplex &dsc){
+void curve::draw(DSC2D::DeformableSimplicialComplex &dsc, DSC2D::vec3 color){
     
     glLineWidth(1.5f);
-    glColor3f(1, 0, 0);
+    glColor3dv(color.get());
     glBegin(GL_LINES);
     
     for (int i = 0; i < size(); i++) {
@@ -46,7 +46,6 @@ void curve::draw(DSC2D::DeformableSimplicialComplex &dsc){
 void curve::update_derivative(DSC2D::DeformableSimplicialComplex &dsc){
     
     // Second derivative
-    assert(size() > 3); //TODO: What happen if there is not enough points
     second_derivative_.clear();
     second_derivative_.resize(size());
     for (int i = 0; i < size(); i++) {
@@ -54,7 +53,6 @@ void curve::update_derivative(DSC2D::DeformableSimplicialComplex &dsc){
     }
     
     // Forth derivative
-    assert(size() > 5); //TODO: What happen if there is not enough points
     forth_derivative_.clear();
     forth_derivative_.resize(size());
     for (int i = 0; i < size(); i++) {
@@ -64,15 +62,7 @@ void curve::update_derivative(DSC2D::DeformableSimplicialComplex &dsc){
 
 curve::node_key curve::cycle_at(int idx){
 
-    
-    if(idx < 0)
-        idx += size();
-    
-    if (idx >= size()) {
-        idx -= size();
-    }
-    
-    return at(idx);
+    return (*this)[idx % size()];
 }
 
 void curve::update_mean_intensity(dsc_obj &complex, image &img){

@@ -31,7 +31,8 @@ public:
     ~curve();
     
     // Draw the curve
-    void draw(DSC2D::DeformableSimplicialComplex &dsc);
+    void draw(DSC2D::DeformableSimplicialComplex &dsc,
+              DSC2D::vec3 color = DSC2D::vec3(1., 0., 0.));
     
     // Compute second and forth derivative
     void update_derivative(DSC2D::DeformableSimplicialComplex &dsc);
