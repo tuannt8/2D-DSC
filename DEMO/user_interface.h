@@ -63,7 +63,7 @@ public:
     std::string create_log_path()
     {
         std::ostringstream s;
-        s << "LOG/delta" << DISCRETIZATION << "_nu" << VELOCITY << "_alpha" << ACCURACY;
+        s << "../../../LOG/delta" << DISCRETIZATION << "_nu" << VELOCITY << "_alpha" << ACCURACY;
         return s.str();
     }
     
