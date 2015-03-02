@@ -15,6 +15,7 @@
 //  See licence.txt for a copy of the GNU General Public License.
 
 #include "user_interface.h"
+#include <unistd.h>
 
 #include "rotate_function.h"
 #include "average_function.h"
@@ -125,7 +126,7 @@ UI::UI(int &argc, char** argv)
     else
     {
         VELOCITY = 10.;
-        DISCRETIZATION = 1;
+        DISCRETIZATION = 21;
         VELOCITY = DISCRETIZATION/2.;
         ACCURACY = DISCRETIZATION/5.;
         
@@ -136,19 +137,18 @@ UI::UI(int &argc, char** argv)
         rotate_square();
 
         // Make test cases
-        random_short_edge(*dsc);
+        random_short_edge(*dsc); // good for smooth
+        
 //        {
 //            profile pf("Parallel");
 //            thread_helper th;
-//            th.smooth(*dsc);
+//            th.edge_collapse(*dsc, 0, WIN_SIZE_X);
 //        }
-//        {
-//            profile pf("Serial");
-//            int count;
-//            dsc->smooth();
-//          //  dsc->remove_degenerate_edges(&count);
-//            std::cout << "Collapse " << count << " edges" << std::endl;
-//        }
+        {
+
+          //  dsc->remove_degenerate_edges(&count);
+        //    std::cout << "Collapse " << count << " edges" << std::endl;
+        }
 
     }
     update_title();
@@ -196,6 +196,7 @@ void UI::display()
         return;
     }
     
+
     draw();
     update_title();
     
@@ -243,7 +244,7 @@ void UI::reshape(int width, int height)
 
 void UI::animate()
 {
-    glutPostRedisplay();
+//    glutPostRedisplay();
 }
 #ifdef PROFILE
 void UI::log_profile(){
@@ -384,31 +385,46 @@ void UI::keyboard(unsigned char key, int x, int y) {
                 update_title();
             }
         case 'e':
-        {
             {
-                profile pf("Parallel");
-                thread_helper th;
-                th.smooth(*dsc, 0, WIN_SIZE_X);
-            //dsc->smooth();
+                {
+                    profile pf("Parallel");
+                    thread_helper th;
+                    th.smooth(*dsc, 0, WIN_SIZE_X);
+                }
+                
+                {
+                    profile pf("serial");
+                    dsc->smooth();
+                }
+                
+                break;
             }
-            
+        case 'f':
             {
-                profile pf("serial");
-              // thread_helper th;
-              //  th.smooth(*dsc, 0, WIN_SIZE_X);
-                dsc->smooth();
+                {
+                    profile pf("Parallel");
+                    thread_helper th;
+                    th.edge_collapse(*dsc, 0, WIN_SIZE_X);
+                }
+//                {
+//                    profile pf("Serial");
+//                    int count = 0;
+//                    dsc->remove_degenerate_edges();
+//                    std::cout << count << " edges collaped" << std::endl;
+//                }
             }
-        }
             break;
     }
+    
+    glutPostRedisplay();
 }
 
 void UI::visible(int v)
 {
-    if(v==GLUT_VISIBLE)
-        glutIdleFunc(animate_);
-    else
-        glutIdleFunc(0);
+//    if(v==GLUT_VISIBLE)
+//        glutIdleFunc(animate_);
+//    else
+//        glutIdleFunc(0);
 }
 
 void UI::draw()

@@ -39,11 +39,14 @@ void thread_helper::smooth(dsc_obj &dsc, double left, double right) {
     dsc.swap_pos(&new_pos);
 }
 
-void thread_helper::edge_collapse(dsc_obj & dsc){
+void thread_helper::edge_collapse(dsc_obj & dsc, double left, double right){
     /////////////////////////////////////////////////////////////////////////////
     // 1. Determine the region
-    double left = 0 - 1;
-    double right = 1;
+    num_thread_ = 3;
+    workers_.clear();
+    
+    left -= 1;
+    right += 1;
     
     // 2. Lauch threads
     count_finish = 0;
@@ -59,6 +62,7 @@ void thread_helper::edge_collapse(dsc_obj & dsc){
 
 void thread_helper::edge_colapse_worker(int th_index, thread_helper *th_mangr, dsc_obj * dsc,
                          double left, double right){
+    
     double witdth = (right - left) / (2. * th_mangr->num_thread_);
     
     // 1. Collapse first group
@@ -82,11 +86,16 @@ void thread_helper::collapse_region(double left, double right, dsc_obj * dsc){
     for(auto ei = dsc->halfedges_begin(); ei != dsc->halfedges_end(); ei++)
     {
         auto p = dsc->get_pos(dsc->walker(*ei).vertex());
-        if((p[0] > left && p[0] < right ) || (p[1] > left && p[1] < right))
+        if((p[0] > left && p[0] < right )
+           && (p[1] > left && p[1] < right))
         {
-            if(dsc->mesh->in_use(*ei)){
+          //  if(dsc->mesh->in_use(*ei))
+            {
                 if(dsc->length(*ei) < dsc->DEG_LENGTH*dsc->AVG_LENGTH && !dsc->collapse(*ei, true)){
                     dsc->collapse(*ei, false);
+#ifdef PROFILE_TH
+                    
+#endif
                 }
             }
         }

@@ -10,6 +10,8 @@
 #include "define.h"
 #include <thread>
 
+#define PROFILE_TH
+
 enum thread_state{
     STATE_NONE
     ,STATE_SMOOTH
@@ -22,14 +24,13 @@ public:
     ~thread_helper();
 
     void smooth (dsc_obj & dsc, double l, double r);
-    void edge_collapse(dsc_obj & dsc);
+    void edge_collapse(dsc_obj & dsc, double l, double r);
 
 public:
     // Thread params
     std::mutex mtx_all_;
     std::condition_variable cv;
     int count_finish;
-    int count_finish_2;
     
     int num_thread_;
     std::vector<std::thread> workers_;

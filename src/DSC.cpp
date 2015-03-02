@@ -877,7 +877,7 @@ namespace DSC2D
         }
         for(auto ei = halfedges_begin(); ei != halfedges_end(); ei++)
         {
-            if(mesh->in_use(*ei))
+  //          if(mesh->in_use(*ei))
             {
                 if(length(*ei) < DEG_LENGTH*AVG_LENGTH && !collapse(*ei, true))
                 {
