@@ -29,6 +29,7 @@
 		7A82D64F17E272BB00C19874 /* design_domain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A82D64D17E272BB00C19874 /* design_domain.cpp */; };
 		7A82D65017E272BB00C19874 /* design_domain.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A82D64E17E272BB00C19874 /* design_domain.h */; };
 		7A9C20DB17DFBE080064171E /* draw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A9C20D917DFBE070064171E /* draw.cpp */; };
+		C5846D435401A8E469643837 /* thread_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C58460A97CF79EE37C5051D1 /* thread_helper.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -72,6 +73,10 @@
 		7A82D64E17E272BB00C19874 /* design_domain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = design_domain.h; path = src/design_domain.h; sourceTree = SOURCE_ROOT; };
 		7A9C20D917DFBE070064171E /* draw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = draw.cpp; sourceTree = "<group>"; };
 		7A9C20DA17DFBE080064171E /* draw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = draw.h; sourceTree = "<group>"; };
+		C58460A97CF79EE37C5051D1 /* thread_helper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_helper.cpp; sourceTree = "<group>"; };
+		C58465670E4A02BF11DA051A /* thread_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = thread_helper.h; sourceTree = "<group>"; };
+		C5846BE29A1D75F32C1A443B /* profile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = profile.h; sourceTree = "<group>"; };
+		C5846DF53D53D3D17DD8007E /* define.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = define.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,6 +156,10 @@
 				7A51F3C917D6393200A8F8F2 /* demo.cpp */,
 				7A51F3CA17D6393200A8F8F2 /* user_interface.cpp */,
 				7A51F3CB17D6393200A8F8F2 /* user_interface.h */,
+				C5846DF53D53D3D17DD8007E /* define.h */,
+				C58465670E4A02BF11DA051A /* thread_helper.h */,
+				C58460A97CF79EE37C5051D1 /* thread_helper.cpp */,
+				C5846BE29A1D75F32C1A443B /* profile.h */,
 			);
 			path = DEMO;
 			sourceTree = "<group>";
@@ -244,6 +253,7 @@
 				7A51F3CF17D6393200A8F8F2 /* demo.cpp in Sources */,
 				7A51F3D017D6393200A8F8F2 /* user_interface.cpp in Sources */,
 				7A9C20DB17DFBE080064171E /* draw.cpp in Sources */,
+				C5846D435401A8E469643837 /* thread_helper.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

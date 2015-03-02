@@ -1,5 +1,5 @@
 //
-//  Deformabel Simplicial Complex (DSC) method
+//  Deformable Simplicial Complex (DSC) method
 //  Copyright (C) 2013  Technical University of Denmark
 //
 //  This program is free software: you can redistribute it and/or modify

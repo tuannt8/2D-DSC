@@ -45,8 +45,10 @@ Log::Log(std::string path_)
 
 void Log::write_message(const std::string& message)
 {
+#ifdef DEBUG
     log << std::endl  << "*** " << message << " ***" << std::endl;
     std::cout << "*** " << message << " ***" << std::endl;
+#endif
 }
 
 void Log::write_variable(const std::string& name, real value)
