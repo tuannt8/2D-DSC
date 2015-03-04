@@ -31,8 +31,12 @@ public:
     ~curve();
     
     // Draw the curve
+    void split_edge(dsc_obj &dsc, image &img);
     void draw(DSC2D::DeformableSimplicialComplex &dsc,
               DSC2D::vec3 color = DSC2D::vec3(1., 0., 0.));
+    
+    std::vector<Vec2> get_node_force(dsc_obj &dsc, image &img);
+    std::vector<Edge_key> get_edge_list(dsc_obj &dsc);
     
     // Compute second and forth derivative
     void update_derivative(DSC2D::DeformableSimplicialComplex &dsc);

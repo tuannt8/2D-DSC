@@ -82,6 +82,7 @@ void interface::display(){
         }
         
         dynamics_image_seg();
+        Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, LOG_PATH);
         RUN = false;
     }
     
@@ -89,7 +90,7 @@ void interface::display(){
 }
 
 void interface::animate(){
-    glutPostRedisplay();
+  //  glutPostRedisplay();
 }
 
 void interface::reshape(int width, int height){
@@ -119,10 +120,10 @@ void interface::reshape(int width, int height){
 }
 
 void interface::visible(int v){
-    if(v==GLUT_VISIBLE)
-        glutIdleFunc(animate_);
-    else
-        glutIdleFunc(0);
+//    if(v==GLUT_VISIBLE)
+//        glutIdleFunc(animate_);
+//    else
+//        glutIdleFunc(0);
 }
 
 void interface::keyboard(unsigned char key, int x, int y){
@@ -144,6 +145,9 @@ void interface::keyboard(unsigned char key, int x, int y){
         case '\t':
             Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, LOG_PATH);
             break;
+        case 'u':
+            dyn_->split_edge(*dsc, *image_);
+            break;
         default:
             break;
     }
@@ -152,6 +156,8 @@ void interface::keyboard(unsigned char key, int x, int y){
     if (dis <= 10 and dis >= 0) {
         bDiplay_[dis] = ! bDiplay_[dis];
     }
+    
+    glutPostRedisplay();
 }
 
 void interface::initGL(){

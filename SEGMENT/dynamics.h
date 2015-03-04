@@ -17,6 +17,8 @@
 #include "velocity_function.h"
 #include "image.h"
 
+using std::vector;
+
 class dynamics : public DSC2D::VelocityFunc<> {
 public:
     dynamics();
@@ -39,6 +41,11 @@ public:
 public:
     bool update_dsc(DSC2D::DeformableSimplicialComplex &dsc, image &img);
     
+    /*
+     Split edge with high energy
+     */
+    void split_edge(dsc_obj &dsc, image &img);
+    
 #pragma mark - Debug
 public:
     void draw_curve(DSC2D::DeformableSimplicialComplex &dsc);
@@ -54,6 +61,9 @@ private:
     void compute_internal_force(std::vector<curve> &curve_list,
                                 DSC2D::DeformableSimplicialComplex &dsc);
     void compute_external_force(std::vector<curve> &curve_list
+                                ,dsc_obj &complex
+                                ,image &tex);
+    void compute_external_force_edge(std::vector<curve> &curve_list
                                 ,dsc_obj &complex
                                 ,image &tex);
     void compute_displacement(dsc_obj &dsc);

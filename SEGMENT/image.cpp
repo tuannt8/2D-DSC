@@ -22,9 +22,6 @@
 #include <GEL/GLGraphics/SOIL.h>
 #endif
 
-#define NOISE 20.0
-#define BLUR 5.0
-
 void image::load_image(std::string const file_path){
     load(file_path.c_str());
     blur(BLUR);

@@ -159,9 +159,9 @@ namespace DSC2D
     
     void DeformableSimplicialComplex::resize_complex()
     {
-        thickening_interface();
-        
-        thinning_interface();
+ //       thickening_interface();
+ 
+ //       thinning_interface();
         
         thickening();
         
@@ -1270,5 +1270,16 @@ namespace DSC2D
         HMesh::MinAngleEnergy energy_fun(MIN_ANGLE);
         priority_queue_optimization(energy_fun);
     }
-    
+
+    void DeformableSimplicialComplex::split_edge(DeformableSimplicialComplex::edge_key ek) {
+        split(ek);
+    }
+
+    void DeformableSimplicialComplex::clean_attributes() {
+        HMesh::IDRemap cleanup_map;
+        cleanup_attributes(cleanup_map);
+
+        init_attributes();
+        update_attributes();
+    }
 }

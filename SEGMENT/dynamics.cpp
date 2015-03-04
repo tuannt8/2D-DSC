@@ -33,7 +33,7 @@ bool dynamics:: update_dsc(DSC2D::DeformableSimplicialComplex &dsc, image &img){
     compute_internal_force(curve_list_, dsc);
     
     // 3. External forces
-    compute_external_force(curve_list_, dsc, img);
+    compute_external_force_edge(curve_list_, dsc, img);
 
     // 4. Compute displacement
     compute_displacement(dsc);
@@ -49,7 +49,7 @@ bool dynamics:: update_dsc(DSC2D::DeformableSimplicialComplex &dsc, image &img){
     compute_internal_force(curve_list_, dsc);
 //    
 //    // 3. External forces
-    compute_external_force(curve_list_, dsc, img);
+    compute_external_force_edge(curve_list_, dsc, img);
 //    
 //    // 4. Compute displacement
 //    compute_displacement(dsc);
@@ -221,6 +221,21 @@ void dynamics::compute_internal_force(std::vector<curve> &curve_list,
     }
 }
 
+void dynamics::compute_external_force_edge(std::vector<curve> &curve_list
+                                 ,dsc_obj &complex
+                                 ,image &img){
+    for (auto &cu : curve_list) {
+        cu.update_mean_intensity(complex, img);
+        
+        std::vector<Edge_key> edge_list = cu.get_edge_list(complex);
+        std::vector<Vec2> node_force = cu.get_node_force(complex, img);
+        
+        for (int i = 0; i < node_force.size(); i++) {
+            complex.set_node_external_force(cu[i], -node_force[i]*g_param.gamma);
+        }
+    }
+}
+
 void dynamics::compute_external_force(std::vector<curve> &curve_list
                                       ,dsc_obj &complex
                                       ,image &img){
@@ -232,9 +247,12 @@ void dynamics::compute_external_force(std::vector<curve> &curve_list
             Vec2 pt = complex.get_pos(cu[i]);
             double inten = img.get_intensity_i(pt[0], pt[1]);
             double scale = (cu.m_out() - cu.m_in())* (inten - cu.m_out() + inten - cu.m_in());
-            //Vec2 norm = complex.get_normal(cu0[i]);
-            Vec2 norm = img.get_local_norm(complex, cu[i], scale < 0);
-            Vec2 force = norm*std::abs(scale) * d_param_.gamma;
+            
+            Vec2 norm = complex.get_normal(cu[i]);
+            Vec2 force = -norm*scale * d_param_.gamma;
+            
+            //Vec2 norm = img.get_local_norm(complex, cu[i], scale < 0);
+            //Vec2 force = norm*std::abs(scale) * d_param_.gamma;
             
             complex.set_node_external_force(cu[i], force);
         }
@@ -253,7 +271,8 @@ void dynamics::compute_displacement(dsc_obj &dsc){
         }
         
         if (dis.length() > 0.0001*el
-            && !dsc.is_crossing(*ni)) {
+       //     && !dsc.is_crossing(*ni)
+            ) {
             dsc.set_destination(*ni, dsc.get_pos(*ni) + dis);
         }
         
@@ -273,4 +292,50 @@ void dynamics::compute_displacement(dsc_obj &dsc){
 //            }
 //        }
 //    }
+}
+
+void dynamics::split_edge(dsc_obj &dsc, image &img) {
+    std::vector<Edge_key> edges;
+    for(auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei)
+    {
+        auto hew = dsc.walker(*hei);
+        if(dsc.is_movable(*hei) && dsc.get_label(hew.face()) < dsc.get_label(hew.opp().face()))
+        {
+            edges.push_back(*hei);
+        }
+    }
+    
+    int thres_hold = 10;
+    
+    std::map<Edge_key, bool> edge_used;
+    for (auto e : edges)
+    {
+        if (edge_used[e]) {
+            continue;
+        }
+
+        
+        auto hew = dsc.walker(e);
+        if(dsc.get_label(hew.face()) != 0)
+            hew = hew.opp();
+        
+        edge_used.insert(std::pair<Edge_key, bool>(e, true));
+        edge_used.insert(std::pair<Edge_key, bool>(hew.opp().halfedge(), true));
+        
+        int count_out;
+        int out = img.get_triangle_intensity_count(dsc.get_pos(hew.face()), &count_out);
+        
+        if(out/(double)count_out > thres_hold)
+        {
+            bool success = dsc.split(e);
+#ifdef DEBUG
+            if(success)
+            {
+                std::cout << "Split interface" << std::endl;
+            }
+#endif
+        }
+    }
+    
+    curve_list_ = extract_curve(dsc);
 }

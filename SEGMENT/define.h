@@ -19,6 +19,10 @@
 #define LOG_PATH "../../../LOG/"
 #endif
 
+#define NOISE 20.0
+#define BLUR 5.0
+
+
 /*********************************************************************/
 /* Type def
  */
@@ -27,14 +31,19 @@ typedef DSC2D::vec3 Vec3;
 typedef DSC2D::DeformableSimplicialComplex dsc_obj;
 typedef dsc_obj::node_key Node_key;
 typedef dsc_obj::face_key Face_key;
+typedef dsc_obj::edge_key Edge_key;
 typedef std::vector<Vec2> Vec2_array;
 
 struct dynamics_param{
-    double alpha = 0.01; // Second derivative. Keep the curve short
-    double beta = 0.01; // Forth derivative. Keep the curve straight
-    double gamma = 0.001; // External force scale
+    dynamics_param(){};
+    dynamics_param(double a, double b, double g, double m):alpha(a), beta(b),
+                gamma(g), mass(m){};
+    
+    double alpha = 0.001; // Second derivative. Keep the curve short
+    double beta = 0.001; // Forth derivative. Keep the curve straight
+    double gamma = 0.000000001; // External force scale
     double mass = 50;
-};
+} ;
 
 /*******
  Flags
@@ -51,6 +60,5 @@ extern std::string IMAGE_NAME;
 extern dynamics_param g_param;
 // Discretization
 extern double DISCRETIZE_RES;
-
 
 #endif // File protection

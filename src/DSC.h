@@ -560,7 +560,7 @@ namespace DSC2D {
          */
         void deform();
         
-    private:
+    public:
         
         /**
          Moves a the vertex with ID vid to its new position. Returns whether the vertex was succesfully moved to its new position.
@@ -659,7 +659,7 @@ namespace DSC2D {
         void thickening_interface();
         
         /**
-         Collapse interface edges that are too long.
+         Collapse interface edges that are too short.
          */
         void thinning_interface();
         
@@ -795,7 +795,11 @@ namespace DSC2D {
          Calculates the intersection with the link of the vertex with ID vid and the line from the position of this vertex towards destination and to infinity. It returns t which is where on the line the intersection occurs. If t=0, the interesection occured at the position of the vertex with ID vid or never occured. If t=1 the intersection occured at the destination point. If 0<t<1 the intersection occured between these points. Finally, if t>1 the intersection occured farther away from the vertex position than destination.
          */
         real intersection_with_link(const node_key& vid, vec2 destination) const;
-        
+
+#pragma mark - TESTING
+    public:
+        void  split_edge(edge_key ek);
+        void clean_attributes();
     };
     
 }

@@ -11,10 +11,13 @@
 
 int debug_num[10] = {-1};
 
+
 /*********************************************************************/
 /* Different parameters
  */
-#define H_BMP
+#define SQUARE_BMP
+
+
 
 /************************/
 /* H.bmp
@@ -23,15 +26,16 @@ int debug_num[10] = {-1};
 
 dynamics_param g_param;
 std::string IMAGE_NAME = "H.bmp";
-double DISCRETIZE_RES = 25;
+double DISCRETIZE_RES = 12;
 
 /************************/
 /* square.bmp
  */
 #elif defined SQUARE_BMP
-dynamics_param g_param;
+dynamics_param g_param = dynamics_param(0., 0., 0.0001, 50);
+
 std::string IMAGE_NAME = "square.bmp";
-double DISCRETIZE_RES = 15;//11.0
+double DISCRETIZE_RES = 8;//11.0
 
 
 /************************/
