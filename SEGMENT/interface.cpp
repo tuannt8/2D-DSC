@@ -81,7 +81,7 @@ void interface::display(){
             gl_debug_helper::print_debug_info(*dsc);
         }
         
-        dynamics_image_seg();
+        
         Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, LOG_PATH);
         RUN = false;
     }
@@ -140,6 +140,7 @@ void interface::keyboard(unsigned char key, int x, int y){
             std::cin >> debug_num[0];
             break;
         case ' ':
+            dynamics_image_seg();
             RUN = !RUN;
             break;
         case '\t':

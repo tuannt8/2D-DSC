@@ -15,7 +15,7 @@ int debug_num[10] = {-1};
 /*********************************************************************/
 /* Different parameters
  */
-#define SQUARE_BMP
+#define MULTIPLE_BMP
 
 
 
@@ -43,7 +43,7 @@ double DISCRETIZE_RES = 8;//11.0
  */
 #elif defined MULTIPLE_BMP
 
-dynamics_param g_param;
+dynamics_param g_param = dynamics_param(0., 0., 0.0001, 50);    ;
 std::string IMAGE_NAME = "multiple.bmp";
 double DISCRETIZE_RES = 15;//11.0
 

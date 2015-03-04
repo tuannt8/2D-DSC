@@ -50,9 +50,7 @@ bool dynamics:: update_dsc(DSC2D::DeformableSimplicialComplex &dsc, image &img){
 //    
 //    // 3. External forces
     compute_external_force_edge(curve_list_, dsc, img);
-//    
-//    // 4. Compute displacement
-//    compute_displacement(dsc);
+
     
     return  true;
 }
@@ -212,9 +210,9 @@ void dynamics::compute_internal_force(std::vector<curve> &curve_list,
     for (auto & cu : curve_list) {
         cu.update_derivative(dsc);
         for (int i = 0; i < cu.size(); i++) {
-            if (dsc.is_crossing(cu[i])) {
-                continue; // By pass crossing vertex
-            }
+//            if (dsc.is_crossing(cu[i])) {
+//                continue; // By pass crossing vertex
+//            }
             Vec2 force = cu.derive2(i)*d_param_.alpha - cu.derive4(i)*d_param_.beta;
             dsc.set_node_internal_force(cu[i], force);
         }
@@ -261,14 +259,11 @@ void dynamics::compute_external_force(std::vector<curve> &curve_list
 }
 
 void dynamics::compute_displacement(dsc_obj &dsc){
-    double max = 0;
+
     double el = dsc.get_avg_edge_length();
     for (auto ni = dsc.vertices_begin(); ni != dsc.vertices_end(); ni++) {
         Vec2 dis = (dsc.get_node_internal_force(*ni) + dsc.get_node_external_force(*ni))
                         / d_param_.mass;
-        if (max < dis.length()) {
-            max = dis.length();
-        }
         
         if (dis.length() > 0.0001*el
        //     && !dsc.is_crossing(*ni)
@@ -277,21 +272,6 @@ void dynamics::compute_displacement(dsc_obj &dsc){
         }
         
     }
-    
-    // To force maximum displacement winthin 1 edge length
-//    std::cout << "Max displacement: " << max <<", Average edge length: " << el <<std::endl;
-    
-//    if (max > el) {
-//        double scale = el / max;
-//        for (auto ni = dsc.vertices_begin(); ni != dsc.vertices_end(); ni++) {
-//            Vec2 dis = dsc.get_destination(*ni) - dsc.get_pos(*ni);
-//            
-//            if (dis.length() > 0.0001*el) {
-//                dis = dis * scale;
-//                dsc.set_destination(*ni, dsc.get_pos(*ni) + dis);
-//            }
-//        }
-//    }
 }
 
 void dynamics::split_edge(dsc_obj &dsc, image &img) {

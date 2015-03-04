@@ -159,9 +159,9 @@ namespace DSC2D
     
     void DeformableSimplicialComplex::resize_complex()
     {
- //       thickening_interface();
+        thickening_interface();
  
- //       thinning_interface();
+        thinning_interface();
         
         thickening();
         
