@@ -31,7 +31,11 @@ namespace DSC2D
         DEG_LENGTH = 0.2*MIN_LENGTH;
         
         MAX_AREA = 5.;
+#ifdef TUAN_SEG
+        MIN_AREA = 2.;
+#else
         MIN_AREA = 0.2;
+#endif
         DEG_AREA = 0.2*MIN_AREA;
         
         INTERFACE_COLOR = DARK_RED;
@@ -159,6 +163,17 @@ namespace DSC2D
     
     void DeformableSimplicialComplex::resize_complex()
     {
+#ifdef TUAN_SEG
+        thickening_interface();
+        
+      //  thinning_interface();
+        
+        thickening();
+        
+        thinning();
+        
+        fix_complex();
+#else
         thickening_interface();
  
         thinning_interface();
@@ -168,6 +183,7 @@ namespace DSC2D
         thinning();
         
         fix_complex();
+#endif /* TUAN_SEG */
     }
     
     real DeformableSimplicialComplex::intersection_with_link(const node_key& vid, vec2 destination) const
@@ -241,8 +257,9 @@ namespace DSC2D
     
     bool DeformableSimplicialComplex::is_movable(node_key vid) const
     {
+        return !boundary(*mesh, vid) && (is_interface(vid) || is_crossing(vid));
         //return unsafe_editable(vid) && is_interface(vid);
-        return unsafe_editable(vid) && (is_interface(vid) || is_crossing(vid));
+        //return unsafe_editable(vid) && (is_interface(vid) || is_crossing(vid));
     }
     
     bool DeformableSimplicialComplex::is_movable(edge_key eid) const
@@ -549,6 +566,7 @@ namespace DSC2D
     
     bool DeformableSimplicialComplex::split(edge_key eid)
     {
+        
         if (!unsafe_editable(eid)) {
             return false;
         }
@@ -652,6 +670,11 @@ namespace DSC2D
     
     bool DeformableSimplicialComplex::collapse(const edge_key& eid, bool safe)
     {
+#ifdef TUAN_SEG
+        if(is_interface(eid))
+            return false;
+#endif
+        
         if (!precond_collapse_edge(*mesh, eid) || !unsafe_editable(eid))
         {
             return false;
@@ -1191,6 +1214,8 @@ namespace DSC2D
         
         for(auto fi = faces_begin(); fi != faces_end(); fi++)
         {
+
+            
             if(mesh->in_use(*fi) && area(*fi) < MIN_AREA*AVG_AREA)
             {
                 bool success = collapse(*fi, true);

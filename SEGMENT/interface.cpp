@@ -141,7 +141,7 @@ void interface::keyboard(unsigned char key, int x, int y){
             break;
         case ' ':
             dynamics_image_seg();
-            RUN = !RUN;
+            //RUN = !RUN;
             break;
         case '\t':
             Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, LOG_PATH);
@@ -284,7 +284,7 @@ void interface::draw_coord(){
 }
 
 void interface::draw_image(){
-    tex->map_texture(0);
+ //   tex->map_texture(0);
     
     DSC2D::DesignDomain const * domain = dsc->get_design_domain();
     std::vector<DSC2D::vec2> corners = domain->get_corners();
@@ -336,7 +336,7 @@ void interface::draw_image(){
     }
     glEnd();
 
-    tex->end();
+  //  tex->end();
 }
 
 void interface::update_title()
@@ -359,21 +359,25 @@ interface::interface(int &argc, char** argv){
     glutInit(&argc, argv);
     initGL();
     
-    tex = std::unique_ptr<texture_helper>(new texture_helper);
-    imageSize = tex->get_tex_size(0);
+//    tex = std::unique_ptr<texture_helper>(new texture_helper);
+//    imageSize = tex->get_tex_size(0);
+    
     dyn_ = std::unique_ptr<dynamics>(new dynamics);
     dsc = nullptr;
     
     image_ = std::unique_ptr<image>(new image);
+    if (argc > 1) {
+        image_->load_image(std::string(argv[1]));
+    }else
     image_->load_image(std::string(DATA_PATH) + IMAGE_NAME);
-  // imageSize = image_->size();
+    imageSize = Vec2(image_->width(), image_->height());
     
     check_gl_error();
     
     init_dsc();
     
-    //init_sqaure_boundary();
-    init_boundary();
+    init_sqaure_boundary();
+//   init_boundary();
     
     reshape(WIN_SIZE_X, WIN_SIZE_Y);
     display();
@@ -403,8 +407,10 @@ void interface::init_dsc(){
 }
 
 void interface::init_sqaure_boundary(){
-    Vec2 s = tex->get_image_size();
-    ObjectGenerator::create_square(*dsc, vec2(0.3*s[0], 0.3*s[1]), vec2(0.4*s[0], 0.4*s[1]), 1);
+    Vec2 s = imageSize;// tex->get_image_size();
+    double left = 0.2;
+    double right = 0.6;
+    ObjectGenerator::create_square(*dsc, vec2(left*s[0], left*s[1]), vec2(right*s[0], right*s[1]), 1);
 }
 
 void interface::init_boundary(){
@@ -413,7 +419,7 @@ void interface::init_boundary(){
         // Compute average intensity inside triangle
         auto pts = dsc->get_pos(*p);
         int count;
-        if(image_->get_triangle_intensity_count(pts, &count) > 0.5*count*MAX_BYTE ){
+        if(image_->get_triangle_intensity_count(pts, &count) > 0.1*count*MAX_BYTE ){
             faceKeys.push_back(*p);
         }
     }

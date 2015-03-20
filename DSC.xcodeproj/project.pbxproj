@@ -32,6 +32,7 @@
 		A61F33181A937CDF00C5C2F8 /* gl_debug_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F33161A937CDF00C5C2F8 /* gl_debug_helper.cpp */; };
 		A61F331B1A94860D00C5C2F8 /* image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F33191A94860D00C5C2F8 /* image.cpp */; };
 		A61F331D1A97745800C5C2F8 /* define.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F331C1A97745800C5C2F8 /* define.cpp */; };
+		A67962501AB965D400EACF40 /* DSC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A51F3A517D6386100A8F8F2 /* DSC.cpp */; };
 		A6A6E2531A8CEC0300E56E95 /* curve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6A6E2511A8CEC0300E56E95 /* curve.cpp */; };
 		A6A6E2571A92255F00E56E95 /* gradient_f.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6A6E2551A92255F00E56E95 /* gradient_f.cpp */; };
 		A6B45F1F1A88CE120091F5A6 /* interface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B45F1E1A88CE120091F5A6 /* interface.cpp */; };
@@ -387,6 +388,7 @@
 			files = (
 				A6B45F441A88F1BE0091F5A6 /* rotate_function.cpp in Sources */,
 				A61F331B1A94860D00C5C2F8 /* image.cpp in Sources */,
+				A67962501AB965D400EACF40 /* DSC.cpp in Sources */,
 				A6B45F431A88F1BB0091F5A6 /* normal_function.cpp in Sources */,
 				A61F331D1A97745800C5C2F8 /* define.cpp in Sources */,
 				A6A6E2531A8CEC0300E56E95 /* curve.cpp in Sources */,

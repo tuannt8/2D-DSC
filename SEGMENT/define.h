@@ -15,7 +15,7 @@
 #ifdef WIN32
 
 #else
-#define DATA_PATH "../../../DATA/"
+#define DATA_PATH ""//"../../../DATA/"
 #define LOG_PATH "../../../LOG/"
 #endif
 

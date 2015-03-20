@@ -23,7 +23,11 @@
 #endif
 
 GLuint texture_helper::LoadTexture( const char * filename ){
-    std::string filePath = std::string(DATA_PATH) + std::string(filename);
+//    std::string filePath = std::string(DATA_PATH) + std::string(filename);
+    return -1;
+    std::string filePath(filename);
+    
+    std::cout << filePath << std::endl;
 
     GLuint tex = SOIL_load_OGL_texture(filePath.c_str(),
                                        SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
@@ -46,7 +50,7 @@ GLuint texture_helper::LoadTexture( const char * filename ){
 //        }
 //    }
     
-    assert(tex != 0);
+
     texture.push_back(tex);
     tex_sizes.push_back(Vec2(width, height));
     SOIL_free_image_data(_image);
@@ -72,6 +76,7 @@ texture_helper::~texture_helper(){
 }
 
 void texture_helper::map_texture(int tex_id){
+    return;
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texture[tex_id]);
 }

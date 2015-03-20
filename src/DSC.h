@@ -28,6 +28,8 @@
 #include <GEL/HMesh/mesh_optimization.h>
 #endif
 
+//#define TUAN_SEG
+
 
 namespace DSC2D {
     
