@@ -7,6 +7,7 @@
 //
 
 #include "gl_debug_helper.h"
+#include "tri_box_overlap.h"
 #ifdef WIN32
 #include <GL/glew.h>
 #include <GL/glut.h>
@@ -17,6 +18,42 @@
 #include <GEL/GLGraphics/SOIL.h>
 #endif
 
+namespace temp_gdh {
+    
+    inline bool is_greater(Vec2 g, Vec2 l){
+        return (g[0] > l[0]) && (g[1] > l[1]);
+    }
+    
+    inline Vec2 left_down(Vec2 p1, Vec2 p2){
+        Vec2 p(INFINITY, INFINITY);
+        p[0] = std::min(p1[0], p2[0]);
+        p[1] = std::min(p1[1], p2[1]);
+        return p;
+    }
+    
+    inline Vec2 right_up(Vec2 p1, Vec2 p2){
+        Vec2 p(INFINITY, INFINITY);
+        p[0] = std::max(p1[0], p2[0]);
+        p[1] = std::max(p1[1], p2[1]);
+        return p;
+    }
+    
+    int tri_box_overlap(Vec2 ld, Vec2 ru, Vec2_array tri_verts){
+        Vec2 center = (ld + ru) / 2.0;
+        Vec2 size = ru - center;
+        float box_center[3] = {(float)center[0], (float)center[1], 0};
+        float boxhalfsize[3] = {(float)size[0], (float)size[1], 1};
+        float triverts[3][3];
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 2; j++) {
+                triverts[i][j] = tri_verts[i][j];
+            }
+            triverts[i][2] = 0;
+        }
+        
+        return triBoxOverlap(box_center, boxhalfsize, triverts);
+    }
+}
 
 gl_debug_helper & gl_debug_helper::get_instance(){
     static gl_debug_helper instance;
@@ -35,6 +72,25 @@ void gl_debug_helper::end(){
 void gl_debug_helper::mouseMove(int x, int y){
     if (get_instance().drawing_) {
         get_instance().right_up_ = get_instance().to_gl_coord(Vec2(x, y));
+        glutPostRedisplay();
+    }
+}
+
+void gl_debug_helper::update_dsc(){
+    Vec2 pt1 = get_instance().left_down_;
+    Vec2 pt2 = get_instance().right_up_;
+    
+    Vec2 ld = temp_gdh::left_down(pt1, pt2);
+    Vec2 ru = temp_gdh::right_up(pt1, pt2);
+    dsc_obj * dsc = get_instance().s_dsc_;
+    
+    static int label_count = 0;
+    int new_label = ++label_count;
+    for (auto fid = dsc->faces_begin(); fid != dsc->faces_end(); fid++) {
+        auto pts = dsc->get_pos(*fid);
+        if (temp_gdh::tri_box_overlap(ld, ru, pts)) {
+            dsc->set_label(*fid, new_label);
+        }
     }
 }
 
@@ -48,8 +104,14 @@ void gl_debug_helper::mouseDown(int button, int state, int x, int y){
         else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP){
             get_instance().drawing_ = false;
             get_instance().right_up_ = get_instance().to_gl_coord(Vec2(x, y));
+            
+            update_dsc();
+            
+            glutPostRedisplay();
         }
     }
+    
+    glutPostRedisplay();
 }
 
 Vec2 gl_debug_helper::to_gl_coord(Vec2 win_coord){
@@ -85,26 +147,6 @@ void gl_debug_helper::draw(){
             glVertex2dv(corner[(i+1)%4].get());
         }
         glEnd();
-    }
-}
-namespace temp_gdh {
-
-    inline bool is_greater(Vec2 g, Vec2 l){
-        return (g[0] > l[0]) && (g[1] > l[1]);
-    }
-
-    inline Vec2 left_down(Vec2 p1, Vec2 p2){
-        Vec2 p(INFINITY, INFINITY);
-        p[0] = std::min(p1[0], p2[0]);
-        p[1] = std::min(p1[1], p2[1]);
-        return p;
-    }
-
-    inline Vec2 right_up(Vec2 p1, Vec2 p2){
-        Vec2 p(INFINITY, INFINITY);
-        p[0] = std::max(p1[0], p2[0]);
-        p[1] = std::max(p1[1], p2[1]);
-        return p;
     }
 }
 

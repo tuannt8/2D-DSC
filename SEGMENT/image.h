@@ -22,14 +22,11 @@ public:
     void load_image(std::string const file_path);
     // Draw in OpenGL coordinate
     void draw_image(int window_width);
-    // 0 - 1.0
-    double get_intensity_d(int x, int y);
-    // 0 - 255
-    int get_intensity_i(int x, int y);
+    // double: 0 - 1.0
+    double get_intensity(int x, int y);
+
     // total intensity inside a triangle
-    int get_triangle_intensity_count(Vec2_array tris, int *nb_pixel = nullptr);
-    
-    Vec2 get_local_norm(dsc_obj &complex, Node_key n_key, bool outside);
+    void get_tri_intensity(Vec2_array tris, int * total_pixel, double * total_intensity);
     
     Vec2 size(){return Vec2(width(), height());}
 };

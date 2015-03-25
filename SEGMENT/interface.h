@@ -24,6 +24,7 @@
 #endif
 
 #include "dynamics.h"
+#include "dynamics_mul.h"
 
 class interface{
 #pragma mark - Local variable
@@ -42,8 +43,7 @@ class interface{
     
     static interface *instance;
     
-    std::unique_ptr<texture_helper> tex;
-    std::unique_ptr<dynamics> dyn_;
+    std::unique_ptr<dynamics_mul> dyn_;
     std::unique_ptr<image> image_;
     
 private:

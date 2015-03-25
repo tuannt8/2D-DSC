@@ -77,10 +77,6 @@ void interface::display(){
     
     // Dynamics
     if(RUN){
-        if (gl_debug_helper::is_debugging()) {
-            gl_debug_helper::print_debug_info(*dsc);
-        }
-        
         
         Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, LOG_PATH);
         RUN = false;
@@ -120,10 +116,7 @@ void interface::reshape(int width, int height){
 }
 
 void interface::visible(int v){
-//    if(v==GLUT_VISIBLE)
-//        glutIdleFunc(animate_);
-//    else
-//        glutIdleFunc(0);
+
 }
 
 void interface::keyboard(unsigned char key, int x, int y){
@@ -147,7 +140,7 @@ void interface::keyboard(unsigned char key, int x, int y){
             Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, LOG_PATH);
             break;
         case 'u':
-            dyn_->split_edge(*dsc, *image_);
+        
             break;
         default:
             break;
@@ -198,7 +191,6 @@ void interface::draw()
 {
     Painter::begin();
     
- //   draw_image();
     if (bDiplay_[1]) {
         image_->draw_image(WIN_SIZE_X);
     }
@@ -207,7 +199,8 @@ void interface::draw()
         if (dsc)
         {
             glEnable(GL_BLEND);
-            glBlendFunc (GL_ONE, GL_ONE);
+            //glBlendFunc (GL_ONE, GL_ONE);
+            glBlendFunc (GL_ONE, GL_SRC_ALPHA);
             
             Painter::draw_complex(*dsc);
             
@@ -215,13 +208,6 @@ void interface::draw()
         }
     }
     
-    if (bDiplay_[3]) {
-    //    draw_coord();
-    }
-    
-    if(bDiplay_[4]){
-        dyn_->draw_curve(*dsc);
-    }
     
     if(bDiplay_[5]){
         Painter::draw_internal_force(*dsc);
@@ -284,40 +270,17 @@ void interface::draw_coord(){
 }
 
 void interface::draw_image(){
- //   tex->map_texture(0);
-    
+
     DSC2D::DesignDomain const * domain = dsc->get_design_domain();
     std::vector<DSC2D::vec2> corners = domain->get_corners();
 
     std::vector<DSC2D::vec2> quad_v = get_quad(0, 0, imageSize[0], imageSize[1]);
     std::vector<DSC2D::vec2> quad_tex;// = get_quad(0.0, 0.0, 1.0, 1.0);
-    
-//    quad_tex.push_back(DSC2D::vec2(0, 1));
-//    quad_tex.push_back(DSC2D::vec2(1, 1));
-//    quad_tex.push_back(DSC2D::vec2(1, 0));
-//    quad_tex.push_back(DSC2D::vec2(0, 0));
-    
-    
-//    quad_tex.push_back(DSC2D::vec2(0, 0));
 
     quad_tex.push_back(DSC2D::vec2(1, 0));
     quad_tex.push_back(DSC2D::vec2(1, 1));
     quad_tex.push_back(DSC2D::vec2(0, 1));
     quad_tex.push_back(DSC2D::vec2(0, 0));
-    
-    
-//    glBegin(GL_TRIANGLES);
-//    glVertex2d(0, 0);
-//    glTexCoord2d(0, 0);
-//    
-//    glVertex2d(1000, 0);
-//    glTexCoord2d(1, 0);
-//    
-//    glVertex2d(1000, 1000);
-//    glTexCoord2d(1, 1);
-//    glEnd();
-    
-    
     
     glColor3f(1, 1, 1);
     glBegin(GL_QUADS);
@@ -335,8 +298,6 @@ void interface::draw_image(){
         glVertex2dv((GLdouble*)quad_v[(i+1)%4].get());
     }
     glEnd();
-
-  //  tex->end();
 }
 
 void interface::update_title()
@@ -359,10 +320,7 @@ interface::interface(int &argc, char** argv){
     glutInit(&argc, argv);
     initGL();
     
-//    tex = std::unique_ptr<texture_helper>(new texture_helper);
-//    imageSize = tex->get_tex_size(0);
-    
-    dyn_ = std::unique_ptr<dynamics>(new dynamics);
+    dyn_ = std::unique_ptr<dynamics_mul>(new dynamics_mul);
     dsc = nullptr;
     
     image_ = std::unique_ptr<image>(new image);
@@ -371,12 +329,13 @@ interface::interface(int &argc, char** argv){
     }else
     image_->load_image(std::string(DATA_PATH) + IMAGE_NAME);
     imageSize = Vec2(image_->width(), image_->height());
-    
+
     check_gl_error();
     
     init_dsc();
     
-    init_sqaure_boundary();
+    gl_debug_helper::set_dsc(&(*dsc));
+//    init_sqaure_boundary();
 //   init_boundary();
     
     reshape(WIN_SIZE_X, WIN_SIZE_Y);
@@ -403,7 +362,7 @@ void interface::init_dsc(){
     
     dsc = std::unique_ptr<DeformableSimplicialComplex>(
                             new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
-//    vel_fun = std::unique_ptr<VelocityFunc<>>(new RotateFunc(VELOCITY, ACCURACY));
+
 }
 
 void interface::init_sqaure_boundary(){
@@ -419,9 +378,9 @@ void interface::init_boundary(){
         // Compute average intensity inside triangle
         auto pts = dsc->get_pos(*p);
         int count;
-        if(image_->get_triangle_intensity_count(pts, &count) > 0.1*count*MAX_BYTE ){
-            faceKeys.push_back(*p);
-        }
+//        if(image_->get_triangle_intensity_count(pts, &count) > 0.1*count*MAX_BYTE ){
+//            faceKeys.push_back(*p);
+//        }
     }
     
     ObjectGenerator::label_tris(*dsc, faceKeys, 1);

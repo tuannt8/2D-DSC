@@ -32,7 +32,7 @@ double DISCRETIZE_RES = 12;
 /* square.bmp
  */
 #elif defined SQUARE_BMP
-dynamics_param g_param = dynamics_param(0., 0., 0.0001, 50);
+dynamics_param g_param;
 
 std::string IMAGE_NAME = "square.bmp";
 double DISCRETIZE_RES = 8;//11.0
@@ -43,7 +43,7 @@ double DISCRETIZE_RES = 8;//11.0
  */
 #elif defined MULTIPLE_BMP
 
-dynamics_param g_param = dynamics_param(0., 0., 0.0001, 80);    ;
+dynamics_param g_param;
 std::string IMAGE_NAME = "multiple.bmp";
 double DISCRETIZE_RES = 15;//11.0
 
@@ -70,7 +70,7 @@ double DISCRETIZE_RES = 15;//11.0
  */
 #elif defined FOX_BMP
 
-dynamics_param g_param(0., 0., 0.0005, 50);
+dynamics_param g_param;
 std::string IMAGE_NAME = "fox.bmp";
 double DISCRETIZE_RES = 10;//11.0
 

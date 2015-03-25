@@ -360,6 +360,14 @@ namespace DSC2D {
             external_node_forces[vid] = force;
         }
         
+        void add_node_external_force(node_key vid, vec2 force){
+            external_node_forces[vid] += force;
+        }
+
+        void set_label(face_key fid, int new_label){
+            face_labels[fid] = new_label;
+        }
+        
         /**
          Sets the destination of the vertex with ID vid to dest.
          To actually move the vertices to their destination, call the deform function.

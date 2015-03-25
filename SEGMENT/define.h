@@ -22,6 +22,7 @@
 #define NOISE 20.0
 #define BLUR 5.0
 
+using std::vector;
 
 /*********************************************************************/
 /* Type def
@@ -35,14 +36,9 @@ typedef dsc_obj::edge_key Edge_key;
 typedef std::vector<Vec2> Vec2_array;
 
 struct dynamics_param{
-    dynamics_param(){};
-    dynamics_param(double a, double b, double g, double m):alpha(a), beta(b),
-                gamma(g), mass(m){};
-    
-    double alpha = 0.001; // Second derivative. Keep the curve short
-    double beta = 0.001; // Forth derivative. Keep the curve straight
-    double gamma = 0.000000001; // External force scale
-    double mass = 50;
+    double alpha = 1; // Curvature
+    double beta = 1; // Forth derivative. Keep the curve straight
+    double mass = 10; // Display scale
 } ;
 
 /*******
@@ -58,6 +54,7 @@ extern int debug_num[10];
 extern std::string IMAGE_NAME;
 // Dynamics parameter
 extern dynamics_param g_param;
+
 // Discretization
 extern double DISCRETIZE_RES;
 

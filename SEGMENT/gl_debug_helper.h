@@ -37,7 +37,10 @@ private:
     double WIN_HEIGHT_;
     
     Vec2 to_gl_coord(Vec2 win_coord);
+    
+    dsc_obj * s_dsc_;
 public:
+    static void set_dsc(dsc_obj *dsc){get_instance().s_dsc_ = dsc;}
     static bool is_debugging(){return get_instance().active_;};
     static void change_state();
     static void begin();
@@ -52,6 +55,9 @@ public:
     static void print_debug_info(dsc_obj &complex);
     
     static void draw();
+    
+private:
+    static void update_dsc();
 };
 
 #endif /* defined(__DSC__gl_debug_helper__) */
