@@ -15,7 +15,7 @@ int debug_num[10] = {-1};
 /*********************************************************************/
 /* Different parameters
  */
-#define MULTIPLE_BMP
+#define MM_BMP
 
 
 
@@ -31,21 +31,29 @@ double DISCRETIZE_RES = 12;
 /************************/
 /* square.bmp
  */
-#elif defined SQUARE_BMP
-dynamics_param g_param;
+#elif defined MM_BMP
+dynamics_param g_param(1,1,10);
 
-std::string IMAGE_NAME = "square.bmp";
-double DISCRETIZE_RES = 8;//11.0
+std::string IMAGE_NAME = "mm.bmp";
+double DISCRETIZE_RES = 22;//11.0
 
+/************************/
+/* arrow.bmp
+ */
+#elif defined ARROW_BMP
+
+dynamics_param g_param(0.1, 1, 10);
+std::string IMAGE_NAME = "arrow.bmp";
+double DISCRETIZE_RES = 22;//11.0
 
 /************************/
 /* multiple.bmp
  */
 #elif defined MULTIPLE_BMP
 
-dynamics_param g_param;
+dynamics_param g_param(1, 1, 10);
 std::string IMAGE_NAME = "multiple.bmp";
-double DISCRETIZE_RES = 15;//11.0
+double DISCRETIZE_RES = 22;//11.0
 
 /************************/
 /* multiple_noise.bmp

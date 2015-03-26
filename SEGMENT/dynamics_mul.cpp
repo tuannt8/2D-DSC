@@ -35,22 +35,57 @@ void dynamics_mul::update_dsc(dsc_obj &dsc, image &img){
     // 3. Curvature force
     compute_curvature_force();
     
-
-    
-    
     s_img = nullptr;
     s_dsc = nullptr;
 }
 
 void dynamics_mul::compute_curvature_force(){
-    
+    for (auto eid = s_dsc->halfedges_begin(); eid != s_dsc->halfedges_end(); eid++) {
+
+        if (s_dsc->is_interface(*eid)) {
+            auto hew0 = s_dsc->walker(*eid);
+            
+            // Find next edge on the boundary
+            auto hew1 = hew0.next().opp();
+            while (1) {
+                if (s_dsc->is_interface(hew1.halfedge())) {
+                    hew1 = hew1.opp();
+                    break;
+                }
+                
+                hew1 = hew1.next().opp();
+            }
+            
+            assert(hew0.halfedge() != hew1.halfedge());
+            
+            Vec2 p0 = s_dsc->get_pos(hew0.vertex()) - s_dsc->get_pos(hew0.opp().vertex());
+            Vec2 p1 = s_dsc->get_pos(hew1.vertex()) - s_dsc->get_pos(hew1.opp().vertex());
+            
+            Vec2 norm0(p0[1], -p0[0]); norm0.normalize();
+            Vec2 norm1(p1[1], -p1[0]); norm1.normalize();
+            Vec2 norm = norm0 + norm1; norm.normalize();
+
+#ifdef DEBUG
+            assert(norm.length() < 1.1 and norm.length() > 0.9);
+#endif
+            
+            
+            double l0 = p0.length();
+            double l1 = p1.length();
+            double angle = std::atan2(CGLA::cross(p0, p1), DSC2D::Util::dot(p0, p1));
+            double curvature = angle / (l0/2.0 + l1/2.0);
+            
+            s_dsc->add_node_internal_force(
+                    hew0.vertex(), -norm*curvature*s_dsc->get_avg_edge_length()*g_param.alpha);
+        }
+    }
 }
 
 void dynamics_mul::displace_dsc(){
     double el = s_dsc->get_avg_edge_length();
     for (auto ni = s_dsc->vertices_begin(); ni != s_dsc->vertices_end(); ni++) {
-        Vec2 dis = (s_dsc->get_node_internal_force(*ni)*g_param.alpha
-                    + s_dsc->get_node_external_force(*ni)*g_param.beta) / g_param.mass;
+        Vec2 dis = (s_dsc->get_node_internal_force(*ni)
+                    + s_dsc->get_node_external_force(*ni)) / g_param.mass;
         
         if (dis.length() > 0.0001*el) {
             s_dsc->set_destination(*ni, s_dsc->get_pos(*ni) + dis);
@@ -114,8 +149,8 @@ void dynamics_mul::compute_intensity_force(){
             L01.normalize();
             Vec2 N01(L01[1], -L01[0]);
             
-            s_dsc->add_node_external_force(hew.opp().vertex(), N01*f0);
-            s_dsc->add_node_external_force(hew.vertex(), N01*f1);
+            s_dsc->add_node_external_force(hew.opp().vertex(), N01*f0*g_param.beta);
+            s_dsc->add_node_external_force(hew.vertex(), N01*f1*g_param.beta);
             
             // Avoid retouch the edge
             touched[*eit] = 1;

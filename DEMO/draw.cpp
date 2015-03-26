@@ -299,6 +299,9 @@ void Painter::draw_faces(const DeformableSimplicialComplex& dsc, const HMesh::Fa
     {
         vec3 c = get_color(colors_, dsc.get_label(*fi));
         glColor4f(c[0], c[1], c[2], 0.3);
+        if (dsc.get_label(*fi) == 0) {
+            continue;
+        }
         for (auto hew = dsc.walker(*fi); !hew.full_circle(); hew = hew.circulate_face_cw())
         {
             vec2 p = dsc.get_pos(hew.vertex());

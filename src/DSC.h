@@ -353,6 +353,13 @@ namespace DSC2D {
             internal_node_forces[vid] = force;
         }
         
+        void add_node_internal_force(node_key vid, vec2 force){
+#ifdef DEBUG
+            assert(!Util::isnan(force[0]) && !Util::isnan(force[1]));
+#endif
+            internal_node_forces[vid] += force;
+        }
+        
         /**
          External force
          */

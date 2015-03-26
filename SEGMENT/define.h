@@ -15,12 +15,12 @@
 #ifdef WIN32
 
 #else
-#define DATA_PATH ""//"../../../DATA/"
+#define DATA_PATH "../../../DATA/"
 #define LOG_PATH "../../../LOG/"
 #endif
 
-#define NOISE 20.0
-#define BLUR 5.0
+#define NOISE 1.0
+#define BLUR 3.0
 
 using std::vector;
 
@@ -36,6 +36,8 @@ typedef dsc_obj::edge_key Edge_key;
 typedef std::vector<Vec2> Vec2_array;
 
 struct dynamics_param{
+    dynamics_param(){}
+    dynamics_param(double a, double b, double m){alpha = a; beta = b; mass = m;};
     double alpha = 1; // Curvature
     double beta = 1; // Forth derivative. Keep the curve straight
     double mass = 10; // Display scale
@@ -57,5 +59,6 @@ extern dynamics_param g_param;
 
 // Discretization
 extern double DISCRETIZE_RES;
+
 
 #endif // File protection
