@@ -52,6 +52,10 @@ void image::draw_image(int window_width){
 
 // 0 - 1.0
 double image::get_intensity(int x, int y){
+    if (x < 0 or x > width()
+        or y < 0 or y > height()) {
+        return 0;
+    }
     return (MAX_BYTE - (double)(*this)(x, height() - y)) / (double)MAX_BYTE;
 }
 

@@ -35,7 +35,7 @@ double DISCRETIZE_RES = 12;
 dynamics_param g_param(1,1,10);
 
 std::string IMAGE_NAME = "mm.bmp";
-double DISCRETIZE_RES = 22;//11.0
+double DISCRETIZE_RES = 30;//11.0
 
 /************************/
 /* arrow.bmp

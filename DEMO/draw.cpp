@@ -120,7 +120,8 @@ void Painter::draw_complex(const DeformableSimplicialComplex& dsc)
 //    draw_domain(*dsc.get_design_domain());
     glEnable(GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_SRC_ALPHA);
-    draw_faces(dsc);
+ //   draw_faces(dsc);
+    draw_faces_intensity(dsc);
     glDisable(GL_BLEND);
 
     draw_edges(dsc);
@@ -278,8 +279,13 @@ void Painter::draw_edges(const DeformableSimplicialComplex& dsc)
 
 void Painter::draw_faces(const DeformableSimplicialComplex& dsc)
 {
+    glEnable(GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_SRC_ALPHA);
+
     HMesh::FaceAttributeVector<vec3> colors = dsc.get_face_colors();
     draw_faces(dsc, colors);
+    
+    glDisable(GL_BLEND);
 }
 
 vec3 get_color(std::vector<vec3> & colors_, int idx){
@@ -287,6 +293,33 @@ vec3 get_color(std::vector<vec3> & colors_, int idx){
     int i = idx % colors_.size();
     
     return colors_[i]/(double)scale;
+}
+
+void Painter::draw_faces_intensity(const DeformableSimplicialComplex& dsc)
+{
+    if (g_param.mean_intensity.size() == 0) {
+        return;
+    }
+    
+    glDisable(GL_BLEND);
+    
+    glBegin(GL_TRIANGLES);
+    
+    for(auto fi = dsc.faces_begin(); fi != dsc.faces_end(); ++fi)
+    {
+        double c = g_param.mean_intensity[dsc.get_label(*fi)];
+        
+        glColor3f(1-c, 1-c, 1-c);
+        if (dsc.get_label(*fi) == 0) {
+            continue;
+        }
+        for (auto hew = dsc.walker(*fi); !hew.full_circle(); hew = hew.circulate_face_cw())
+        {
+            vec2 p = dsc.get_pos(hew.vertex());
+            glVertex3d(static_cast<double>(p[0]), static_cast<double>(p[1]), static_cast<double>(0.));
+        }
+    }
+    glEnd();
 }
 
 void Painter::draw_faces(const DeformableSimplicialComplex& dsc, const HMesh::FaceAttributeVector<vec3> &colors)

@@ -28,6 +28,7 @@
 
 class interface{
 #pragma mark - Local variable
+public:
     std::unique_ptr<DSC2D::DeformableSimplicialComplex> dsc;
     
     // Windows size
@@ -79,7 +80,7 @@ private:
     void update_title();
     
 #pragma mark - data
-private:
+public:
     void init_dsc();
     void init_sqaure_boundary();
     void init_boundary();

@@ -72,21 +72,27 @@ void interface::display(){
         return;
     }
     
+
+    
     draw();
     update_title();
     
-    // Dynamics
-    if(RUN){
-        
-        Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, LOG_PATH);
-        RUN = false;
-    }
-    
     check_gl_error();
+    
+    if (RUN) {
+        dynamics_image_seg();
+        glutPostRedisplay();
+    }
 }
 
 void interface::animate(){
-  //  glutPostRedisplay();
+//    if (RUN) {
+//        dynamics_image_seg();
+//        glutPostRedisplay();
+//    }
+//    else{
+//        sleep(0.7);
+//    }
 }
 
 void interface::reshape(int width, int height){
@@ -116,7 +122,11 @@ void interface::reshape(int width, int height){
 }
 
 void interface::visible(int v){
-
+//    if(v==GLUT_VISIBLE){
+//        glutIdleFunc(animate_);
+//    }
+//    else
+//        glutIdleFunc(0);
 }
 
 void interface::keyboard(unsigned char key, int x, int y){
@@ -133,8 +143,11 @@ void interface::keyboard(unsigned char key, int x, int y){
             std::cin >> debug_num[0];
             break;
         case ' ':
-            dynamics_image_seg();
-            //RUN = !RUN;
+        {
+            RUN = !RUN;
+            
+            //dynamics_image_seg();
+        }
             break;
         case '\t':
             Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, LOG_PATH);
@@ -195,17 +208,17 @@ void interface::draw()
         image_->draw_image(WIN_SIZE_X);
     }
     
-    if (bDiplay_[2]) {
-        if (dsc)
-        {
-            glEnable(GL_BLEND);
-            //glBlendFunc (GL_ONE, GL_ONE);
-            glBlendFunc (GL_ONE, GL_SRC_ALPHA);
-            
-            Painter::draw_complex(*dsc);
-            
-            glDisable(GL_BLEND);
-        }
+    if (bDiplay_[2] and dsc) {
+        Painter::draw_edges(*dsc);
+        Painter::draw_vertices(*dsc);
+    }
+    
+    if (bDiplay_[3] and dsc) {
+        Painter::draw_faces(*dsc);
+    }
+    
+    if (!bDiplay_[4] and dsc) {
+        Painter::draw_faces_intensity(*dsc);
     }
     
     

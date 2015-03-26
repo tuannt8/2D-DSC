@@ -184,7 +184,8 @@ void UI::reshape(int width, int height)
 
 void UI::animate()
 {
-//    glutPostRedisplay();
+
+    //glutPostRedisplay();
 }
 
 void UI::keyboard(unsigned char key, int x, int y) {
@@ -291,10 +292,10 @@ void UI::keyboard(unsigned char key, int x, int y) {
 
 void UI::visible(int v)
 {
-//    if(v==GLUT_VISIBLE)
-//        glutIdleFunc(animate_);
-//    else
-//        glutIdleFunc(0);
+    if(v==GLUT_VISIBLE)
+        glutIdleFunc(animate_);
+    else
+        glutIdleFunc(0);
 }
 
 void UI::draw()

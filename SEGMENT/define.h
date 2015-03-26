@@ -38,9 +38,12 @@ typedef std::vector<Vec2> Vec2_array;
 struct dynamics_param{
     dynamics_param(){}
     dynamics_param(double a, double b, double m){alpha = a; beta = b; mass = m;};
+    
     double alpha = 1; // Curvature
     double beta = 1; // Forth derivative. Keep the curve straight
     double mass = 10; // Display scale
+    
+    std::map<int, double> mean_intensity;
 } ;
 
 /*******

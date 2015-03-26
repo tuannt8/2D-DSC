@@ -18,6 +18,7 @@
 
 #include "DSC.h"
 #include "velocity_function.h"
+#include "define.h"
 
 #define FORCE_SCALE 10
 
@@ -92,11 +93,13 @@ public:
      Draws the faces with the colors defined by the get_face_colors function in the simplicial complex.
      */
     static void draw_faces(const DSC2D::DeformableSimplicialComplex& complex);
-    
+    static void draw_faces_intensity(const DSC2D::DeformableSimplicialComplex& complex);
     /**
      Draws the faces with the colors given as input.
      */
     static void draw_faces(const DSC2D::DeformableSimplicialComplex& complex, const HMesh::FaceAttributeVector<DSC2D::vec3> &colors);
+    
+    
     
     /**
      Draws the faces using the 'jet' color scheme.

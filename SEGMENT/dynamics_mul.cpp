@@ -26,6 +26,7 @@ void dynamics_mul::update_dsc(dsc_obj &dsc, image &img){
     // 1. Update mean intensity
      // <phase - mean intensity>
     compute_mean_intensity(mean_inten_);
+    g_param.mean_intensity = mean_inten_;
     
     // 2. Compute intensity force
     //      External force attributes
