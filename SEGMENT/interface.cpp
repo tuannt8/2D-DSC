@@ -153,7 +153,10 @@ void interface::keyboard(unsigned char key, int x, int y){
             Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, LOG_PATH);
             break;
         case 'u':
-        
+            std::cout << g_param.alpha << " - New alpha: ";
+            std::cin >> g_param.alpha;
+            std::cout << g_param.beta << " - New beta: ";
+            std::cin >> g_param.beta;
             break;
         default:
             break;

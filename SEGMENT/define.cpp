@@ -15,7 +15,7 @@ int debug_num[10] = {-1};
 /*********************************************************************/
 /* Different parameters
  */
-#define MM_BMP
+#define ARROW_BMP
 
 
 
@@ -42,7 +42,7 @@ double DISCRETIZE_RES = 30;//11.0
  */
 #elif defined ARROW_BMP
 
-dynamics_param g_param(0.1, 1, 10);
+dynamics_param g_param(0.1, 1, 1.0);
 std::string IMAGE_NAME = "arrow.bmp";
 double DISCRETIZE_RES = 22;//11.0
 

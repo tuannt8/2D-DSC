@@ -7,6 +7,12 @@
 //
 
 #include "dynamics_mul.h"
+#include "helper.h"
+#ifdef WIN32
+#include <CGLA/Mat3x3f.h>
+#else
+#include <GEL/CGLA/Mat3x3f.h>
+#endif
 
 dynamics_mul::dynamics_mul(){
     
@@ -26,7 +32,7 @@ void dynamics_mul::update_dsc(dsc_obj &dsc, image &img){
     // 1. Update mean intensity
      // <phase - mean intensity>
     compute_mean_intensity(mean_inten_);
-    g_param.mean_intensity = mean_inten_;
+    g_param.mean_intensity = mean_inten_; // For drawing
     
     // 2. Compute intensity force
     //      External force attributes
@@ -36,8 +42,81 @@ void dynamics_mul::update_dsc(dsc_obj &dsc, image &img){
     // 3. Curvature force
     compute_curvature_force();
     
+    // 4. Debug log
+    debug_optimum_dt_2();
+    
     s_img = nullptr;
     s_dsc = nullptr;
+}
+
+void dynamics_mul::debug_optimum_dt_2(){
+    
+    for (auto ni = s_dsc->vertices_begin(); ni != s_dsc->vertices_end(); ni++) {
+        if (s_dsc->is_interface(*ni)) {
+           // Vec2 s = (s_dsc->get_node_internal_force(*ni) + s_dsc->get_node_external_force(*ni));
+            
+            Vec2 s = s_dsc->get_node_external_force(*ni);
+            
+            // 1. Find furthest movement
+            double alpha_max = furthest_move(*ni, s);
+            
+            // 2. Compute energy change
+            double E0 = star_energy(*ni, s_dsc->get_pos(*ni));
+            double E1 = star_energy(*ni, s_dsc->get_pos(*ni) + s*alpha_max/2.0);
+            double E2 = star_energy(*ni, s_dsc->get_pos(*ni) + s*alpha_max);
+            
+            CGLA::Mat3x3f A(CGLA::Vec3f(0, 0, 1),
+                            CGLA::Vec3f(alpha_max/2.*alpha_max/2., alpha_max/2., 1),
+                            CGLA::Vec3f(alpha_max*alpha_max, alpha_max, 1));
+            CGLA::Vec3f b(E0, E1, E2);
+            CGLA::Mat3x3f A_i = CGLA::invert(A);
+            CGLA::Vec3f coes = A_i*b;
+            
+            double alpha_g = -1.0/2.0 * coes[1] / coes[0];
+            
+            if(alpha_g < 0)
+                alpha_g = 0;
+            if (alpha_g > alpha_max) {
+                alpha_g = alpha_max;
+            }
+            
+            
+            s_dsc->set_node_external_force(*ni, s*alpha_g);
+        }
+    }
+}
+
+void dynamics_mul::debug_optimum_dt(){
+    
+    alpha_map_.clear();
+    
+    for (auto ni = s_dsc->vertices_begin(); ni != s_dsc->vertices_end(); ni++) {
+        if (s_dsc->is_interface(*ni)) {
+            Vec2 s = (s_dsc->get_node_internal_force(*ni)
+                      + s_dsc->get_node_external_force(*ni));
+            
+            // 1. Find furthest movement
+            double alpha_max = furthest_move(*ni, s);
+            
+            // 2. Compute energy change
+            double delta_E = energy_change(*ni, s_dsc->get_pos(*ni) + s * alpha_max);
+
+            // 3. Compute partial derivative of E wrt to alpha
+            double ll = curve_length(*ni, s_dsc->get_pos(*ni));
+            double grad_E_a_2 = s.length() * s.length() / ll;
+            
+            // 4. Optimal alpha
+            double alpha_g = 1.0/2.0*(2.0*delta_E - alpha_max*grad_E_a_2)/(delta_E - alpha_max*grad_E_a_2);
+            
+            cout << " " << alpha_g << endl;
+            
+        }
+    }
+}
+
+double dynamics_mul::furthest_move(Node_key nid, Vec2 direction){
+    double max_move = s_dsc->intersection_with_link(nid, s_dsc->get_pos(nid) + direction);
+    return max_move;
 }
 
 void dynamics_mul::compute_curvature_force(){
@@ -82,13 +161,47 @@ void dynamics_mul::compute_curvature_force(){
     }
 }
 
+void dynamics_mul::displace_dsc_2(){
+    for (auto ni = s_dsc->vertices_begin(); ni != s_dsc->vertices_end(); ni++) {
+        if (s_dsc->is_interface(*ni)) {
+//            Vec2 s = (s_dsc->get_node_internal_force(*ni)
+//                      + s_dsc->get_node_external_force(*ni));
+//            
+//            // 1. Find furthest movement
+//            double alpha_max = furthest_move(*ni, s);
+//            
+//            // 2. Compute energy change
+//            double E0 = star_energy(*ni, s_dsc->get_pos(*ni));
+//            double E1 = star_energy(*ni, s_dsc->get_pos(*ni) + s*alpha_max/2.0);
+//            double E2 = star_energy(*ni, s_dsc->get_pos(*ni) + s*alpha_max);
+//            
+//            CGLA::Mat3x3f A(CGLA::Vec3f(0, 0, 1),
+//                            CGLA::Vec3f(alpha_max/2.*alpha_max/2., alpha_max/2., 1),
+//                            CGLA::Vec3f(alpha_max*alpha_max, alpha_max, 1));
+//            CGLA::Vec3f b(E0, E1, E2);
+//            CGLA::Mat3x3f A_i = CGLA::invert(A);
+//            CGLA::Vec3f coes = A_i*b;
+//            
+//            double alpha_g = -1.0/2.0 * coes[1] / coes[0];
+//            
+//            s_dsc->set_destination(*ni, s_dsc->get_pos(*ni) + s*alpha_g);
+            
+            s_dsc->set_destination(*ni, s_dsc->get_pos(*ni) + s_dsc->get_node_external_force(*ni));
+        }
+    }
+    
+    s_dsc->deform();
+}
+
 void dynamics_mul::displace_dsc(){
-    double el = s_dsc->get_avg_edge_length();
     for (auto ni = s_dsc->vertices_begin(); ni != s_dsc->vertices_end(); ni++) {
         Vec2 dis = (s_dsc->get_node_internal_force(*ni)
                     + s_dsc->get_node_external_force(*ni)) / g_param.mass;
         
-        if (dis.length() > 0.0001*el) {
+        // It is better if we check is interface instead
+       // if (dis.length() > 0.0001*el)
+        if (s_dsc->is_interface(*ni))
+        {
             s_dsc->set_destination(*ni, s_dsc->get_pos(*ni) + dis);
         }
     }
@@ -140,7 +253,25 @@ void dynamics_mul::compute_intensity_force(){
                 auto p = p0 + (p1 - p0)*(double(i)/(double)length);
                 double I = s_img->get_intensity(p[0], p[1]);
                 
-                double f = (c0-c1)*(2*I - c0 - c1);
+                // Normalize force
+                int normalizedF = 3;
+                double f ;
+                switch (normalizedF) {
+                    case 1:
+                        f = ( (c0-c1)*(2*I - c0 - c1)) / ((c0-c1)*(c0-c1));
+                        break;
+                    case 2:
+                        f = ( (c0-c1)*(2*I - c0 - c1)) / std::abs((c0 - c1));
+                        break;
+                    case 3:
+                        f = (c0-c1)*(2*I - c0 - c1);
+                        break;
+                    default:
+                        f = 0.0;
+                        break;
+                }
+                
+                // Barry Centric coordinate
                 f0 += f*(p-p1).length() / (double)length;
                 f1 += f*(p-p0).length() / (double)length;
             }
@@ -158,4 +289,72 @@ void dynamics_mul::compute_intensity_force(){
             touched[hew.opp().halfedge()] = 1;
         }
     }
+}
+
+double dynamics_mul::star_energy(Node_key nid, Vec2 new_pos){
+
+    double E1 = intensity_energy(nid, new_pos);
+    double L1 = curve_length(nid, new_pos);
+    
+    return L1*g_param.alpha + E1*g_param.beta;
+}
+
+double dynamics_mul::energy_change(Node_key nid, Vec2 new_pos) {
+    double dE = 0.0;
+
+    double E0 = intensity_energy(nid, s_dsc->get_pos(nid));
+    double E1 = intensity_energy(nid, new_pos);
+    
+    double L0 = curve_length(nid, s_dsc->get_pos(nid));
+    double L1 = curve_length(nid, new_pos);
+    
+    dE = (L1 - L0)*g_param.alpha + (E1 - E0)*g_param.beta;
+
+    return dE;
+}
+
+// intensity different in node link
+double dynamics_mul::intensity_energy(Node_key nid, Vec2 new_pos){
+    double E = 0.0;
+    for (auto hew = s_dsc->walker(nid); !hew.full_circle(); hew = hew.circulate_vertex_cw()) {
+        auto fid = hew.face();
+        Vec2_array tris;
+        tris.push_back(new_pos);
+        tris.push_back(s_dsc->get_pos(hew.vertex()));
+        tris.push_back(s_dsc->get_pos(hew.next().vertex()));
+
+        double ci = mean_inten_[s_dsc->get_label(fid)];
+        
+        Vec2 min(INFINITY, INFINITY), max(-INFINITY, -INFINITY);
+        for (auto p: tris){
+            min[0] = std::min(min[0], p[0]);
+            min[1] = std::min(min[1], p[1]);
+            max[0] = std::max(max[0], p[0]);
+            max[1] = std::max(max[1], p[1]);
+        }
+        
+        for (int i = floor(min[0]); i < ceil(max[0]); i++) {
+            for (int j = floor(min[1]); j < ceil(max[1]); j++) {
+                if (helper_t::is_point_in_tri(Vec2(i,j), tris)) {
+                    double I = s_img->get_intensity(i, j);
+                    E += (I - ci)*(I-ci);
+                }
+            }
+        }
+    }
+    
+    return E;
+}
+
+// Interface length in node link
+double dynamics_mul::curve_length(Node_key nid, Vec2 new_pos){
+    double L = 0.0;
+    
+    for (auto hew = s_dsc->walker(nid); !hew.full_circle(); hew = hew.circulate_vertex_cw()) {
+        if (s_dsc->is_interface(hew.halfedge())) {
+            L += (s_dsc->get_pos(hew.vertex()) - new_pos).length();
+        }
+    }
+    
+    return L;
 }

@@ -19,10 +19,10 @@
 #define LOG_PATH "../../../LOG/"
 #endif
 
-#define NOISE 1.0
-#define BLUR 3.0
 
 using std::vector;
+using std::cout;
+using std::endl;
 
 /*********************************************************************/
 /* Type def
@@ -39,9 +39,9 @@ struct dynamics_param{
     dynamics_param(){}
     dynamics_param(double a, double b, double m){alpha = a; beta = b; mass = m;};
     
-    double alpha = 1; // Curvature
-    double beta = 1; // Forth derivative. Keep the curve straight
-    double mass = 10; // Display scale
+    double alpha = 1.0; // Curvature
+    double beta = 1.0; // Forth derivative. Keep the curve straight
+    double mass = 10.0; // Display scale
     
     std::map<int, double> mean_intensity;
 } ;

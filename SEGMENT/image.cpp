@@ -22,6 +22,10 @@
 #include <GEL/GLGraphics/SOIL.h>
 #endif
 
+
+#define NOISE 0.0
+#define BLUR 0.0
+
 void image::load_image(std::string const file_path){
     
     

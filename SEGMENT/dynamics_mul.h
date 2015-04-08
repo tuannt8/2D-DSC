@@ -30,11 +30,26 @@ private:
     // Mean intensity
     std::map<int, double> mean_inten_;
     
+    std::map<int, double> alpha_map_;
 private:
     void compute_mean_intensity(std::map<int, double> & mean_inten_o);
     void compute_intensity_force();
     void displace_dsc();
     void compute_curvature_force();
+    
+private:
+    void displace_dsc_2();
+    void debug_optimum_dt();
+    void debug_optimum_dt_2();
+    
+    double furthest_move(Node_key nid, Vec2 direction);
+    double energy_change(Node_key nid, Vec2 new_pos);
+    
+    double star_energy(Node_key nid, Vec2 new_pos);
+    // intensity different in node link
+    double intensity_energy(Node_key nid, Vec2 new_pos);
+    // Interface length in node link
+    double curve_length(Node_key nid, Vec2 new_pos);
 };
 
 #endif /* defined(__DSC__dynamics_mul__) */
