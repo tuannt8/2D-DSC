@@ -24,7 +24,7 @@
 
 
 #define NOISE 0.0
-#define BLUR 0.0
+#define BLUR 2.0
 
 void image::load_image(std::string const file_path){
     
@@ -36,6 +36,8 @@ void image::load_image(std::string const file_path){
     
     blur(BLUR);
     noise(NOISE);
+    
+    compute_gradient();
 }
 
 // Draw in OpenGL coordinate
@@ -45,7 +47,23 @@ void image::draw_image(int window_width){
     glBegin(GL_POINTS);
     for (int i = 0; i < width(); i++) {
         for (int j = 0; j < height(); j++) {
-            double g = 1.0 - get_intensity(i, j);
+            double g = get_intensity(i, j);
+            glColor3f(g, g, g);
+            glVertex2d((double)i, (double)j);
+        }
+    }
+    glEnd();
+    glPointSize(1.0);
+}
+
+void image::draw_grad(int window_width){
+    double pointSize = (double)window_width / this->width();
+    glPointSize(pointSize);
+    glBegin(GL_POINTS);
+    for (int i = 0; i < width(); i++) {
+        for (int j = 0; j < height(); j++) {
+            double g = grad(i, j)[1];
+            g = (g+1)/2.0;
             glColor3f(g, g, g);
             glVertex2d((double)i, (double)j);
         }
@@ -60,7 +78,7 @@ double image::get_intensity(int x, int y){
         or y < 0 or y > height()) {
         return 0;
     }
-    return (MAX_BYTE - (double)(*this)(x, height() - y)) / (double)MAX_BYTE;
+    return ((double)(*this)(x, height() - y)) / (double)MAX_BYTE;
 }
 
 void image::get_tri_intensity(Vec2_array tris, int * total_pixel, double * total_intensity){
@@ -86,4 +104,38 @@ void image::get_tri_intensity(Vec2_array tris, int * total_pixel, double * total
     
     *total_intensity = total_inten;
     *total_pixel = t_pixel;
+}
+
+
+void image::compute_gradient(){
+    gradient_.resize(width()*height());
+    
+    cimg_library::CImgList<int> grad_img = get_gradient("xy", 0);
+    CImg<int> *gX = grad_img.data(0);
+    CImg<int> *gY = grad_img.data(1);
+    
+    for (int x = 0; x < width(); x++) {
+        for (int y = 0; y< height(); y++) {
+            double x_g = (*gX)(x, height()-y)/(double)MAX_BYTE;
+            double y_g = (*gY)(x, height()-y)/(double)MAX_BYTE;
+            gradient_[y * width() + x] = Vec2(x_g,y_g);
+        }
+    }
+  
+    FILE *f = fopen("../grad.txt", "w");
+    for (int x = 0; x < width(); x++) {
+        for (int y = 0; y < height(); y++) {
+            fprintf(f, "%f ", grad(x, y)[0]);
+        }
+        fprintf(f, "\n");
+    }
+    fclose(f);
+//    gX->display("gX");
+//    gY->display("gY");
+//    grad_img.display();
+}
+
+
+Vec2 image::grad(int x, int y){
+    return gradient_[y * width() + x];
 }

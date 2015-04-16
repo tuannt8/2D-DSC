@@ -136,7 +136,7 @@ void interface::keyboard(unsigned char key, int x, int y){
             gl_debug_helper::change_state();
             break;
         case 'p':
-            gl_debug_helper::print_debug_info(*dsc);
+            gl_debug_helper::print_debug_info_nearest(*dsc);
             break;
         case 'i':
             std::cout << "Input debug number: ";
@@ -231,6 +231,10 @@ void interface::draw()
     
     if(bDiplay_[6]){
         Painter::draw_external_force(*dsc);
+    }
+    
+    if(!bDiplay_[7]){
+        image_->draw_grad(WIN_SIZE_X);
     }
     
     gl_debug_helper::draw();

@@ -20,7 +20,6 @@
 #define LOG_EDGE    true
 #define LOG_FACE    true
 
-
 class gl_debug_helper{
 private: // Singleton
     gl_debug_helper(){};
@@ -31,6 +30,8 @@ private:
     bool active_ = false;
     bool drawing_ = false;
     Vec2 left_down_, right_up_; // The rectangle
+    
+    Vec2 cur_mouse_pos_;
     
     Vec2 window_draw_left_;
     Vec2 scale_gl_over_win_;
@@ -52,7 +53,11 @@ public:
     static void mouseMove(int x, int y);
     
     static void coord_transform(Vec2 window_draw_left, Vec2 scale, double win_height);
+    // Index of element inside the box
     static void print_debug_info(dsc_obj &complex);
+    
+    // Index of nearest element
+    static void print_debug_info_nearest(dsc_obj &complex);
     
     static void draw();
     

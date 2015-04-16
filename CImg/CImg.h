@@ -186,7 +186,7 @@
 // Define 'cimg_display' to: '0' to disable display capabilities.
 //                           '1' to use the X-Window framework (X11).
 //                           '2' to use the Microsoft GDI32 framework.
-#define cimg_display 0
+#define cimg_display 1
 
 #ifndef cimg_display
 #if cimg_OS==0
@@ -215,11 +215,12 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <X11/extensions/XShm.h>
-#endif
+#endif    // cimg_use_xshm
 #ifdef cimg_use_xrandr
 #include <X11/extensions/Xrandr.h>
-#endif
-#endif
+#endif    // cimg_use_xrandr
+#endif // cimg_display
+
 #ifndef cimg_appname
 #define cimg_appname "CImg"
 #endif

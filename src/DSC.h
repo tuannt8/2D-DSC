@@ -117,6 +117,8 @@ namespace DSC2D {
          */
         void create_simplicial_complex(const std::vector<real>& points, const std::vector<int>& faces);
         
+        DeformableSimplicialComplex(){};
+        
         //************** DISPLAY FUNCTIONS ***************
 #pragma mark - Display fuctions
     public:
@@ -817,6 +819,8 @@ namespace DSC2D {
     public:
         void  split_edge(edge_key ek);
         void clean_attributes();
+        
+        DeformableSimplicialComplex * clone();
     };
     
 }

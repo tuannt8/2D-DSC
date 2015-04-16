@@ -309,7 +309,7 @@ void Painter::draw_faces_intensity(const DeformableSimplicialComplex& dsc)
     {
         double c = g_param.mean_intensity[dsc.get_label(*fi)];
         
-        glColor3f(1-c, 1-c, 1-c);
+        glColor3f(c, c, c);
         if (dsc.get_label(*fi) == 0) {
             continue;
         }

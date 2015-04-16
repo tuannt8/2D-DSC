@@ -84,6 +84,8 @@ void gl_debug_helper::update_dsc(){
     Vec2 ru = temp_gdh::right_up(pt1, pt2);
     dsc_obj * dsc = get_instance().s_dsc_;
     
+    // Tuan - game
+    
     static int label_count = 0;
     int new_label = ++label_count;
     for (auto fid = dsc->faces_begin(); fid != dsc->faces_end(); fid++) {
@@ -95,6 +97,8 @@ void gl_debug_helper::update_dsc(){
 }
 
 void gl_debug_helper::mouseDown(int button, int state, int x, int y){
+    get_instance().cur_mouse_pos_ = get_instance().to_gl_coord(Vec2(x, y));
+    
     if (get_instance().active_) {
         if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
             get_instance().drawing_ = true;
@@ -147,6 +151,29 @@ void gl_debug_helper::draw(){
             glVertex2dv(corner[(i+1)%4].get());
         }
         glEnd();
+    }
+}
+
+void gl_debug_helper::print_debug_info_nearest(dsc_obj &complex){
+    Vec2 pt = get_instance().cur_mouse_pos_;
+    
+    if (LOG_VERTEX) {
+        double nearest = INFINITY;
+        Node_key nearID;
+        for (auto nid = complex.vertices_begin(); nid != complex.vertices_end(); ++nid) {
+            Vec2 p = complex.get_pos(*nid);
+            
+            double dis = (p - pt).length();
+            if (dis < nearest) {
+                nearest = dis;
+                nearID = *nid;
+            }
+        }
+        std::cout << "Node: " << nearID << std::endl;
+    }
+    
+    if (LOG_FACE) {
+        
     }
 }
 

@@ -34,7 +34,7 @@ private:
 private:
     void compute_mean_intensity(std::map<int, double> & mean_inten_o);
     void compute_intensity_force();
-    void displace_dsc();
+    void displace_dsc(dsc_obj *obj = nullptr);
     void compute_curvature_force();
     
 private:
@@ -50,6 +50,18 @@ private:
     double intensity_energy(Node_key nid, Vec2 new_pos);
     // Interface length in node link
     double curve_length(Node_key nid, Vec2 new_pos);
+    
+private:
+    double get_total_energy(dsc_obj *obj, std::map<int, double>  intesity_map);
+    
+    double energy_gradient_by_moving_distance(dsc_obj *obj, std::map<int, double>  intesity_map);
+    double u_gradient(dsc_obj *obj, std::map<int, double>  intensity_map);
+    double image_gradient_count(dsc_obj *obj, std::map<int, double>  intensity_map);
+    double gradient_length(dsc_obj *obj);
+    void get_curvature(dsc_obj *obj, HMesh::Walker hew, double &Kcur, double &Kpre);
+    double get_curvature(dsc_obj *obj, HMesh::Walker hew);
+    
+    double optimal_dt(dsc_obj * clone);
 };
 
 #endif /* defined(__DSC__dynamics_mul__) */

@@ -33,6 +33,7 @@
 		A61F33181A937CDF00C5C2F8 /* gl_debug_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F33161A937CDF00C5C2F8 /* gl_debug_helper.cpp */; };
 		A61F331B1A94860D00C5C2F8 /* image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F33191A94860D00C5C2F8 /* image.cpp */; };
 		A61F331D1A97745800C5C2F8 /* define.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F331C1A97745800C5C2F8 /* define.cpp */; };
+		A663DE681AD6B25B006CC422 /* libX11.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A663DE671AD6B25B006CC422 /* libX11.6.dylib */; };
 		A67962501AB965D400EACF40 /* DSC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A51F3A517D6386100A8F8F2 /* DSC.cpp */; };
 		A6B45F1F1A88CE120091F5A6 /* interface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B45F1E1A88CE120091F5A6 /* interface.cpp */; };
 		A6B45F201A88E9230091F5A6 /* libDSC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A51F3D517D6399200A8F8F2 /* libDSC.a */; };
@@ -105,6 +106,7 @@
 		A61F33191A94860D00C5C2F8 /* image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = image.cpp; sourceTree = "<group>"; };
 		A61F331A1A94860D00C5C2F8 /* image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = image.h; sourceTree = "<group>"; };
 		A61F331C1A97745800C5C2F8 /* define.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = define.cpp; sourceTree = "<group>"; };
+		A663DE671AD6B25B006CC422 /* libX11.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libX11.6.dylib; path = ../../../../../opt/X11/lib/libX11.6.dylib; sourceTree = "<group>"; };
 		A6B45F131A88CC9B0091F5A6 /* SEGMENT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SEGMENT; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6B45F1D1A88CDFD0091F5A6 /* interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = interface.h; sourceTree = "<group>"; };
 		A6B45F1E1A88CE120091F5A6 /* interface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = interface.cpp; sourceTree = "<group>"; };
@@ -140,6 +142,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A663DE681AD6B25B006CC422 /* libX11.6.dylib in Frameworks */,
 				A6B45F471A88F3D80091F5A6 /* GEL.framework in Frameworks */,
 				A6B45F461A88F3990091F5A6 /* GLUT.framework in Frameworks */,
 				A6B45F451A88F3910091F5A6 /* OpenGL.framework in Frameworks */,
@@ -153,6 +156,7 @@
 		7A51F38E17D6383500A8F8F2 = {
 			isa = PBXGroup;
 			children = (
+				A663DE671AD6B25B006CC422 /* libX11.6.dylib */,
 				7A51F3B417D638B500A8F8F2 /* GEL.framework */,
 				7A51F3B217D6388800A8F8F2 /* OpenGL.framework */,
 				7A51F3B017D6388200A8F8F2 /* GLUT.framework */,
@@ -426,6 +430,12 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					opt/X11/include,
+				);
+				LIBRARY_SEARCH_PATHS = opt/X11/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -452,6 +462,12 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					opt/X11/include,
+				);
+				LIBRARY_SEARCH_PATHS = opt/X11/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				SDKROOT = macosx;
 			};
@@ -520,6 +536,11 @@
 				HEADER_SEARCH_PATHS = (
 					/Library/Frameworks/GEL.framework/Headers,
 					../DEMO,
+					/opt/X11/include/,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/opt/X11/lib/,
+					/opt/X11/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				MTL_ENABLE_DEBUG_INFO = "";
@@ -549,6 +570,11 @@
 				HEADER_SEARCH_PATHS = (
 					/Library/Frameworks/GEL.framework/Headers,
 					../DEMO,
+					/opt/X11/include/,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/opt/X11/lib/,
+					/opt/X11/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				MTL_ENABLE_DEBUG_INFO = "";
