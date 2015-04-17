@@ -23,8 +23,8 @@
 #endif
 
 
-#define NOISE 0.0
-#define BLUR 2.0
+#define NOISE 20.0
+#define BLUR 3.0
 
 void image::load_image(std::string const file_path){
     
@@ -34,8 +34,8 @@ void image::load_image(std::string const file_path){
     // convert to 0-1 scale
    // *this = this->get_RGBtoYCbCr().channel(0);
     
-    blur(BLUR);
-    noise(NOISE);
+    blur(3.0);
+    noise(40.0);
     
     compute_gradient();
 }
@@ -110,6 +110,17 @@ void image::get_tri_intensity(Vec2_array tris, int * total_pixel, double * total
 void image::compute_gradient(){
     gradient_.resize(width()*height());
     
+    /**
+     \param axes Axes considered for the gradient computation, as a C-string (e.g "xy").
+     \param scheme = Numerical scheme used for the gradient computation:
+     - -1 = Backward finite differences
+     - 0 = Centered finite differences
+     - 1 = Forward finite differences
+     - 2 = Using Sobel masks
+     - 3 = Using rotation invariant masks
+     - 4 = Using Deriche recusrsive filter.
+     - 5 = Using Van Vliet recusrsive filter.
+     **/
     cimg_library::CImgList<int> grad_img = get_gradient("xy", 0);
     CImg<int> *gX = grad_img.data(0);
     CImg<int> *gY = grad_img.data(1);

@@ -454,6 +454,10 @@ void dynamics_mul::compute_intensity_force(){
             auto p0 = s_dsc->get_pos(hew.opp().vertex());
             auto p1 = s_dsc->get_pos(hew.vertex());
             
+            Vec2 L01 = p1 - p0;
+            L01.normalize();
+            Vec2 N01(L01[1], -L01[0]); // Outward pointing normal
+            
             int length = (int)(p1 - p0).length();
             double f0 = 0.0, f1 = 0.0;
             Vec2 fg0(0.0), fg1(0.0);
@@ -479,6 +483,16 @@ void dynamics_mul::compute_intensity_force(){
                         break;
                 }
                 
+                // Image gradient force
+                Vec2 gg = s_img->grad(p[0], p[1]);
+                Vec2 fu = N01*(c0-c1)*(2*I - c0 - c1);
+                Vec2 fg = Vec2(0.0);//gg*(2*I - c0 - c1);
+                
+                Vec2 fv = (fu - fg)/((c0-c1)*(c0-c1));
+                
+                fg0 += fv*(p-p1).length() / (double)length;
+                fg1 += fv*(p-p0).length() / (double)length;
+                
                 // Barry Centric coordinate
                 f0 += f*(p-p1).length() / (double)length;
                 f1 += f*(p-p0).length() / (double)length;
@@ -490,12 +504,9 @@ void dynamics_mul::compute_intensity_force(){
             }
             
             // Set force
-            Vec2 L01 = p1 - p0;
-            L01.normalize();
-            Vec2 N01(L01[1], -L01[0]);
             
-            Vec2 f_x0 = N01*f0;// - fg0;
-            Vec2 f_x1 = N01*f1;// - fg1;
+            Vec2 f_x0 = fg0; // N01*f0;
+            Vec2 f_x1 = fg1; // N01*f1;
             
             s_dsc->add_node_external_force(hew.opp().vertex(), f_x0*g_param.beta);
             s_dsc->add_node_external_force(hew.vertex(), f_x1*g_param.beta);
