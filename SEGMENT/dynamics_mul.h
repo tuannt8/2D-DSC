@@ -13,8 +13,13 @@
 #include "define.h"
 #include "image.h"
 
+#define EX_BOUND 1
+#define IN_BOUND 2
+#define IMAGE_GRAD 3
+#define INDEX_VERT 4
+
 class dynamics_mul {
-    
+
     
 public:
     dynamics_mul();
@@ -29,9 +34,22 @@ private:
     
     // Mean intensity
     std::map<int, double> mean_inten_;
-    
     std::map<int, double> alpha_map_;
+    
 private:
+    /*
+     Compute on the whole domain
+     */
+    void update_dsc_implicit(dsc_obj &dsc, image &img);
+    void compute_intensity_force_implicit();
+    void compute_curvature_force_implicit();
+    void compute_image_gradient_force_implicit(std::vector<Vec2> & grad_force);
+    void indexing_vertices();
+    std::vector<int> get_vert_idx(std::vector<HMesh::VertexID> vids);
+    void build_and_solve();
+    
+private:
+    void update_dsc_explicit(dsc_obj &dsc, image &img);
     void compute_mean_intensity(std::map<int, double> & mean_inten_o);
     void compute_intensity_force();
     void displace_dsc(dsc_obj *obj = nullptr);

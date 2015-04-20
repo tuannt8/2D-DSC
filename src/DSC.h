@@ -30,6 +30,7 @@
 
 //#define TUAN_SEG
 
+#define NB_FORCES 10
 
 namespace DSC2D {
     
@@ -93,6 +94,8 @@ namespace DSC2D {
         
         HMesh::VertexAttributeVector<vec2> internal_node_forces;
         HMesh::VertexAttributeVector<vec2> external_node_forces;
+        
+        HMesh::VertexAttributeVector<std::vector<vec2>> forces;
         
         HMesh::VertexAttributeVector<int> vertex_labels;
         HMesh::HalfEdgeAttributeVector<int> edge_labels;
@@ -336,6 +339,18 @@ namespace DSC2D {
         
         const HMesh::VertexAttributeVector<vec2> & get_external_force () const{
             return external_node_forces;
+        }
+        
+        vec2 get_node_force(node_key vid, int index){
+            return forces[vid][index];
+        }
+        
+        void set_node_force(node_key vid, vec2 f, int index){
+            forces[vid][index] = f;
+        }
+        
+        void add_node_force(node_key vid, vec2 f, int index){
+            forces[vid][index] += f;
         }
         
         //************** SETTERS ***************

@@ -166,6 +166,7 @@ void interface::keyboard(unsigned char key, int x, int y){
     if (dis <= 10 and dis >= 0) {
         bDiplay_[dis] = ! bDiplay_[dis];
     }
+    g_param.bDisplay = bDiplay_;
     
     glutPostRedisplay();
 }

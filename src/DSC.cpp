@@ -55,6 +55,8 @@ namespace DSC2D
                                                                   vec2(0.0f));
         external_node_forces = HMesh::VertexAttributeVector<vec2>(get_no_vertices(),
                                                                   vec2(0.0f));
+        forces = HMesh::VertexAttributeVector<std::vector<vec2>>(get_no_vertices(),
+                                                    std::vector<vec2>(NB_FORCES, Vec2(0.0)));
     }
     
     void DeformableSimplicialComplex::cleanup_attributes(HMesh::IDRemap& cleanup_map)
@@ -66,6 +68,7 @@ namespace DSC2D
         destination.cleanup(cleanup_map.vmap);
         internal_node_forces.cleanup(cleanup_map.vmap);
         external_node_forces.cleanup(cleanup_map.vmap);
+        forces.cleanup(cleanup_map.vmap);
     }
     
     
@@ -255,6 +258,7 @@ namespace DSC2D
         new_dsc->destination = destination;
         new_dsc->internal_node_forces = internal_node_forces;
         new_dsc->external_node_forces = external_node_forces;
+        new_dsc->forces = forces;
         new_dsc->vertex_labels = vertex_labels;
         new_dsc->edge_labels = edge_labels;
         new_dsc->face_labels = face_labels;
@@ -496,6 +500,7 @@ namespace DSC2D
         destination[vid] = get_pos(vid);
         internal_node_forces[vid] = vec2(0.0);
         external_node_forces[vid] = vec2(0.0);
+        forces[vid] = std::vector<vec2>(NB_FORCES, Vec2(0.0));
     }
     
     void DeformableSimplicialComplex::init_attributes(face_key fid, int label)

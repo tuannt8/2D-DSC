@@ -59,13 +59,16 @@ void image::draw_image(int window_width){
 void image::draw_grad(int window_width){
     double pointSize = (double)window_width / this->width();
     glPointSize(pointSize);
-    glBegin(GL_POINTS);
+    glBegin(GL_LINES);
     for (int i = 0; i < width(); i++) {
         for (int j = 0; j < height(); j++) {
-            double g = grad(i, j)[1];
-            g = (g+1)/2.0;
-            glColor3f(g, g, g);
-            glVertex2d((double)i, (double)j);
+            Vec2 g = grad(i, j)*10;
+            glColor3f(1.0, 0.0, 0.0);
+            
+            Vec2 pt((double)i+0.5, (double)j+0.5);
+            glVertex2d(pt[0], pt[1]);
+            Vec2 top = pt + g;
+            glVertex2d(top[0], top[1]);
         }
     }
     glEnd();
@@ -117,7 +120,7 @@ void image::compute_gradient(){
     for (int x = 0; x < width(); x++) {
         for (int y = 0; y< height(); y++) {
             double x_g = (*gX)(x, height()-y)/(double)MAX_BYTE;
-            double y_g = (*gY)(x, height()-y)/(double)MAX_BYTE;
+            double y_g = -(*gY)(x, height()-y)/(double)MAX_BYTE;
             gradient_[y * width() + x] = Vec2(x_g,y_g);
         }
     }

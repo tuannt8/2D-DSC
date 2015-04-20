@@ -44,6 +44,8 @@ struct dynamics_param{
     double mass = 10.0; // Display scale
     
     std::map<int, double> mean_intensity;
+    
+    std::vector<bool> bDisplay;
 } ;
 
 /*******

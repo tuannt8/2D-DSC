@@ -29,12 +29,14 @@
 		7A82D64F17E272BB00C19874 /* design_domain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A82D64D17E272BB00C19874 /* design_domain.cpp */; };
 		7A82D65017E272BB00C19874 /* design_domain.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A82D64E17E272BB00C19874 /* design_domain.h */; };
 		7A9C20DB17DFBE080064171E /* draw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A9C20D917DFBE070064171E /* draw.cpp */; };
-		A615B7E71ABC8708001E1EA7 /* dynamics_mul.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A615B7E51ABC8708001E1EA7 /* dynamics_mul.cpp */; };
+		A615B7E71ABC8708001E1EA7 /* dynamics_mul.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A615B7E51ABC8708001E1EA7 /* dynamics_mul.cpp */; settings = {COMPILER_FLAGS = "-larmadillo"; }; };
 		A61F33181A937CDF00C5C2F8 /* gl_debug_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F33161A937CDF00C5C2F8 /* gl_debug_helper.cpp */; };
 		A61F331B1A94860D00C5C2F8 /* image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F33191A94860D00C5C2F8 /* image.cpp */; };
 		A61F331D1A97745800C5C2F8 /* define.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F331C1A97745800C5C2F8 /* define.cpp */; };
 		A663DE681AD6B25B006CC422 /* libX11.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A663DE671AD6B25B006CC422 /* libX11.6.dylib */; };
 		A67962501AB965D400EACF40 /* DSC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A51F3A517D6386100A8F8F2 /* DSC.cpp */; };
+		A699B3661AE1584800522DA2 /* libarmadillo.5.000.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A699B3651AE1584800522DA2 /* libarmadillo.5.000.1.dylib */; };
+		A699B3681AE4E7B500522DA2 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A699B3671AE4E7B500522DA2 /* Accelerate.framework */; };
 		A6B45F1F1A88CE120091F5A6 /* interface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B45F1E1A88CE120091F5A6 /* interface.cpp */; };
 		A6B45F201A88E9230091F5A6 /* libDSC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A51F3D517D6399200A8F8F2 /* libDSC.a */; };
 		A6B45F291A88EE190091F5A6 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B45F271A88EE190091F5A6 /* main.cpp */; };
@@ -107,6 +109,8 @@
 		A61F331A1A94860D00C5C2F8 /* image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = image.h; sourceTree = "<group>"; };
 		A61F331C1A97745800C5C2F8 /* define.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = define.cpp; sourceTree = "<group>"; };
 		A663DE671AD6B25B006CC422 /* libX11.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libX11.6.dylib; path = ../../../../../opt/X11/lib/libX11.6.dylib; sourceTree = "<group>"; };
+		A699B3651AE1584800522DA2 /* libarmadillo.5.000.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libarmadillo.5.000.1.dylib; path = "../../../../armadillo-5.000.1/libarmadillo.5.000.1.dylib"; sourceTree = "<group>"; };
+		A699B3671AE4E7B500522DA2 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		A6B45F131A88CC9B0091F5A6 /* SEGMENT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SEGMENT; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6B45F1D1A88CDFD0091F5A6 /* interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = interface.h; sourceTree = "<group>"; };
 		A6B45F1E1A88CE120091F5A6 /* interface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = interface.cpp; sourceTree = "<group>"; };
@@ -142,6 +146,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A699B3681AE4E7B500522DA2 /* Accelerate.framework in Frameworks */,
+				A699B3661AE1584800522DA2 /* libarmadillo.5.000.1.dylib in Frameworks */,
 				A663DE681AD6B25B006CC422 /* libX11.6.dylib in Frameworks */,
 				A6B45F471A88F3D80091F5A6 /* GEL.framework in Frameworks */,
 				A6B45F461A88F3990091F5A6 /* GLUT.framework in Frameworks */,
@@ -156,6 +162,8 @@
 		7A51F38E17D6383500A8F8F2 = {
 			isa = PBXGroup;
 			children = (
+				A699B3671AE4E7B500522DA2 /* Accelerate.framework */,
+				A699B3651AE1584800522DA2 /* libarmadillo.5.000.1.dylib */,
 				A663DE671AD6B25B006CC422 /* libX11.6.dylib */,
 				7A51F3B417D638B500A8F8F2 /* GEL.framework */,
 				7A51F3B217D6388800A8F8F2 /* OpenGL.framework */,
@@ -333,7 +341,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 7A51F39217D6383500A8F8F2 /* Build configuration list for PBXProject "DSC" */;
+			buildConfigurationList = 7A51F39217D6383500A8F8F2 /* Build configuration list for PBXProject "DSC_seg" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -537,10 +545,12 @@
 					/Library/Frameworks/GEL.framework/Headers,
 					../DEMO,
 					/opt/X11/include/,
+					"$HOME/armadillo-5.000.1/include",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/X11/lib/,
 					/opt/X11/lib,
+					"/Users/tuannt8/armadillo-5.000.1",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				MTL_ENABLE_DEBUG_INFO = "";
@@ -571,10 +581,12 @@
 					/Library/Frameworks/GEL.framework/Headers,
 					../DEMO,
 					/opt/X11/include/,
+					"$HOME/armadillo-5.000.1/include",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/X11/lib/,
 					/opt/X11/lib,
+					"/Users/tuannt8/armadillo-5.000.1",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				MTL_ENABLE_DEBUG_INFO = "";
@@ -586,7 +598,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		7A51F39217D6383500A8F8F2 /* Build configuration list for PBXProject "DSC" */ = {
+		7A51F39217D6383500A8F8F2 /* Build configuration list for PBXProject "DSC_seg" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7A51F39E17D6383500A8F8F2 /* Debug */,
