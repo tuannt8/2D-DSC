@@ -84,7 +84,7 @@ void gl_debug_helper::update_dsc(){
     Vec2 ru = temp_gdh::right_up(pt1, pt2);
     dsc_obj * dsc = get_instance().s_dsc_;
     
-    // Tuan - game
+    
     
     static int label_count = 0;
     int new_label = ++label_count;

@@ -25,6 +25,10 @@ namespace helper_t {
         int index = 0;
         Vec3 next();
     };
+    
+    void start_timer();
+    void stop_timer();
+    double get_time_and_start();
 }
 
 #endif /* defined(__DSC__helper__) */

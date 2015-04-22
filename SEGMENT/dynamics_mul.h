@@ -17,6 +17,8 @@
 #define IN_BOUND 2
 #define IMAGE_GRAD 3
 #define INDEX_VERT 4
+#define FORCE_TEMP 5
+#define V_COUNT 6
 
 class dynamics_mul {
 
@@ -36,6 +38,10 @@ private:
     std::map<int, double> mean_inten_;
     std::map<int, double> alpha_map_;
     
+    // Adaptive dt
+    double E0_ = 0.0, E1_ = 0.0, dE_0_ = 0.;
+    std::vector<Vec2> E_grad0_;
+    double dt = 200.;
 private:
     /*
      Compute on the whole domain
@@ -47,6 +53,9 @@ private:
     void indexing_vertices();
     std::vector<int> get_vert_idx(std::vector<HMesh::VertexID> vids);
     void build_and_solve();
+    
+private:
+    void update_dsc_explicit_whole_domain(dsc_obj &dsc, image &img);
     
 private:
     void update_dsc_explicit(dsc_obj &dsc, image &img);

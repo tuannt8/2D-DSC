@@ -143,7 +143,7 @@ namespace DSC2D {
         
         //************** ATTRIBUTE FUNCTIONS ***************
 #pragma mark - attribute functions
-    protected:
+    public:
         
         /**
          Clean up the attribute vectors (the lists that stores the attributes of each vertex, edge and face). Should be called after removing primitives.

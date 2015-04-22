@@ -39,4 +39,19 @@ namespace helper_t {
         
         return colorList[index++];
     }
+    
+    std::chrono::time_point<std::chrono::system_clock> start_time;
+    std::chrono::time_point<std::chrono::system_clock> stop_time;
+    void start_timer(){
+        start_time = std::chrono::system_clock::now();
+    }
+    void stop_timer(){
+        stop_time = std::chrono::system_clock::now();
+    }
+    double get_time_and_start(){
+        stop_timer();
+        std::chrono::duration<double> t = (stop_time - start_time);
+        start_timer();
+        return t.count();
+    }
 }

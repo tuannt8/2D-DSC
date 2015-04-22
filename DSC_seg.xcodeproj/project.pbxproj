@@ -116,9 +116,9 @@
 		A6B45F1E1A88CE120091F5A6 /* interface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = interface.cpp; sourceTree = "<group>"; };
 		A6B45F271A88EE190091F5A6 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		A6B460AA1A8B6B530091F5A6 /* define.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = define.h; sourceTree = "<group>"; };
-		A6B460EB1A8BC01B0091F5A6 /* CImg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CImg.h; path = CImg/CImg.h; sourceTree = SOURCE_ROOT; };
 		A6B460ED1A8CADF30091F5A6 /* helper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = helper.cpp; sourceTree = "<group>"; };
 		A6B460EE1A8CADF30091F5A6 /* helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = helper.h; sourceTree = "<group>"; };
+		A6EB2A0D1AE79B70008CBC7E /* CImg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CImg.h; path = CImg/CImg.h; sourceTree = SOURCE_ROOT; };
 		A6FF355C1AC2C46E001071B3 /* tri_box_overlap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tri_box_overlap.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -247,7 +247,6 @@
 			children = (
 				A615B7E41ABC8560001E1EA7 /* Source */,
 				A615B7E31ABC8520001E1EA7 /* Lib */,
-				A6B460EB1A8BC01B0091F5A6 /* CImg.h */,
 				A6B45F1D1A88CDFD0091F5A6 /* interface.h */,
 				A6B45F271A88EE190091F5A6 /* main.cpp */,
 				A6B460EE1A8CADF30091F5A6 /* helper.h */,
@@ -256,6 +255,7 @@
 				A6B460AA1A8B6B530091F5A6 /* define.h */,
 				A615B7E51ABC8708001E1EA7 /* dynamics_mul.cpp */,
 				A615B7E61ABC8708001E1EA7 /* dynamics_mul.h */,
+				A6EB2A0D1AE79B70008CBC7E /* CImg.h */,
 			);
 			path = SEGMENT;
 			sourceTree = "<group>";

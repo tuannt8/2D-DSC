@@ -34,8 +34,8 @@ void image::load_image(std::string const file_path){
     // convert to 0-1 scale
    // *this = this->get_RGBtoYCbCr().channel(0);
     
-    blur(BLUR);
-    noise(NOISE);
+//    blur(BLUR);
+//    noise(NOISE);
     
     compute_gradient();
 }
