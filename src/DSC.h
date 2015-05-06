@@ -86,7 +86,7 @@ namespace DSC2D {
         vec3 OUTSIDE_FACE_COLOR;
         vec3 DEFAULT_FACE_COLOR;
         
-    private:
+    public:
         HMesh::Manifold *mesh;
         DesignDomain *design_domain;
         
@@ -96,13 +96,19 @@ namespace DSC2D {
         HMesh::VertexAttributeVector<vec2> external_node_forces;
         
         HMesh::VertexAttributeVector<std::vector<vec2>> forces;
+
         
         HMesh::VertexAttributeVector<int> vertex_labels;
         HMesh::HalfEdgeAttributeVector<int> edge_labels;
         HMesh::FaceAttributeVector<int> face_labels;
+ 
+    public:
+        HMesh::FaceAttributeVector<std::vector<vec2>> face_att;
         
         //************** INITIALISATION ***************
     public:
+        
+        
         
         /**
          Creates a simplicial complex with size (SIZE_X_, SIZE_Y_). The input parameters specifies the design domain, the initial object(s) and the discretization. The latter is defined by the parameter AVG_EDGE_LENGTH, which tells how long edges are on average.
@@ -392,6 +398,14 @@ namespace DSC2D {
             face_labels[fid] = new_label;
         }
         
+        void set_phase_attr(face_key fid, vec2 new_attr, int idx){
+            face_att[fid][idx] = new_attr;
+        };
+        
+        vec2 get_phase_attr(face_key fid, int idx){
+            return face_att[fid][idx];
+        }
+        
         /**
          Sets the destination of the vertex with ID vid to dest.
          To actually move the vertices to their destination, call the deform function.
@@ -433,6 +447,14 @@ namespace DSC2D {
         HMesh::FaceIDIterator faces_begin() const
         {
             return mesh->faces_begin();
+        }
+        
+        HMesh::IDIteratorPair<HMesh::Vertex> vertices() const {
+            return mesh->vertices();
+        }
+        
+        HMesh::IDIteratorPair<HMesh::Face> faces() const {
+            return mesh->faces();
         }
         
         HMesh::FaceIDIterator faces_end() const

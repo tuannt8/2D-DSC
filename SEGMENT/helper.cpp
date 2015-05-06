@@ -24,6 +24,33 @@ bool helper_t::is_point_in_tri(Vec2 p, std::vector<Vec2> const & pts){
     return is_point_in_tri(p, pts[0], pts[1], pts[2]);
 }
 
+double dis_point_to_edge(Vec2 p, Vec2 e1, Vec2 e2){
+    // Return minimum distance between line segment vw and point p
+    const double l2 = (e1-e2).length();
+    if (l2 == 0.0) return (p-e1).length();
+    
+    const float t = dot(p - e1, e2 - e1) / l2;
+    
+    if (t < 0.0) return (p - e1).length();
+    else if (t > 1.0) return (p - e2).length();
+    
+    const Vec2 projection = e1 + (e2 - e1)*t;
+    
+    return (p - projection).length();
+}
+
+double helper_t::distance_to_edge(Vec2 p, std::vector<Vec2> const & pts){
+    double dis = INFINITY;
+    for (int i = 0; i < 3; i++) {
+        double dis_to_e = dis_point_to_edge(p, pts[i], pts[(i+1)%3]);
+        if(dis > dis_to_e){
+            dis = dis_to_e;
+        }
+    }
+    
+    return dis;
+}
+
 namespace helper_t {
     Vec3 autoColor::next(){
         static std::vector<Vec3> colorList =

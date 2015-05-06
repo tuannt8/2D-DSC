@@ -51,6 +51,8 @@ namespace DSC2D
         vertex_labels = HMesh::VertexAttributeVector<int>(get_no_vertices(), OUTSIDE);
         edge_labels = HMesh::HalfEdgeAttributeVector<int>(get_no_halfedges(), OUTSIDE);
         face_labels = HMesh::FaceAttributeVector<int>(get_no_faces(), OUTSIDE);
+        face_att = HMesh::FaceAttributeVector<std::vector<vec2>>(get_no_faces(),
+                                                        std::vector<vec2>(NB_FORCES, Vec2(0.)));
         internal_node_forces = HMesh::VertexAttributeVector<vec2>(get_no_vertices(),
                                                                   vec2(0.0f));
         external_node_forces = HMesh::VertexAttributeVector<vec2>(get_no_vertices(),
@@ -65,10 +67,12 @@ namespace DSC2D
         vertex_labels.cleanup(cleanup_map.vmap);
         edge_labels.cleanup(cleanup_map.hmap);
         face_labels.cleanup(cleanup_map.fmap);
+//        face_att.cleanup(cleanup_map.fmap);
         destination.cleanup(cleanup_map.vmap);
         internal_node_forces.cleanup(cleanup_map.vmap);
         external_node_forces.cleanup(cleanup_map.vmap);
         forces.cleanup(cleanup_map.vmap);
+
     }
     
     

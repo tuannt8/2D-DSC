@@ -13,12 +13,30 @@
 #include "define.h"
 #include "image.h"
 
-#define EX_BOUND 1
-#define IN_BOUND 2
-#define IMAGE_GRAD 3
-#define INDEX_VERT 4
-#define FORCE_TEMP 5
-#define V_COUNT 6
+//#define EX_BOUND 1
+//#define IN_BOUND 2
+//#define IMAGE_GRAD 3
+//#define INDEX_VERT 4
+//#define FORCE_TEMP 5
+//#define V_COUNT 6
+//#define E2 7
+
+enum {
+    EX_BOUND = 0,
+    IN_BOUND,
+    IMAGE_GRAD,
+    INDEX_VERT,
+    FORCE_TEMP,
+    V_COUNT,
+    E2_GRAD,
+    AREA_FORCE,
+    STAR_DIFFER,
+};
+
+enum {
+    FACE_IDX = 0,
+    PHASE_PROBABILITY, // Probability of phase
+};
 
 class dynamics_mul {
 
@@ -28,7 +46,7 @@ public:
     ~dynamics_mul();
     
     void  update_dsc(dsc_obj &dsc, image &img);
-    
+            
 private:
     // temporary variable
     dsc_obj * s_dsc;
@@ -37,11 +55,14 @@ private:
     // Mean intensity
     std::map<int, double> mean_inten_;
     std::map<int, double> alpha_map_;
+
+    std::map<int, double> total_inten_;
+    std::map<int, int> total_pixel;
     
     // Adaptive dt
-    double E0_ = 0.0, E1_ = 0.0, dE_0_ = 0.;
+    double E0_ = 0.0, E1_ = 0.0, dE_0_ = 0., dE2 = 0.;
     std::vector<Vec2> E_grad0_;
-    double dt = 200.;
+    double dt = 1.;
 private:
     /*
      Compute on the whole domain
@@ -56,6 +77,11 @@ private:
     
 private:
     void update_dsc_explicit_whole_domain(dsc_obj &dsc, image &img);
+    void update_dsc_area(dsc_obj &dsc, image &img);
+    void update_dsc_build_and_solve(dsc_obj &dsc, image &img);
+    
+private:
+    void update_probability(dsc_obj &dsc, image &img);
     
 private:
     void update_dsc_explicit(dsc_obj &dsc, image &img);
@@ -64,10 +90,14 @@ private:
     void displace_dsc(dsc_obj *obj = nullptr);
     void compute_curvature_force();
     
+    void compute_difference();
+    
 private:
     void displace_dsc_2();
     void debug_optimum_dt();
     void debug_optimum_dt_2();
+    
+    void optimize_phase();
     
     double furthest_move(Node_key nid, Vec2 direction);
     double energy_change(Node_key nid, Vec2 new_pos);
@@ -88,7 +118,13 @@ private:
     void get_curvature(dsc_obj *obj, HMesh::Walker hew, double &Kcur, double &Kpre);
     double get_curvature(dsc_obj *obj, HMesh::Walker hew);
     
+    double energy_triangle(HMesh::FaceID fid, double c, int new_phase);
+    
     double optimal_dt(dsc_obj * clone);
+    
+    Vec2 get_vertex_norm(dsc_obj *obj, HMesh::Walker hew);
+    HMesh::Walker pre_edge(dsc_obj *obj, HMesh::Walker hew);
+    HMesh::Walker next_edge(dsc_obj *obj, HMesh::Walker hew);
 };
 
 #endif /* defined(__DSC__dynamics_mul__) */

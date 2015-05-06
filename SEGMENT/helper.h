@@ -29,6 +29,7 @@ namespace helper_t {
     void start_timer();
     void stop_timer();
     double get_time_and_start();
+    double distance_to_edge(Vec2 p, std::vector<Vec2> const & pts);
 }
 
 #endif /* defined(__DSC__helper__) */

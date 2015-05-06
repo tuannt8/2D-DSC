@@ -78,6 +78,7 @@ private:
     void draw_image();
     void draw_coord();
     void update_title();
+    void thres_hold_init();
     
 #pragma mark - data
 public:

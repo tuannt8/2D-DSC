@@ -383,7 +383,27 @@ void interface::init_dsc(){
     
     dsc = std::unique_ptr<DeformableSimplicialComplex>(
                             new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
+    
+ //   thres_hold_init();
 
+}
+
+void interface::thres_hold_init(){
+    for (auto fid = dsc->faces_begin(); fid != dsc->faces_end(); fid++) {
+        auto tris = dsc->get_pos(*fid);
+        int totalPixel = 0;
+        double total_inten = 0.0;
+        image_->get_tri_intensity(tris, & totalPixel, & total_inten);
+        double mean_c = total_inten / (double)totalPixel;
+        
+        if (mean_c < 0.2) {
+            dsc->set_label(*fid, 0);
+        }
+        else if (mean_c < 0.7)
+            dsc->set_label(*fid, 1);
+        else
+            dsc->set_label(*fid, 3);
+    }
 }
 
 void interface::init_sqaure_boundary(){

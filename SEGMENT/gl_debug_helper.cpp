@@ -170,6 +170,7 @@ void gl_debug_helper::print_debug_info_nearest(dsc_obj &complex){
             }
         }
         std::cout << "Node: " << nearID << std::endl;
+        debug_num[0] = (int)nearID.get_index();
     }
     
     if (LOG_FACE) {

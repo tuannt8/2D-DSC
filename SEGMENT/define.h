@@ -19,6 +19,8 @@
 #define LOG_PATH "../../../LOG/"
 #endif
 
+#define PI_V1 3.14159
+
 
 using std::vector;
 using std::cout;
