@@ -23,7 +23,7 @@
 #endif
 
 
-#define NOISE 2.0
+#define NOISE 5.
 #define BLUR 2.0
 
 void image::load_image(std::string const file_path){
@@ -34,8 +34,8 @@ void image::load_image(std::string const file_path){
     // convert to 0-1 scale
    // *this = this->get_RGBtoYCbCr().channel(0);
 //    
-//    blur(BLUR);
-//    noise(NOISE);
+    blur(BLUR);
+    noise(NOISE);
     
     compute_gradient();
 }

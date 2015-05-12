@@ -18,6 +18,8 @@
 #include <GEL/GLGraphics/SOIL.h>
 #endif
 
+#include "helper.h"
+
 namespace temp_gdh {
     
     inline bool is_greater(Vec2 g, Vec2 l){
@@ -174,7 +176,14 @@ void gl_debug_helper::print_debug_info_nearest(dsc_obj &complex){
     }
     
     if (LOG_FACE) {
-        
+        for (auto fkey : complex.faces()){
+            auto tris = complex.get_pos(fkey);
+            if (helper_t::is_point_in_tri(pt, tris)) {
+                std::cout << "Tri: " << fkey.get_index() << std::endl;
+                debug_num[1] = (int)fkey.get_index();
+                break;
+            }
+        }
     }
 }
 

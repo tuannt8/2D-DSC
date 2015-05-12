@@ -322,6 +322,139 @@ void Painter::draw_faces_intensity(const DeformableSimplicialComplex& dsc)
     glEnd();
 }
 
+void Painter::draw_faces_probability(const DeformableSimplicialComplex& dsc)
+{
+    glDisable(GL_BLEND);
+    
+    glBegin(GL_TRIANGLES);
+    
+    for(auto fi = dsc.faces_begin(); fi != dsc.faces_end(); ++fi)
+    {
+        double c = dsc.face_att[*fi][intensity][0];
+        
+        
+        glColor3f(c, c, c);
+
+        for (auto hew = dsc.walker(*fi); !hew.full_circle(); hew = hew.circulate_face_cw())
+        {
+            vec2 p = dsc.get_pos(hew.vertex());
+            glVertex3d(static_cast<double>(p[0]), static_cast<double>(p[1]), static_cast<double>(0.));
+        }
+    }
+    glEnd();
+}
+
+void drawString (char *s, float x, float y){
+    unsigned int i;
+    glRasterPos2f(x, y);
+    
+    glColor3d(1.0, 0.8, 0.2);
+    for (i = 0; i < strlen (s); i++)
+        glutBitmapCharacter (GLUT_BITMAP_HELVETICA_18, s[i]);
+}
+
+void Painter::draw_faces_probability_force(const DeformableSimplicialComplex& dsc)
+{
+    glDisable(GL_BLEND);
+    
+    glBegin(GL_TRIANGLES);
+    
+    double range = -INFINITY;
+    for(auto fi = dsc.faces_begin(); fi != dsc.faces_end(); ++fi)
+    {
+        double c = std::abs( dsc.face_att[*fi][xac_suat_force][0] );
+        if (c > range) {
+            range = c;
+        }
+    }
+    
+    for(auto fi = dsc.faces_begin(); fi != dsc.faces_end(); ++fi)
+    {
+        double c = - dsc.face_att[*fi][xac_suat_force][0];
+        
+        if (c < 0) {
+            c =  0.5 + std::abs(c) / range;
+            glColor3f(0, 0, c);
+        }else{
+            c =  0.5 + std::abs(c) / range;
+            glColor3f(c, 0, 0);
+        }
+
+        
+        
+
+        for (auto hew = dsc.walker(*fi); !hew.full_circle(); hew = hew.circulate_face_cw())
+        {
+            vec2 p = dsc.get_pos(hew.vertex());
+            glVertex3d(static_cast<double>(p[0]), static_cast<double>(p[1]), static_cast<double>(0.));
+        }
+    }
+    glEnd();
+    
+//    glDisable(GL_LIGHTING);
+    char buff[100];
+    for(auto fi = dsc.faces_begin(); fi != dsc.faces_end(); ++fi)
+    {
+        auto tris = dsc.get_pos(*fi);
+        Vec2 pt(0.);
+        for (auto v : tris) {
+            pt += v;
+        }
+        pt /= 3.0;
+        
+        double x = -dsc.face_att[*fi][xac_suat_force][0];
+        sprintf(buff, "%1.2e ", x);
+        
+        
+        drawString(buff, pt[0], pt[1]);
+    }
+}
+
+void Painter::draw_faces_probability_lambda(const DeformableSimplicialComplex& dsc)
+{
+    char buff[100];
+    for(auto fi = dsc.faces_begin(); fi != dsc.faces_end(); ++fi)
+    {
+        auto tris = dsc.get_pos(*fi);
+        Vec2 pt(0.);
+        for (auto v : tris) {
+            pt += v;
+        }
+        pt /= 3.0;
+        
+        double x = -dsc.face_att[*fi][lambda][0];
+        sprintf(buff, "%1.2e ", x);
+        
+        
+        drawString(buff, pt[0], pt[1]);
+    }
+}
+
+
+
+void Painter::draw_prob(const DeformableSimplicialComplex& dsc)
+{
+    glDisable(GL_LIGHTING);
+    for(auto fi = dsc.faces_begin(); fi != dsc.faces_end(); ++fi)
+    {
+        auto tris = dsc.get_pos(*fi);
+        Vec2 pt(0.);
+        for (auto v : tris) {
+            pt += v;
+        }
+        pt /= 3.0;
+        
+        double x = dsc.face_att[*fi][xac_suat][0];
+        char buff[10];
+        sprintf(buff, "%1.2f", x);
+        
+        
+        drawString(buff, pt[0], pt[1]);
+    }
+}
+
+
+
 void Painter::draw_faces(const DeformableSimplicialComplex& dsc, const HMesh::FaceAttributeVector<vec3> &colors)
 {
     glBegin(GL_TRIANGLES);

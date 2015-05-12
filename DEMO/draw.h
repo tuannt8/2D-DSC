@@ -94,6 +94,11 @@ public:
      */
     static void draw_faces(const DSC2D::DeformableSimplicialComplex& complex);
     static void draw_faces_intensity(const DSC2D::DeformableSimplicialComplex& complex);
+    
+    static void draw_faces_probability(const DSC2D::DeformableSimplicialComplex& complex);
+    static void draw_faces_probability_force(const DSC2D::DeformableSimplicialComplex& complex);
+    static void draw_faces_probability_lambda(const DSC2D::DeformableSimplicialComplex& complex);
+    static void draw_prob(const DSC2D::DeformableSimplicialComplex& complex);
     /**
      Draws the faces with the colors given as input.
      */

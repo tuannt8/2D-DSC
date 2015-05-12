@@ -62,7 +62,7 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
 //        printf("dt = %f \n", dt);
 //    }
     
-  //  optimize_phase();
+    optimize_phase();
     
     // 4. Update DSC
     displace_dsc();
@@ -77,7 +77,7 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
     // 3. Curvature force
     compute_curvature_force();
     
-    compute_difference();
+  //  compute_difference();
 }
 void dynamics_mul::compute_difference()
 {
@@ -760,17 +760,24 @@ void dynamics_mul::optimize_phase(){
             double ci = mean_inten_[s_dsc->get_label(*fid)];
             double oldE = energy_triangle(*fid, ci, s_dsc->get_label(*fid));
             
+            double meanE = INFINITY;
+            int new_phase = -1;
             for (int i = 0; i < nb_phase; i++) {
                 double cc = mean_inten_[i];
                 if (i != phase) {
                     double newE = energy_triangle(*fid, cc, i);
-                    if (newE < oldE) {
+                    if (newE < oldE and newE < meanE) {
+                        meanE = newE;
+                        new_phase = i;
                         // change phase to i
-                        s_dsc->set_label(*fid, i);
-                        change = true;
+
                         break;
                     }
                 }
+            }
+            if (new_phase != -1) {
+                s_dsc->set_label(*fid, new_phase);
+                change = true;
             }
         }
         
@@ -815,7 +822,7 @@ double dynamics_mul::energy_triangle(HMesh::FaceID fid, double c,  int new_phase
         hew = hew.next();
     }
     
-    return ET + 0.1*length;
+    return ET + 0.03*length;
 }
 
 #define NB_PHASE 3
@@ -1581,12 +1588,12 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
     double max_move = 0.0;
     double el = obj->get_avg_edge_length();
     for (auto ni = obj->vertices_begin(); ni != obj->vertices_end(); ni++) {
-        Vec2 dis = (obj->get_node_internal_force(*ni)
-                    + obj->get_node_external_force(*ni));
+        Vec2 dis = (obj->get_node_internal_force(*ni) * g_param.alpha
+                    + obj->get_node_external_force(*ni) * g_param.beta);
         
         double d = obj->get_node_force(*ni, STAR_DIFFER)[0];
         
-        double differ = std::atan(d/1) * 2 / PI_V1;
+        double differ = 1.0;//std::atan(d/1) * 2 / PI_V1;
         
 
         if ((obj->is_interface(*ni) or obj->is_crossing(*ni)))
@@ -1723,7 +1730,7 @@ void dynamics_mul::compute_intensity_force(){
                 double I = s_img->get_intensity(p[0], p[1]);
                 
                 // Normalize force
-                int normalizedF = 3;
+                int normalizedF = 1;
                 double f ;
                 switch (normalizedF) {
                     case 1:

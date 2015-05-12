@@ -153,10 +153,7 @@ void interface::keyboard(unsigned char key, int x, int y){
             Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, LOG_PATH);
             break;
         case 'u':
-            std::cout << g_param.alpha << " - New alpha: ";
-            std::cin >> g_param.alpha;
-            std::cout << g_param.beta << " - New beta: ";
-            std::cin >> g_param.beta;
+            dynamics_image_seg();
             break;
         default:
             break;
@@ -222,16 +219,20 @@ void interface::draw()
     }
     
     if (!bDiplay_[4] and dsc) {
-        Painter::draw_faces_intensity(*dsc);
+   //     Painter::draw_faces_intensity(*dsc);
+        Painter::draw_faces_probability(*dsc);
     }
     
     
-    if(bDiplay_[5]){
-        Painter::draw_internal_force(*dsc);
+    if(!bDiplay_[5]){
+    //    Painter::draw_internal_force(*dsc);
+    //    Painter::draw_faces_probability_force(*dsc);
+        Painter::draw_faces_probability_lambda(*dsc);
     }
     
-    if(bDiplay_[6]){
+    if(!bDiplay_[6]){
         Painter::draw_external_force(*dsc);
+    //    Painter::draw_prob(*dsc);
     }
     
     if(!bDiplay_[7]){
@@ -428,5 +429,9 @@ void interface::init_boundary(){
 }
 
 void interface:: dynamics_image_seg(){
+    
     dyn_->update_dsc(*dsc, *image_);
+    
+//    dynamics_prob dyn_prob;
+//    dyn_prob.update_dsc(*dsc, *image_);
 }

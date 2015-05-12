@@ -48,6 +48,10 @@ struct dynamics_param{
     std::map<int, double> mean_intensity;
     
     std::vector<bool> bDisplay;
+    
+    // New
+    double lambda = 1.0;
+    double rK = 5.0;
 } ;
 
 /*******

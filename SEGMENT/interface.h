@@ -25,6 +25,7 @@
 
 #include "dynamics.h"
 #include "dynamics_mul.h"
+#include "dynamics_prob.h"
 
 class interface{
 #pragma mark - Local variable

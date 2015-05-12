@@ -32,6 +32,13 @@
 
 #define NB_FORCES 10
 
+enum{ // Phase attribute
+    xac_suat = 0,
+    intensity, // u
+    xac_suat_force,
+    lambda,
+};
+
 namespace DSC2D {
     
     
