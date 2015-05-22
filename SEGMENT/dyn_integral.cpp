@@ -69,11 +69,6 @@ void dyn_integral::compute_derivative(){
             energy_with_location(Ey0, nkey, Vec2(0.0, -epsilon_deriv));
             energy_with_location(Ey1, nkey, Vec2(0.0, epsilon_deriv));
             
-            s_dsc->v_atrr[nkey][E_MID] = E0;
-            s_dsc->v_atrr[nkey][E_X_0] = Ex0;
-            s_dsc->v_atrr[nkey][E_X_1] = Ex1;
-            s_dsc->v_atrr[nkey][E_Y_0] = Ey0;
-            s_dsc->v_atrr[nkey][E_Y_1] = Ey1;
             
             // Derivative
             // We also need ddE_xy

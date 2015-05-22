@@ -231,37 +231,29 @@
 		A615B7E31ABC8520001E1EA7 /* Lib */ = {
 			isa = PBXGroup;
 			children = (
+				A6EB2A0D1AE79B70008CBC7E /* CImg.h */,
 				A6FF355C1AC2C46E001071B3 /* tri_box_overlap.h */,
 			);
 			name = Lib;
 			sourceTree = "<group>";
 		};
-		A615B7E41ABC8560001E1EA7 /* Source */ = {
-			isa = PBXGroup;
-			children = (
-				A61F331C1A97745800C5C2F8 /* define.cpp */,
-				A61F33191A94860D00C5C2F8 /* image.cpp */,
-				A61F33161A937CDF00C5C2F8 /* gl_debug_helper.cpp */,
-				A6B460ED1A8CADF30091F5A6 /* helper.cpp */,
-				A6B45F1E1A88CE120091F5A6 /* interface.cpp */,
-			);
-			name = Source;
-			sourceTree = "<group>";
-		};
 		A6B45F141A88CC9B0091F5A6 /* SEGMENT */ = {
 			isa = PBXGroup;
 			children = (
-				A615B7E41ABC8560001E1EA7 /* Source */,
 				A615B7E31ABC8520001E1EA7 /* Lib */,
 				A6B45F1D1A88CDFD0091F5A6 /* interface.h */,
+				A6B45F1E1A88CE120091F5A6 /* interface.cpp */,
 				A6B45F271A88EE190091F5A6 /* main.cpp */,
 				A6B460EE1A8CADF30091F5A6 /* helper.h */,
+				A6B460ED1A8CADF30091F5A6 /* helper.cpp */,
 				A61F33171A937CDF00C5C2F8 /* gl_debug_helper.h */,
+				A61F33161A937CDF00C5C2F8 /* gl_debug_helper.cpp */,
 				A61F331A1A94860D00C5C2F8 /* image.h */,
+				A61F33191A94860D00C5C2F8 /* image.cpp */,
 				A6B460AA1A8B6B530091F5A6 /* define.h */,
+				A61F331C1A97745800C5C2F8 /* define.cpp */,
 				A615B7E51ABC8708001E1EA7 /* dynamics_mul.cpp */,
 				A615B7E61ABC8708001E1EA7 /* dynamics_mul.h */,
-				A6EB2A0D1AE79B70008CBC7E /* CImg.h */,
 				A69B8AD51AF7B3690031E45D /* polygon_f.cpp */,
 				A69B8AD61AF7B3690031E45D /* polygon_f.h */,
 				A61E857C1B0E2F150064FB92 /* dyn_integral.cpp */,

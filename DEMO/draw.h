@@ -83,7 +83,7 @@ public:
      Draws the vertices with the colors defined by the get_vertex_colors function in the simplicial complex.
      */
     static void draw_vertices(const DSC2D::DeformableSimplicialComplex& complex);
-
+    static void draw_vertices_index(const DSC2D::DeformableSimplicialComplex& complex);
     /**
      Draws the edges with the colors defined by the get_edge_colors function in the simplicial complex.
      */
@@ -120,4 +120,7 @@ public:
      Draws the lines given as input with the color given as input.
      */
     static void draw_lines(const DSC2D::DeformableSimplicialComplex& complex, const HMesh::VertexAttributeVector<DSC2D::vec2> &lines, DSC2D::vec3 color = GREEN);
+    
+    // Utility
+    static void print_gl(const double &x, const double &y, char* str);
 };

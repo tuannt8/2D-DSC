@@ -44,6 +44,7 @@ public:
 
     // total intensity inside a triangle
     void get_tri_intensity(Vec2_array tris, int * total_pixel, double * total_intensity);
+    void get_tri_differ(Vec2_array tris, int *total_pixel, double * total_differ, double ci);
     
     Vec2 size(){return Vec2(width(), height());}
     

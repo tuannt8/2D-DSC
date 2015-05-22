@@ -11,6 +11,8 @@
 #include "object_generator.h"
 #include "draw.h"
 
+#include "dyn_integral.h"
+
 #include "gl_debug_helper.h"
 
 void _check_gl_error(const char *file, int line)
@@ -234,8 +236,9 @@ void interface::draw()
         Painter::draw_external_force(*dsc);
     }
     
-    if(!bDiplay_[7]){
-        image_->draw_grad(WIN_SIZE_X);
+    if(bDiplay_[7]){
+        glColor3f(1, 0, 0);
+        Painter::draw_vertices_index(*dsc);
     }
     
     gl_debug_helper::draw();
@@ -379,7 +382,7 @@ void interface::init_dsc(){
     std::vector<int> faces;
     Trializer::trialize(width, height, DISCRETIZATION, points, faces);
     
-    DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, DISCRETIZATION);
+    DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, 0 /* DISCRETIZATION */);
     
     dsc = std::unique_ptr<DeformableSimplicialComplex>(
                             new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
@@ -428,5 +431,8 @@ void interface::init_boundary(){
 }
 
 void interface:: dynamics_image_seg(){
-    dyn_->update_dsc(*dsc, *image_);
+    // dyn_->update_dsc(*dsc, *image_);
+    
+    static dyn_integral dyn;
+    dyn.update_dsc(*dsc, *image_);
 }

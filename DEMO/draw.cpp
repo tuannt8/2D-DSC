@@ -175,6 +175,30 @@ void Painter::draw_vertices(const DeformableSimplicialComplex& dsc)
 	glEnd();
 }
 
+void Painter::print_gl(const double &x, const double &y, char* str){
+    glRasterPos2f(x, y);
+    for (char *c = str; *c != '\0'; c++) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *c);
+    }
+}
+
+void Painter::draw_vertices_index(const DSC2D::DeformableSimplicialComplex& dsc){
+    vec2 p;
+    char idx_text[20];
+    auto corner = dsc.get_design_domain()->get_corners();
+    double height = corner[2][1];
+    for(auto vi = dsc.vertices_begin(); vi != dsc.vertices_end(); ++vi)
+    {
+        p = vec2(dsc.get_pos(*vi)[0], dsc.get_pos(*vi)[1]);
+        if (height - p[1] < 2.) {
+            p[1] -= 12;
+        }
+        
+        sprintf(idx_text, " %d", (int)vi->get_index());
+        print_gl(p[0], p[1], idx_text);
+    }
+}
+
 void Painter::draw_interface(const DeformableSimplicialComplex& dsc, vec3 color)
 {
     glPointSize(std::max(std::floor(POINT_SIZE*dsc.get_avg_edge_length()), 1.));
