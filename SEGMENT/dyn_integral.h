@@ -40,7 +40,7 @@ private:
     
     // Distance to compute derivative
     // Displacement of vertices should be around or smaller
-    double epsilon_deriv = 10.0;
+    double epsilon_deriv = 6.0;
     
     std::map<int, double> mean_inten_;
     

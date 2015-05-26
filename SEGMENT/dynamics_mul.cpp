@@ -1586,7 +1586,7 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
         
         double d = obj->get_node_force(*ni, STAR_DIFFER)[0];
         
-        double differ = std::atan(d/1) * 2 / PI_V1;
+        double differ = 1.0;//std::atan(d/1) * 2 / PI_V1;
         
 
         if ((obj->is_interface(*ni) or obj->is_crossing(*ni)))
@@ -1723,7 +1723,7 @@ void dynamics_mul::compute_intensity_force(){
                 double I = s_img->get_intensity(p[0], p[1]);
                 
                 // Normalize force
-                int normalizedF = 3;
+                int normalizedF = 1;
                 double f ;
                 switch (normalizedF) {
                     case 1:

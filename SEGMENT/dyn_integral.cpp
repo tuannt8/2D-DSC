@@ -39,12 +39,22 @@ void dyn_integral::displace_dsc(){
             // TODO: Compute the force
             Vec2 dE = s_dsc->forces[nkey][FIRST_DERIVE];
             Vec2 ddE = s_dsc->forces[nkey][SECOND_DEREIVE];
+            ddE[0] = abs(ddE[0]) + 0.01;
+            ddE[1] = abs(ddE[1]) + 0.01;
             
-           // Vec2 f(- dE[0]/ddE[0], - dE[1]/ddE[1]);
-            Vec2 f(- dE[0], - dE[1]);
-            f = f * 0.1;
+            Vec2 f(- dE[0]/ddE[0], - dE[1]/ddE[1]);
+         //   Vec2 f(- dE[0], - dE[1]);
+            f = f * 0.01;
             
-            printf("Node: %d - [%f %f] [%f %f]\n", nkey.get_index(), dE[0], dE[1], ddE[0], ddE[1]);
+            double max = 2;
+            double amp = f.length();
+            double scale = atan(amp/0.01) * 2 / PI_V1 * max;
+            f = f* scale;
+            
+//            if (f.length() > 10) {
+//                f = f * 10. / f.length();
+//            }
+            
             
             Vec2 des = s_dsc->get_pos(nkey) + f;
             s_dsc->set_destination(nkey, des);
@@ -54,7 +64,7 @@ void dyn_integral::displace_dsc(){
             s_dsc->set_node_external_force(nkey, Vec2(0.0));
         }
     }
-    printf("=================\n");
+
     s_dsc->deform();
 }
 
@@ -63,27 +73,44 @@ void dyn_integral::compute_derivative(){
     for(auto nkey : s_dsc->vertices()){
         if (s_dsc->is_interface(nkey) or s_dsc->is_crossing(nkey)) {
             double E0, Ex0, Ex1, Ey0, Ey1;
+            double Ex0y0, Ex0y1, Ex1y0, Ex1y1;
             energy_with_location(E0, nkey, Vec2(0.0));
             energy_with_location(Ex0, nkey, Vec2(-epsilon_deriv, 0.0));
             energy_with_location(Ex1, nkey, Vec2(epsilon_deriv, 0.0));
             energy_with_location(Ey0, nkey, Vec2(0.0, -epsilon_deriv));
             energy_with_location(Ey1, nkey, Vec2(0.0, epsilon_deriv));
             
+            energy_with_location(Ex0y0, nkey, Vec2(-epsilon_deriv, -epsilon_deriv));
+            energy_with_location(Ex0y1, nkey, Vec2(-epsilon_deriv, epsilon_deriv));
+            energy_with_location(Ex1y0, nkey, Vec2(epsilon_deriv, -epsilon_deriv));
+            energy_with_location(Ex1y1, nkey, Vec2(-epsilon_deriv, epsilon_deriv));
+            
             
             // Derivative
-            // We also need ddE_xy
             Vec2 dE(0.0), ddE(0.0);
-            dE[0] = 1./2./epsilon_deriv * (Ex1 - Ex0);
-            dE[1] = 1./2./epsilon_deriv * (Ey1 - Ey0);
-            ddE[0] = 1. / (epsilon_deriv*epsilon_deriv) *(Ex1 + Ex0 - 2*E0);
-            ddE[1] = 1. / (epsilon_deriv*epsilon_deriv) *(Ey1 + Ey0 - 2*E0);
+            dE[0] = (Ex1 - Ex0) / (2. * epsilon_deriv) ;
+            dE[1] = (Ey1 - Ey0) / (2. * epsilon_deriv);
+            ddE[0] = (Ex1 + Ex0 - 2*E0) / (epsilon_deriv*epsilon_deriv);
+            ddE[1] = (Ey1 + Ey0 - 2*E0) / (epsilon_deriv*epsilon_deriv);
+            
+            // ddE_xy
+            double dEx_y0 = (Ex1y0 - Ex0y0) / (2. * epsilon_deriv);
+            double dEx_y1 = (Ex1y1 - Ex0y1) / (2. * epsilon_deriv);
+            double dEy_x0 = (Ex0y1 - Ex0y0) / (2. * epsilon_deriv);
+            double dEy_x1 = (Ex1y1 - Ex1y0) / (2. * epsilon_deriv);
+            
+            double ddExy = (dEy_x1 - dEy_x0) / (2. * epsilon_deriv);
+            double ddEyx = (dEx_y1 - dEx_y0) / (2. * epsilon_deriv);
             
             s_dsc->forces[nkey][FIRST_DERIVE] = dE;
             s_dsc->forces[nkey][SECOND_DEREIVE] = ddE;
             
-            
+//            printf("Node: %d - [%f %f] [%f %f %f]\n",
+//                    (int)nkey.get_index(), dE[0], dE[1], ddE[0], ddE[1], ddExy);
         }
     }
+    
+//    printf("-------------------------------------\n");
 }
 
 bool dyn_integral::energy_with_location_1(double &E, Node_key nkey , Vec2 displace, double * real_dis){
