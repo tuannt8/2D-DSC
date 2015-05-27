@@ -14,6 +14,7 @@
 #include "dyn_integral.h"
 
 #include "gl_debug_helper.h"
+#include "dynamics_edge.h"
 
 void _check_gl_error(const char *file, int line)
 {
@@ -215,7 +216,9 @@ void interface::draw()
     }
     
     if (bDiplay_[2] and dsc) {
+        glColor3f(1, 0.4, 0.3);
         Painter::draw_edges(*dsc);
+        glColor3f(1, 0.0, 0.0);
         Painter::draw_vertices(*dsc);
     }
     
@@ -435,4 +438,7 @@ void interface:: dynamics_image_seg(){
     
     static dyn_integral dyn;
     dyn.update_dsc(*dsc, *image_);
+
+//    static dynamics_edge dyn;
+//    dyn.update_dsc(*dsc, *image_);
 }

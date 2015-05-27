@@ -16,7 +16,7 @@
                BlueprintIdentifier = "A6B45F121A88CC9B0091F5A6"
                BuildableName = "SEGMENT"
                BlueprintName = "SEGMENT"
-               ReferencedContainer = "container:DSC.xcodeproj">
+               ReferencedContainer = "container:DSC_seg_integral.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -28,22 +28,13 @@
       buildConfiguration = "Debug">
       <Testables>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A6B45F121A88CC9B0091F5A6"
-            BuildableName = "SEGMENT"
-            BlueprintName = "SEGMENT"
-            ReferencedContainer = "container:DSC_seg_integral.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
-      useCustomWorkingDirectory = "NO"
-      customWorkingDirectory = "/Users/tuannt8/Documents/Github/imageSeg/DATA"
+      useCustomWorkingDirectory = "YES"
+      customWorkingDirectory = "/Users/tuannt8/Documents/Github/2D-DSC"
       buildConfiguration = "Release"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
@@ -67,15 +58,6 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A6B45F121A88CC9B0091F5A6"
-            BuildableName = "SEGMENT"
-            BlueprintName = "SEGMENT"
-            ReferencedContainer = "container:DSC.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

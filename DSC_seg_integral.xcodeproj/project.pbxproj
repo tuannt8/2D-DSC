@@ -29,6 +29,7 @@
 		7A82D64F17E272BB00C19874 /* design_domain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A82D64D17E272BB00C19874 /* design_domain.cpp */; };
 		7A82D65017E272BB00C19874 /* design_domain.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A82D64E17E272BB00C19874 /* design_domain.h */; };
 		7A9C20DB17DFBE080064171E /* draw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A9C20D917DFBE070064171E /* draw.cpp */; };
+		A60796651B15CB6E00A70D70 /* dynamics_edge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A60796631B15CB6E00A70D70 /* dynamics_edge.cpp */; };
 		A615B7E71ABC8708001E1EA7 /* dynamics_mul.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A615B7E51ABC8708001E1EA7 /* dynamics_mul.cpp */; settings = {COMPILER_FLAGS = "-larmadillo"; }; };
 		A61E857E1B0E2F150064FB92 /* dyn_integral.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61E857C1B0E2F150064FB92 /* dyn_integral.cpp */; };
 		A61F33181A937CDF00C5C2F8 /* gl_debug_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F33161A937CDF00C5C2F8 /* gl_debug_helper.cpp */; };
@@ -103,6 +104,8 @@
 		7A82D64E17E272BB00C19874 /* design_domain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = design_domain.h; path = src/design_domain.h; sourceTree = SOURCE_ROOT; };
 		7A9C20D917DFBE070064171E /* draw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = draw.cpp; sourceTree = "<group>"; };
 		7A9C20DA17DFBE080064171E /* draw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = draw.h; sourceTree = "<group>"; };
+		A60796631B15CB6E00A70D70 /* dynamics_edge.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dynamics_edge.cpp; sourceTree = "<group>"; };
+		A60796641B15CB6E00A70D70 /* dynamics_edge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dynamics_edge.h; sourceTree = "<group>"; };
 		A615B7E51ABC8708001E1EA7 /* dynamics_mul.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dynamics_mul.cpp; sourceTree = "<group>"; };
 		A615B7E61ABC8708001E1EA7 /* dynamics_mul.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dynamics_mul.h; sourceTree = "<group>"; };
 		A61E857C1B0E2F150064FB92 /* dyn_integral.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dyn_integral.cpp; sourceTree = "<group>"; };
@@ -258,6 +261,8 @@
 				A69B8AD61AF7B3690031E45D /* polygon_f.h */,
 				A61E857C1B0E2F150064FB92 /* dyn_integral.cpp */,
 				A61E857D1B0E2F150064FB92 /* dyn_integral.h */,
+				A60796631B15CB6E00A70D70 /* dynamics_edge.cpp */,
+				A60796641B15CB6E00A70D70 /* dynamics_edge.h */,
 			);
 			path = SEGMENT;
 			sourceTree = "<group>";
@@ -409,6 +414,7 @@
 				A6B45F411A88F1AF0091F5A6 /* log.cpp in Sources */,
 				A6B45F401A88F1AD0091F5A6 /* draw.cpp in Sources */,
 				A6B460EF1A8CADF30091F5A6 /* helper.cpp in Sources */,
+				A60796651B15CB6E00A70D70 /* dynamics_edge.cpp in Sources */,
 				A61F33181A937CDF00C5C2F8 /* gl_debug_helper.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -550,6 +556,8 @@
 					../DEMO,
 					/opt/X11/include/,
 					"$HOME/armadillo-5.000.1/include",
+					../CImg/libtiff,
+					./CImg/libtiff,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/X11/lib/,
@@ -586,6 +594,8 @@
 					../DEMO,
 					/opt/X11/include/,
 					"$HOME/armadillo-5.000.1/include",
+					../CImg/libtiff,
+					./CImg/libtiff,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/X11/lib/,

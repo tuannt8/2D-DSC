@@ -15,7 +15,7 @@ int debug_num[10] = {-1};
 /*********************************************************************/
 /* Different parameters
  */
-#define TEST_BMP
+#define CHALK_TIFF
 
 
 
@@ -44,7 +44,16 @@ double DISCRETIZE_RES = 30;//11.0
 dynamics_param g_param(1.0,1.0,1.);
 
 std::string IMAGE_NAME = "test.bmp";
-double DISCRETIZE_RES = 23;//11.0
+double DISCRETIZE_RES = 27;//11.0
+
+/************************/
+/* test.bmp
+ */
+#elif defined CHALK_TIFF
+dynamics_param g_param(1.0,1.0,1.);
+
+std::string IMAGE_NAME = "chalk.BMP";
+double DISCRETIZE_RES = 39;//11.0
 
 /************************/
 /* arrow.bmp

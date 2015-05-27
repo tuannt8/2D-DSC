@@ -293,8 +293,8 @@ extern "C" {
 // (see methods 'CImg[List]<T>::{load,save}_tiff()').
 #ifdef cimg_use_tiff
 extern "C" {
-#define uint64 uint64_hack_
-#define int64 int64_hack_
+//#define uint64 uint64_hack_
+//#define int64 int64_hack_
 #include "tiffio.h"
 #undef uint64
 #undef int64

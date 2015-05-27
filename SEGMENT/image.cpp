@@ -30,30 +30,61 @@ void image::load_image(std::string const file_path){
     
     
     load(file_path.c_str());
-    
-    // convert to 0-1 scale
-   // *this = this->get_RGBtoYCbCr().channel(0);
+    this->mirror('y');
+
+//    printf("Image %d changel \n", this->spectrum());
+
 //    
 //    blur(BLUR);
-    noise(NOISE);
-    
-    compute_gradient();
+//    noise(NOISE);
+
+    set_gl_texture();
+//    compute_gradient();
 }
 
 // Draw in OpenGL coordinate
 void image::draw_image(int window_width){
-    double pointSize = (double)window_width / this->width();
-    glPointSize(pointSize);
-    glBegin(GL_POINTS);
-    for (int i = 0; i < width(); i++) {
-        for (int j = 0; j < height(); j++) {
-            double g = get_intensity(i, j);
-            glColor3f(g, g, g);
-            glVertex2d((double)i, (double)j);
+    if(0){
+        double pointSize = (double)window_width / this->width();
+        glPointSize(pointSize);
+        glBegin(GL_POINTS);
+        for (int i = 0; i < width(); i++) {
+            for (int j = 0; j < height(); j++) {
+                double g = get_intensity(i, j);
+                glColor3f(g, g, g);
+                glVertex2d((double)i, (double)j);
+            }
         }
+        glEnd();
+        glPointSize(1.0);
     }
-    glEnd();
-    glPointSize(1.0);
+    else{
+        double w = width();
+        double h = height();
+
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, tex_ID);
+        
+        glColor3f(1, 1, 1);
+        glBegin(GL_QUADS);
+
+        glTexCoord2f(0.0, 0.0);
+        glVertex2f(0.0, 0.0);
+
+        glTexCoord2f(1.0, 0.0);
+        glVertex2f(w, 0.0);
+
+        glTexCoord2f(1.0, 1.0);
+        glVertex2f(w, h);
+
+        glTexCoord2f(0.0, 1.0);
+        glVertex2f(0.0, h);
+        
+        glEnd();
+
+        glDisable(GL_TEXTURE_2D);
+    }
+
 }
 
 void image::draw_grad(int window_width){
@@ -81,7 +112,7 @@ double image::get_intensity(int x, int y){
         or y < 0 or y > height()) {
         return 0;
     }
-    return ((double)(*this)(x, height() - y)) / (double)MAX_BYTE;
+    return ((double)(*this)(x, y)) / (double)MAX_BYTE;
 }
 
 void image::get_tri_intensity(Vec2_array tris, int * total_pixel, double * total_intensity){
@@ -166,4 +197,29 @@ void image::compute_gradient(){
 
 Vec2 image::grad(int x, int y){
     return gradient_[y * width() + x];
+}
+
+void image::set_gl_texture() {
+    BYTE* buffer = this->data();
+
+    BYTE* texture_buf = (BYTE*)malloc( width()* height() * 3 * sizeof(BYTE));
+    BYTE* ptr = texture_buf;
+    for (int j = 0; j < height(); ++j) {
+    for (int i = 0; i < width(); ++i) {
+            *(ptr++) = (*this)(i,j, 0);
+            *(ptr++) = (*this)(i,j, 0);
+            *(ptr++) = (*this)(i,j, 0);
+        }
+    }
+
+    glGenTextures(1, &tex_ID);
+
+    // "Bind" the newly created texture : all future texture functions will modify this texture
+    glBindTexture(GL_TEXTURE_2D, tex_ID);
+
+    // Give the image to OpenGL
+    glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, width(), height(), 0, GL_RGB, GL_UNSIGNED_BYTE, texture_buf);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 }

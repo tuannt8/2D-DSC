@@ -9,6 +9,7 @@
 #define __DSC__image__
 
 #include <stdio.h>
+#include <GL/glew.h>
 #include "define.h"
 #include "CImg.h"
 
@@ -33,6 +34,8 @@ private:
 private:
     void compute_gradient();
 
+    GLuint  tex_ID;
+
 public:
     void load_image(std::string const file_path);
     // Draw in OpenGL coordinate
@@ -49,6 +52,8 @@ public:
     Vec2 size(){return Vec2(width(), height());}
     
     Vec2 grad(int x, int y);
+
+    void set_gl_texture();
 };
 
 #endif /* defined(__DSC__image__) */

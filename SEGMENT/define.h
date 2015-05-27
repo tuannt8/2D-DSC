@@ -15,11 +15,13 @@
 #ifdef WIN32
 
 #else
-#define DATA_PATH "../../../DATA/"
-#define LOG_PATH "../../../LOG/"
+#define DATA_PATH "./DATA/"
+#define LOG_PATH "./LOG/"
 #endif
 
 #define PI_V1 3.14159
+
+// #define cimg_use_tiff
 
 
 using std::vector;

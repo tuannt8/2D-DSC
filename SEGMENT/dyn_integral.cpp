@@ -44,7 +44,7 @@ void dyn_integral::displace_dsc(){
             
             Vec2 f(- dE[0]/ddE[0], - dE[1]/ddE[1]);
          //   Vec2 f(- dE[0], - dE[1]);
-            f = f * 0.01;
+            f = f * 0.1;
             
             double max = 2;
             double amp = f.length();
@@ -59,7 +59,7 @@ void dyn_integral::displace_dsc(){
             Vec2 des = s_dsc->get_pos(nkey) + f;
             s_dsc->set_destination(nkey, des);
             
-            s_dsc->set_node_external_force(nkey, -f);
+            s_dsc->set_node_external_force(nkey, -f*1000);
         }else{
             s_dsc->set_node_external_force(nkey, Vec2(0.0));
         }
