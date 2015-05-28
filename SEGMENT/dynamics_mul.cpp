@@ -43,10 +43,13 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
     // 4. Update DSC
     E0_ = get_total_energy(s_dsc, mean_inten_);
     
+    static int iter = 0;
+    printf("%d %f \n", iter++, E0_);
+    
     displace_dsc();
     
-    E1_ = get_total_energy(s_dsc, mean_inten_);
-    
+//    E1_ = get_total_energy(s_dsc, mean_inten_);
+//
 //    if (dE_0_ < 0.) {
 //        double ee = E0_ - E1_;
 //        double gap = -1./2.*dE_0_/(E1_ - E0_ - dE_0_);
@@ -1586,7 +1589,7 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
         
         double d = obj->get_node_force(*ni, STAR_DIFFER)[0];
         
-        double differ = 1.0;//std::atan(d/1) * 2 / PI_V1;
+        double differ = 1.0; // std::atan(d/1) * 2 / PI_V1;
         
 
         if ((obj->is_interface(*ni) or obj->is_crossing(*ni)))
@@ -1602,7 +1605,7 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
         }
     }
     
-    printf("Max dis: %f\n", max_move);
+//    printf("Max dis: %f\n", max_move);
     
     obj->deform();
 }

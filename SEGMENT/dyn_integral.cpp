@@ -7,8 +7,48 @@
 //
 
 #include "dyn_integral.h"
+#include "helper.h"
 
 using namespace std;
+
+double get_total_energy(dsc_obj *obj, image* s_img, std::map<int, double>  intesity_map){
+    double total_length = 0.0;
+    HMesh::HalfEdgeAttributeVector<int> touch(obj->get_no_halfedges(), 0);
+    for (auto eid = obj->halfedges_begin(); eid != obj->halfedges_end(); eid++) {
+        auto hew = obj->walker(*eid);
+        if (!touch[*eid] and obj->is_interface(*eid)) {
+            total_length += obj->length(*eid);
+        }
+        
+        touch[*eid] = 1;
+        touch[hew.opp().halfedge()] = 1;
+    }
+    
+    double E = 0.0;
+    for (auto fid = obj->faces_begin(); fid != obj->faces_end(); fid++) {
+        double ci = intesity_map[obj->get_label(*fid)];
+        auto tris = obj->get_pos(*fid);
+        
+        Vec2 min(INFINITY, INFINITY), max(-INFINITY, -INFINITY);
+        for (auto p: tris){
+            min[0] = std::min(min[0], p[0]);
+            min[1] = std::min(min[1], p[1]);
+            max[0] = std::max(max[0], p[0]);
+            max[1] = std::max(max[1], p[1]);
+        }
+        
+        for (int i = floor(min[0]); i < ceil(max[0]); i++) {
+            for (int j = floor(min[1]); j < ceil(max[1]); j++) {
+                if (helper_t::is_point_in_tri(Vec2(i,j), tris)) {
+                    double I = s_img->get_intensity(i, j);
+                    E += (I-ci)*(I-ci);
+                }
+            }
+        }
+    }
+    
+    return E;
+}
 
 void dyn_integral:: update_dsc(dsc_obj &dsc, image &img){
     s_dsc = &dsc;
@@ -20,6 +60,11 @@ void dyn_integral:: update_dsc(dsc_obj &dsc, image &img){
      Mean intensity
      */
     compute_mean_intensity(mean_inten_);
+    g_param.mean_intensity = mean_inten_;
+    
+    double E = get_total_energy(s_dsc, s_img, mean_inten_);
+    static int iter = 0;
+    printf("%d %f \n", iter++, E);
     
     /*
      Energy when move the vertex
@@ -33,6 +78,8 @@ void dyn_integral:: update_dsc(dsc_obj &dsc, image &img){
     
 }
 
+
+
 void dyn_integral::displace_dsc(){
     for(auto nkey : s_dsc->vertices()){
         if (s_dsc->is_interface(nkey) || s_dsc->is_crossing(nkey)) {
@@ -43,8 +90,8 @@ void dyn_integral::displace_dsc(){
             ddE[1] = abs(ddE[1]) + 0.01;
             
             Vec2 f(- dE[0]/ddE[0], - dE[1]/ddE[1]);
-         //   Vec2 f(- dE[0], - dE[1]);
-            f = f * 0.01;
+      //      Vec2 f(- dE[0], - dE[1]);
+            f = f * 0.05;
             
 //            double max = 2;
 //            double amp = f.length();

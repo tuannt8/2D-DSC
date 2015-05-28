@@ -23,7 +23,7 @@
 #endif
 
 
-#define NOISE 70
+#define NOISE 30
 #define BLUR 0.0
 
 void image::load_image(std::string const file_path){
@@ -36,7 +36,7 @@ void image::load_image(std::string const file_path){
 
 //    
 //    blur(BLUR);
-//    noise(NOISE);
+    noise(NOISE);
 
     set_gl_texture();
 //    compute_gradient();
