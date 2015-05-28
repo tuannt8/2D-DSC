@@ -105,6 +105,10 @@ namespace DSC2D {
     public:
         HMesh::FaceAttributeVector<std::vector<vec2>> face_att;
         
+        // attibute
+        HMesh::VertexAttributeVector<std::vector<int>> node_att_i;
+        HMesh::HalfEdgeAttributeVector<std::vector<int>> edge_att_i;
+        
         //************** INITIALISATION ***************
     public:
         

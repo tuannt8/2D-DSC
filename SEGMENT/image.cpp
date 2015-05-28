@@ -115,6 +115,25 @@ double image::get_intensity(int x, int y){
     return ((double)(*this)(x, y)) / (double)MAX_BYTE;
 }
 
+// 0 - 1.0
+double image::get_intensity_f(double x, double y){
+    if (x < 0 or x > width()
+        or y < 0 or y > height()) {
+        return 0;
+    }
+    
+    int x_i = (int)x;
+    int y_i = (int)y;
+    double ep_x = x - x_i;
+    double ep_y = y - y_i;
+    
+    double vd = get_intensity(x_i, y_i)*(1-ep_x) + get_intensity(x_i + 1, y_i)*ep_x;
+    double vu = get_intensity(x_i, y_i+1)*(1-ep_x) + get_intensity(x_i + 1, y_i+1)*ep_x;
+    double v = vd * (1 - ep_y) + vu * ep_y;
+    
+    return v;
+}
+
 void image::get_tri_intensity(Vec2_array tris, int * total_pixel, double * total_intensity){
     Vec2 min(INFINITY, INFINITY), max(-INFINITY, -INFINITY);
     for (auto p: tris){

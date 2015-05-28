@@ -19,11 +19,38 @@ void dynamics_edge::update_dsc(dsc_obj &dsc, image &img){
     compute_mean_intensity(mean_inten_);
 
     /*
+     * Indexing edges and vertices on interface only
+     */
+    index_interface_edge_and_vertices();
+    
+    /*
     * Compute the force
     */
     compute_edge_force();
 
 
+}
+
+void dynamics_edge::index_interface_edge_and_vertices(){
+    int idx = 0;
+    for (auto nkey : dsc_->vertices()) {
+        if (dsc_->is_interface(nkey) or dsc_->is_crossing(nkey)) {
+            dsc_->node_att_i[nkey][INDEX] = idx++;
+        }else
+            dsc_->node_att_i[nkey][INDEX] = INVALID_IDX;
+    }
+    
+    idx= 0;
+    for (auto ekey : dsc_->halfedges()) {
+        auto hew = dsc_->walker(ekey);
+        
+        if (dsc_->is_interface(ekey)
+            and hew.vertex().get_index() > hew.opp().vertex().get_index()) {
+            dsc_->edge_att_i[ekey][INDEX] = idx++;
+        }
+        else
+            dsc_->edge_att_i[ekey][INDEX] = INVALID_IDX;
+    }
 }
 
 void dynamics_edge::compute_mean_intensity(std::map<int, double> mean_inten_o) {
@@ -56,12 +83,9 @@ void dynamics_edge::compute_mean_intensity(std::map<int, double> mean_inten_o) {
 
 void dynamics_edge::compute_edge_force() {
     for (Edge_key ekey : dsc_->halfedges()){
-        // Loop one only
-        auto hew = dsc_->walker(ekey);
-        if(hew.vertex().get_index() > hew.opp().vertex().get_index()){
-            continue;
+        if(dsc_->edge_att_i[ekey][INDEX] != INVALID_IDX){
+            auto hew = dsc_->walker(ekey);
+            
         }
-
-
     }
 }

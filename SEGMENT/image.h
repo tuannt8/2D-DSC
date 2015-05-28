@@ -44,6 +44,9 @@ public:
     
     // double: 0 - 1.0
     double get_intensity(int x, int y);
+    
+    // Interpolate intensity to smooth function
+    double get_intensity_f(double x, double y);
 
     // total intensity inside a triangle
     void get_tri_intensity(Vec2_array tris, int * total_pixel, double * total_intensity);

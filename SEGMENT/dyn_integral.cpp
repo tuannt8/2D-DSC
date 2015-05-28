@@ -44,16 +44,12 @@ void dyn_integral::displace_dsc(){
             
             Vec2 f(- dE[0]/ddE[0], - dE[1]/ddE[1]);
          //   Vec2 f(- dE[0], - dE[1]);
-            f = f * 0.1;
+            f = f * 0.01;
             
-            double max = 2;
-            double amp = f.length();
-            double scale = atan(amp/0.01) * 2 / PI_V1 * max;
-            f = f* scale;
-            
-//            if (f.length() > 10) {
-//                f = f * 10. / f.length();
-//            }
+//            double max = 2;
+//            double amp = f.length();
+//            double scale = atan(amp/0.01) * 2 / PI_V1 * max;
+//            f = f* scale;
             
             
             Vec2 des = s_dsc->get_pos(nkey) + f;

@@ -13,7 +13,14 @@
 #include "define.h"
 #include "image.h"
 
+
+
 class dynamics_edge{
+    enum node_attri{
+        INDEX = 0,
+    };
+    
+#define INVALID_IDX -1
 public:
     dynamics_edge(){};
     ~dynamics_edge(){};
@@ -29,6 +36,9 @@ public:
     void compute_mean_intensity(std::map<int, double> map);
 
     void compute_edge_force();
+    
+private:
+    void index_interface_edge_and_vertices();
 };
 
 #endif /* defined(__DSC_seg_integral__dynamics_edge__) */

@@ -373,13 +373,19 @@ interface::interface(int &argc, char** argv){
 using namespace DSC2D;
 
 void interface::init_dsc(){
-    int width = imageSize[0];
-    int height = imageSize[1];
+    double width = imageSize[0];
+    double height = imageSize[1];
     
-    DISCRETIZATION = (double) height / DISCRETIZE_RES;
+    DISCRETIZATION = (double) height / (double)DISCRETIZE_RES;
     
     width -= 2*DISCRETIZATION;
     height -= 2*DISCRETIZATION;
+    
+//    int width = 600;
+//    int height = 400;
+//    DISCRETIZATION = 100;
+    
+    
     
     std::vector<real> points;
     std::vector<int> faces;
@@ -440,5 +446,5 @@ void interface:: dynamics_image_seg(){
     dyn.update_dsc(*dsc, *image_);
 
 //    static dynamics_edge dyn;
-//    dyn.update_dsc(*dsc, *image_);
+//   dyn.update_dsc(*dsc, *image_);
 }
