@@ -46,7 +46,7 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
     static int iter = 0;
     printf("%d %f \n", iter++, E0_);
     
-    displace_dsc();
+//    displace_dsc();
     
 //    E1_ = get_total_energy(s_dsc, mean_inten_);
 //
@@ -70,7 +70,7 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
     // 4. Update DSC
     displace_dsc();
     
-    compute_mean_intensity(mean_inten_);
+  //  compute_mean_intensity(mean_inten_);
     g_param.mean_intensity = mean_inten_; // For drawing
     
     // 2. Compute intensity force
@@ -80,7 +80,7 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
     // 3. Curvature force
     compute_curvature_force();
     
-    compute_difference();
+//    compute_difference();
 }
 void dynamics_mul::compute_difference()
 {
@@ -1723,7 +1723,7 @@ void dynamics_mul::compute_intensity_force(){
             Vec2 fg0(0.0), fg1(0.0);
             for (int i = 0; i <= length; i++) {
                 auto p = p0 + (p1 - p0)*(double(i)/(double)length);
-                double I = s_img->get_intensity(p[0], p[1]);
+                double I = s_img->get_intensity_f(p[0], p[1]);
                 
                 // Normalize force
                 int normalizedF = 1;

@@ -66,6 +66,8 @@ private:
     bool energy_with_location_1(double &E, Node_key nkey , Vec2 displace, double * real_dis = nullptr);
 
     bool energy_with_location(double &E, Node_key nkey , Vec2 displace, double * real_dis = nullptr);
+    void optimize_phase();
+    double tri_energy_with_phase_assumtion(Face_key fkey, int assume_phase);
 };
 
 #endif /* defined(__DSC_seg_integral__dyn_integral__) */

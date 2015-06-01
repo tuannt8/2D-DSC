@@ -85,7 +85,20 @@ void dynamics_edge::compute_edge_force() {
     for (Edge_key ekey : dsc_->halfedges()){
         if(dsc_->edge_att_i[ekey][INDEX] != INVALID_IDX){
             auto hew = dsc_->walker(ekey);
+            auto p0 = dsc_->get_pos(hew.opp().vertex());
+            auto p1 = dsc_->get_pos(hew.vertex());
             
+            Vec2 L01 = p1 - p0;
+            L01.normalize();
+            Vec2 N01(L01[1], -L01[0]);
+            
+            double c0 = mean_inten_[dsc_->get_label(hew.face())];
+            double c1 = mean_inten_[dsc_->get_label(hew.opp().face())];
+            
+            int length = (int)(p1 - p0).length();
+            for (int i = 0; i < length; i++) {
+                double grad_01 = 0;
+            }
         }
     }
 }

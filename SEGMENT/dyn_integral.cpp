@@ -8,6 +8,8 @@
 
 #include "dyn_integral.h"
 #include "helper.h"
+#include <armadillo>
+#include <CGLA/Mat2x2f.h>
 
 using namespace std;
 
@@ -56,15 +58,22 @@ void dyn_integral:: update_dsc(dsc_obj &dsc, image &img){
     
 
     
+    
     /*
      Mean intensity
      */
     compute_mean_intensity(mean_inten_);
+    
+    optimize_phase();
+    
+    s_dsc->deform();
+    
+    compute_mean_intensity(mean_inten_);
     g_param.mean_intensity = mean_inten_;
     
-    double E = get_total_energy(s_dsc, s_img, mean_inten_);
-    static int iter = 0;
-    printf("%d %f \n", iter++, E);
+//    double E = get_total_energy(s_dsc, s_img, mean_inten_);
+//    static int iter = 0;
+//    printf("%d %f \n", iter++, E);
     
     /*
      Energy when move the vertex
@@ -74,13 +83,72 @@ void dyn_integral:: update_dsc(dsc_obj &dsc, image &img){
     /*
      Displace
      */
-    displace_dsc();
+//    displace_dsc();
     
 }
 
+void dyn_integral::optimize_phase(){
+    for(auto fkey : s_dsc->faces()){
+        auto pts = s_dsc->get_pos(fkey);
+        
+        int cur_label = s_dsc->get_label(fkey);
+        int total_pixel;
+        double cur_energy = tri_energy_with_phase_assumtion(fkey, cur_label);
+        
+        int min_phase = -1;
+        double min_differ = INFINITY;
+        for (int i = 0; i < mean_inten_.size(); i++) {
+            double ener = tri_energy_with_phase_assumtion(fkey, i);
+            if (min_differ > ener - cur_energy) {
+                min_differ = ener - cur_energy;
+                min_phase = i;
+            }
+        }
+        assert(min_phase != -1);
+        
+        
+        if (cur_label != min_phase) {
+            s_dsc->set_label(fkey, min_phase);
+        }
+    }
+}
+
+double dyn_integral::tri_energy_with_phase_assumtion(Face_key fkey, int assume_phase)
+{
+    double E = 0.0;
+    
+    int cur_phase = s_dsc->get_label(fkey);
+    
+    double length = 0;
+    for (auto hew = s_dsc->walker(fkey); !hew.full_circle();
+         hew = hew.circulate_face_cw())
+    {
+        if(HMesh::boundary(*s_dsc->mesh, hew.halfedge()))
+        {
+            continue;
+        }
+        
+        double opp_label = s_dsc->get_label(hew.opp().face());
+        if (opp_label != assume_phase) {
+            length += s_dsc->length(hew.halfedge());
+        }
+    }
+    
+    int total_pixel;
+    double total_differ;
+    auto pts = s_dsc->get_pos(fkey);
+    s_img->get_tri_differ(pts, &total_pixel, &total_differ, mean_inten_[assume_phase]);
+    
+    E = total_differ + length;
+
+    
+    return E;
+}
 
 
 void dyn_integral::displace_dsc(){
+    
+    
     for(auto nkey : s_dsc->vertices()){
         if (s_dsc->is_interface(nkey) || s_dsc->is_crossing(nkey)) {
             // TODO: Compute the force
@@ -102,13 +170,13 @@ void dyn_integral::displace_dsc(){
             Vec2 des = s_dsc->get_pos(nkey) + f;
             s_dsc->set_destination(nkey, des);
             
-            s_dsc->set_node_external_force(nkey, -f*1000);
+            s_dsc->set_node_external_force(nkey, f*10);
         }else{
             s_dsc->set_node_external_force(nkey, Vec2(0.0));
         }
     }
 
-    s_dsc->deform();
+// s_dsc->deform();
 }
 
 
@@ -145,11 +213,39 @@ void dyn_integral::compute_derivative(){
             double ddExy = (dEy_x1 - dEy_x0) / (2. * epsilon_deriv);
             double ddEyx = (dEx_y1 - dEx_y0) / (2. * epsilon_deriv);
             
+            
+            
             s_dsc->forces[nkey][FIRST_DERIVE] = dE;
             s_dsc->forces[nkey][SECOND_DEREIVE] = ddE;
             
-//            printf("Node: %d - [%f %f] [%f %f %f]\n",
-//                    (int)nkey.get_index(), dE[0], dE[1], ddE[0], ddE[1], ddExy);
+            Vec2 d = -dE; // Moving direction
+            d.normalize();
+            double Ed1, Ed0;
+            energy_with_location(Ed1, nkey, d*epsilon_deriv);
+            energy_with_location(Ed0, nkey, d*(-epsilon_deriv));
+            double de2 = (Ed1 + Ed0 - 2*E0)/(epsilon_deriv*epsilon_deriv);
+            
+            /* 
+             * Compute force right now
+             */
+            
+            Vec2 force;
+            
+            ddE[0] = abs(ddE[0]) + 0.01;
+            ddE[1] = abs(ddE[1]) + 0.01;
+            
+            de2 = abs(de2) + 0.1;
+            
+       //     force = Vec2(- dE[0]/ddE[0], - dE[1]/ddE[1]);
+            force = Vec2(- dE[0]/de2, - dE[1]/de2);
+      //      force = Vec2(-dE[0], -dE[1]);
+            force *= 0.05;
+            
+            Vec2 des = s_dsc->get_pos(nkey) + force;
+            s_dsc->set_destination(nkey, des);
+            s_dsc->set_node_external_force(nkey, force*10);
+        }else{
+            s_dsc->set_node_external_force(nkey, Vec2(0.0));
         }
     }
     
@@ -191,7 +287,7 @@ bool dyn_integral::energy_with_location(double &E, Node_key nkey , Vec2 displace
         for(auto hew = s_dsc->walker(nkey); !hew.full_circle(); hew = hew.circulate_vertex_cw()){
             
             if (s_dsc->is_interface(hew.halfedge())) {
-                length += s_dsc->length(hew.halfedge());
+                length += (s_dsc->get_pos(hew.vertex()) - (cur_pos + displace)).length();
             }
             
             Vec2_array tris;

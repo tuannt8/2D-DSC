@@ -30,6 +30,7 @@ public:
     image *img_;
 
     std::map<int, double> mean_inten_;
+    int epsilon = 5;
 public:
     void update_dsc(dsc_obj &dsc, image &img);
 

@@ -397,7 +397,8 @@ void interface::init_dsc(){
                             new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
     
  //   thres_hold_init();
-
+    
+    printf("Average edge length: %f \n", dsc->get_avg_edge_length());
 }
 
 void interface::thres_hold_init(){

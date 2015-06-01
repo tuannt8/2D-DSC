@@ -36,7 +36,7 @@ void image::load_image(std::string const file_path){
 
 //    
 //    blur(BLUR);
-    noise(NOISE);
+//    noise(NOISE);
 
     set_gl_texture();
 //    compute_gradient();
@@ -181,7 +181,8 @@ void image::get_tri_differ(Vec2_array tris, int *total_pixel, double * total_dif
     }
     
     *total_differ = total_diff;
-    *total_pixel = t_pixel;
+    if(total_pixel)
+        *total_pixel = t_pixel;
 }
 
 
