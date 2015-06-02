@@ -139,7 +139,7 @@ double dyn_integral::tri_energy_with_phase_assumtion(Face_key fkey, int assume_p
     auto pts = s_dsc->get_pos(fkey);
     s_img->get_tri_differ(pts, &total_pixel, &total_differ, mean_inten_[assume_phase]);
     
-    E = total_differ + length;
+    E = total_differ + length*0.01;
 
     
     return E;
@@ -236,10 +236,10 @@ void dyn_integral::compute_derivative(){
             
             de2 = abs(de2) + 0.1;
             
-       //     force = Vec2(- dE[0]/ddE[0], - dE[1]/ddE[1]);
+        //    force = Vec2(- dE[0]/ddE[0], - dE[1]/ddE[1]);
             force = Vec2(- dE[0]/de2, - dE[1]/de2);
       //      force = Vec2(-dE[0], -dE[1]);
-            force *= 0.05;
+            force *= 0.5;
             
             Vec2 des = s_dsc->get_pos(nkey) + force;
             s_dsc->set_destination(nkey, des);
