@@ -378,25 +378,31 @@ void interface::init_dsc(){
     
     DISCRETIZATION = (double) height / (double)DISCRETIZE_RES;
     
-    width -= 2*DISCRETIZATION;
-    height -= 2*DISCRETIZATION;
+//    width += 2*DISCRETIZATION;
+//    height += 2*DISCRETIZATION;
     
-//    int width = 600;
-//    int height = 400;
-//    DISCRETIZATION = 100;
-    
-    
+    imageSize[0] = width + 2*DISCRETIZATION;
+    imageSize[1] = height + 2*DISCRETIZATION;
     
     std::vector<real> points;
     std::vector<int> faces;
     Trializer::trialize(width, height, DISCRETIZATION, points, faces);
     
-    DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, 0 /* DISCRETIZATION */);
+    DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, DISCRETIZATION );
     
     dsc = std::unique_ptr<DeformableSimplicialComplex>(
                             new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
     
  //   thres_hold_init();
+    
+    for (auto nkey : dsc->vertices()){
+        if (HMesh::boundary(*dsc->mesh, nkey)) {
+            for (auto hew = dsc->walker(nkey); !hew.full_circle(); hew = hew.circulate_vertex_cw()) {
+                if(hew.face() != HMesh::InvalidFaceID)
+                    dsc->set_label(hew.face(), 1);
+            }
+        }
+    }
     
     printf("Average edge length: %f \n", dsc->get_avg_edge_length());
 }
@@ -442,6 +448,9 @@ void interface::init_boundary(){
 
 void interface:: dynamics_image_seg(){
 //    dyn_->update_dsc(*dsc, *image_);
+    
+    dsc->deform();
+    return;
     
     static dyn_integral dyn;
     dyn.update_dsc(*dsc, *image_);

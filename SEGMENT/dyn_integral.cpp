@@ -239,7 +239,7 @@ void dyn_integral::compute_derivative(){
         //    force = Vec2(- dE[0]/ddE[0], - dE[1]/ddE[1]);
             force = Vec2(- dE[0]/de2, - dE[1]/de2);
       //      force = Vec2(-dE[0], -dE[1]);
-            force *= 0.5;
+            force *= 0.05;
             
             Vec2 des = s_dsc->get_pos(nkey) + force;
             s_dsc->set_destination(nkey, des);
