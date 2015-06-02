@@ -264,6 +264,9 @@
 //
 // PNG library may be used to get a native support of '.png' files.
 // (see methods 'CImg<T>::{load,save}_png()'.
+
+#define cimg_use_png
+
 #ifdef cimg_use_png
 extern "C" {
 #include "png.h"
@@ -277,7 +280,9 @@ extern "C" {
 //
 // JPEG library may be used to get a native support of '.jpg' files.
 // (see methods 'CImg<T>::{load,save}_jpeg()').
+
 #ifdef cimg_use_jpeg
+
 extern "C" {
 #include "jpeglib.h"
 #include "setjmp.h"

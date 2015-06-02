@@ -441,10 +441,10 @@ void interface::init_boundary(){
 }
 
 void interface:: dynamics_image_seg(){
-//    dyn_->update_dsc(*dsc, *image_);
+    dyn_->update_dsc(*dsc, *image_);
     
-    static dyn_integral dyn;
-    dyn.update_dsc(*dsc, *image_);
+//    static dyn_integral dyn;
+//    dyn.update_dsc(*dsc, *image_);
 
 //    static dynamics_edge dyn;
 //    dyn.update_dsc(*dsc, *image_);

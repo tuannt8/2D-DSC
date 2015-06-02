@@ -65,7 +65,7 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
 //        printf("dt = %f \n", dt);
 //    }
     
-  //  optimize_phase();
+    optimize_phase();
     
     // 4. Update DSC
     displace_dsc();
@@ -818,7 +818,7 @@ double dynamics_mul::energy_triangle(HMesh::FaceID fid, double c,  int new_phase
         hew = hew.next();
     }
     
-    return ET + 0.1*length;
+    return ET + 0.01*length;
 }
 
 #define NB_PHASE 3

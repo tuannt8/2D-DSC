@@ -52,6 +52,7 @@
 		A6B45F461A88F3990091F5A6 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A51F3B017D6388200A8F8F2 /* GLUT.framework */; };
 		A6B45F471A88F3D80091F5A6 /* GEL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A51F3B417D638B500A8F8F2 /* GEL.framework */; };
 		A6B460EF1A8CADF30091F5A6 /* helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B460ED1A8CADF30091F5A6 /* helper.cpp */; };
+		A6E1B0241B1D9F6B00F31E48 /* libpng15.15.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A6E1B0231B1D9F6B00F31E48 /* libpng15.15.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -127,6 +128,7 @@
 		A6B460AA1A8B6B530091F5A6 /* define.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = define.h; sourceTree = "<group>"; };
 		A6B460ED1A8CADF30091F5A6 /* helper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = helper.cpp; sourceTree = "<group>"; };
 		A6B460EE1A8CADF30091F5A6 /* helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = helper.h; sourceTree = "<group>"; };
+		A6E1B0231B1D9F6B00F31E48 /* libpng15.15.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng15.15.dylib; path = ../../../../../opt/X11/lib/libpng15.15.dylib; sourceTree = "<group>"; };
 		A6EB2A0D1AE79B70008CBC7E /* CImg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CImg.h; path = CImg/CImg.h; sourceTree = SOURCE_ROOT; };
 		A6FF355C1AC2C46E001071B3 /* tri_box_overlap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tri_box_overlap.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -155,6 +157,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A6E1B0241B1D9F6B00F31E48 /* libpng15.15.dylib in Frameworks */,
 				A699B3681AE4E7B500522DA2 /* Accelerate.framework in Frameworks */,
 				A699B3661AE1584800522DA2 /* libarmadillo.5.000.1.dylib in Frameworks */,
 				A663DE681AD6B25B006CC422 /* libX11.6.dylib in Frameworks */,
@@ -171,6 +174,7 @@
 		7A51F38E17D6383500A8F8F2 = {
 			isa = PBXGroup;
 			children = (
+				A6E1B0231B1D9F6B00F31E48 /* libpng15.15.dylib */,
 				A699B3671AE4E7B500522DA2 /* Accelerate.framework */,
 				A699B3651AE1584800522DA2 /* libarmadillo.5.000.1.dylib */,
 				A663DE671AD6B25B006CC422 /* libX11.6.dylib */,
@@ -558,6 +562,7 @@
 					"$HOME/armadillo-5.000.1/include",
 					../CImg/libtiff,
 					./CImg/libtiff,
+					/opt/X11/include/libpng15,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/X11/lib/,
@@ -596,6 +601,7 @@
 					"$HOME/armadillo-5.000.1/include",
 					../CImg/libtiff,
 					./CImg/libtiff,
+					/opt/X11/include/libpng15,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/X11/lib/,
