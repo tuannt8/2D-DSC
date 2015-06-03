@@ -216,6 +216,10 @@ void interface::draw()
         image_->draw_image(WIN_SIZE_X);
     }
     
+    if (bDiplay_[3] and dsc) {
+        Painter::draw_faces(*dsc);
+    }
+    
     if (bDiplay_[2] and dsc) {
         glColor3f(1, 0.4, 0.3);
         Painter::draw_edges(*dsc);
@@ -223,9 +227,7 @@ void interface::draw()
         Painter::draw_vertices(*dsc);
     }
     
-    if (bDiplay_[3] and dsc) {
-        Painter::draw_faces(*dsc);
-    }
+
     
     if (!bDiplay_[4] and dsc) {
         Painter::draw_faces_intensity(*dsc);

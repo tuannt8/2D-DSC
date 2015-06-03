@@ -78,6 +78,9 @@ private:
     Vec2 center_tri(Face_key fkey);
     /// Neighbor of a triangle in same phase, in certain radius
     std::vector<Face_key> grow_region(Face_key fkey);
+    std::vector<Face_key> grow_region_smooth(Face_key fkey,
+                                             std::map<Face_key, double> & tri_mean_inten);
+    
     
     // Optimize phase individually
     void optimize_phase();
@@ -86,6 +89,10 @@ private:
     double tri_energy_with_phase_assumtion(Face_key fkey, int assume_phase);
     /// Energy on a region
     double region_energy_assume_phase(std::vector<Face_key> region, int assumed_phase);
+    double region_energy_assume_phase(std::vector<Face_key> region, int assumed_phase,
+                                      std::map<Face_key, double> & tri_mean_inten);
+    double grad_region(std::vector<Face_key> region,
+                       std::map<Face_key, double> & tri_mean_inten);
     
     // Check if a triangle is on boundary
     bool is_boundary(Face_key fkey);
