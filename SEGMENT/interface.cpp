@@ -140,6 +140,7 @@ void interface::keyboard(unsigned char key, int x, int y){
             break;
         case 'p':
             gl_debug_helper::print_debug_info_nearest(*dsc);
+            gl_debug_helper::print_image_info(*image_);
             break;
         case 'i':
             std::cout << "Input debug number: ";

@@ -28,6 +28,7 @@ typedef unsigned char BYTE;
 
 struct intensity_out{
     double total_differ;
+    double area;
     int total_pixel;
 };
 
@@ -51,7 +52,10 @@ public:
     double get_intensity(int x, int y);
     
     // Interpolate intensity to smooth function
+    /// Computation base on its 4 neighbor pixel
     double get_intensity_f(double x, double y);
+    double get_tri_differ_f(Vec2_array tris, double ci);
+
 
     // total intensity inside a triangle
     void get_tri_intensity(Vec2_array tris, int * total_pixel, double * total_intensity);

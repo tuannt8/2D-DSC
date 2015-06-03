@@ -3,7 +3,6 @@
 //  DSC
 //
 //  Created by Tuan Nguyen Trung on 2/18/15.
-//  Copyright (c) 2015 Asger Nyman Christiansen. All rights reserved.
 //
 
 #include "image.h"
@@ -32,7 +31,7 @@ void image::load_image(std::string const file_path){
     load(file_path.c_str());
     this->mirror('y');
 
-//    printf("Image %d changel \n", this->spectrum());
+//    printf("Image %d change \n", this->spectrum());
 
 //    
 //    blur(BLUR);
@@ -126,10 +125,10 @@ double image::get_intensity_f(double x, double y){
     int y_i = (int)y;
     double ep_x = x - x_i;
     double ep_y = y - y_i;
-    
-    double vd = get_intensity(x_i, y_i)*(1-ep_x) + get_intensity(x_i + 1, y_i)*ep_x;
-    double vu = get_intensity(x_i, y_i+1)*(1-ep_x) + get_intensity(x_i + 1, y_i+1)*ep_x;
-    double v = vd * (1 - ep_y) + vu * ep_y;
+
+    double vdown = get_intensity(x_i, y_i)*(1-ep_x) + get_intensity(x_i + 1, y_i)*ep_x;
+    double vup = get_intensity(x_i, y_i+1)*(1-ep_x) + get_intensity(x_i + 1, y_i+1)*ep_x;
+    double v = vdown * (1 - ep_y) + vup * ep_y;
     
     return v;
 }
@@ -270,4 +269,22 @@ void image::set_gl_texture() {
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+}
+
+double image::get_tri_differ_f(Vec2_array tris, double ci) {
+    double area = helper_t::area(tris);
+    int res = (int)std::sqrt(area) + 1;
+    double step = 1.0/(double)res;
+
+    double energy = 0.0;
+    for (double ep1 = step/2.0; ep1 < 1.0; ep1 += step){
+        for(double ep2 = 1 - ep1 - step/2.0; ep2 > 0; ep2 -= step){
+            double ep3 = 1 - ep1 - ep2;
+            Vec2 pt = tris[0]*ep1 + tris[1]*ep2 + tris[2]*ep3;
+            energy += get_intensity_f(pt[0], pt[1]);
+        }
+
+    }
+
+    return energy * area / (double)(res*res);
 }

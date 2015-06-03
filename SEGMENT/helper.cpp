@@ -81,4 +81,9 @@ namespace helper_t {
         start_timer();
         return t.count();
     }
+
+    double area(std::vector<Vec2> const &pts) {
+        double A = 0.5*cross(pts[1]-pts[0], pts[2]-pts[0]);
+        return std::abs(A);
+    }
 }

@@ -7,6 +7,9 @@
     <content url="file:///opt/X11/lib/libX11.6.dylib">
       <sourceFolder url="file:///opt/X11/lib/libX11.6.dylib" isTestSource="false" />
     </content>
+    <content url="file:///opt/X11/lib/libpng15.15.dylib">
+      <sourceFolder url="file:///opt/X11/lib/libpng15.15.dylib" isTestSource="false" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>

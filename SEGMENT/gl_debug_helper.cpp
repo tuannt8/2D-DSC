@@ -18,6 +18,9 @@
 #include <GEL/GLGraphics/SOIL.h>
 #endif
 
+using std::cout;
+using std::endl;
+
 namespace temp_gdh {
     
     inline bool is_greater(Vec2 g, Vec2 l){
@@ -214,4 +217,12 @@ void gl_debug_helper::print_debug_info(dsc_obj &complex){
         }
         std::cout << std::endl;
     }
+}
+
+void gl_debug_helper::print_image_info(image &img) {
+    Vec2 pt1 = get_instance().left_down_;
+    Vec2 pt2 = get_instance().right_up_;
+    Vec2 pt = get_instance().cur_mouse_pos_;
+    double intensity = img.get_intensity_f(pt[0], pt[1]);
+    cout << "Pixel intensity: " << intensity << endl;
 }
