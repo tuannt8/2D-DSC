@@ -52,11 +52,134 @@ double get_total_energy(dsc_obj *obj, image* s_img, std::map<int, double>  intes
     return E;
 }
 
-void dyn_integral:: update_dsc(dsc_obj &dsc, image &img){
+Vec2 dyn_integral::center_tri(Face_key fkey){
+    auto pos = s_dsc->get_pos(fkey);
+    return (pos[0] + pos[1] + pos[2]) / 3.0;
+}
+
+std::vector<Face_key> dyn_integral::grow_region(Face_key fkey){
+    double dis = 100;
+    int phase = s_dsc->get_label(fkey);
+    
+    bool touched_node[10000] = {false};
+    bool touch_face[10000] = {false};
+    std::queue<Node_key> grow_node;
+    auto nodes = s_dsc->get_verts(fkey);
+    grow_node.push(nodes[0]);
+    grow_node.push(nodes[1]);
+    grow_node.push(nodes[2]);
+    touched_node[nodes[0].get_index()] = true;
+    touched_node[nodes[1].get_index()] = true;
+    touched_node[nodes[2].get_index()] = true;
+    Vec2 center_point = center_tri(fkey);
+
+    
+    std::vector<Face_key> neighbor;
+    while (!grow_node.empty())
+    {
+        Node_key nkey = grow_node.front();
+        grow_node.pop();
+        
+        for (auto hew = s_dsc->walker(nkey); !hew.full_circle(); hew = hew.circulate_vertex_cw())
+        {
+            if(hew.face() == HMesh::InvalidFaceID){
+                continue;
+            }
+            
+            double center_dis = (center_point - center_tri(hew.face())).length();
+            
+            if (!touch_face[hew.face().get_index()]
+                and s_dsc->get_label(hew.face()) == phase
+                and center_dis < dis)
+            {
+                touch_face[hew.face().get_index()] = true;
+                
+                neighbor.push_back(hew.face());
+                
+                // Add to queue
+                auto verts = s_dsc->get_verts(hew.face());
+                for (auto v : verts)
+                {
+                    if (touched_node[v.get_index()])
+                    {
+                        touched_node[v.get_index()] = true;
+                        grow_node.push(v);
+                    }
+                }
+            }
+        }
+    }
+    
+    return neighbor;
+}
+
+void dyn_integral::optimize_phase_region(){
+    for (auto fkey : s_dsc->faces()){
+        std::vector<Face_key> regions = grow_region(fkey);
+        int cur_phase = s_dsc->get_label(fkey);
+        double E0 = region_energy_assume_phase(regions, cur_phase);
+        
+        int mean_phase = -1;
+        double mean_E_change = INFINITY;
+        for (int i = 0; i < mean_inten_.size(); i++) {
+            double EE = region_energy_assume_phase(regions, i);
+            if (EE - E0 < mean_E_change) {
+                mean_E_change = EE - E0;
+                mean_phase = i;
+            }
+        }
+        assert(mean_phase != -1);
+        
+        if (mean_phase != cur_phase) {
+            for (auto fk : regions) {
+                if (!is_boundary(fkey)) {
+                    s_dsc->set_label(fk, mean_phase);
+                }
+            }
+            
+            return;
+        }
+    }
+}
+
+double dyn_integral::region_energy_assume_phase(std::vector<Face_key> region, int assumed_phase){
+    double E = 0.0;
+    double length = 0;
+    long pixel_count = 0;
+    
+    
+    
+    for(auto fkey : region){
+        auto EE = s_img->get_tri_differ(s_dsc->get_pos(fkey), mean_inten_[assumed_phase]);
+        E += EE.total_differ;
+        pixel_count += EE.total_pixel;
+        
+        for(auto hew = s_dsc->walker(fkey); !hew.full_circle(); hew = hew.circulate_face_cw()){
+            
+            if (!HMesh::boundary(*s_dsc->mesh, hew.halfedge())
+                and std::find(region.begin(), region.end(), hew.opp().face()) == region.end()
+                and s_dsc->get_label(hew.opp().face()) != assumed_phase) {
+                length += s_dsc->length(hew.halfedge());
+            }
+        }
+    }
+    return E + length;
+}
+
+void dyn_integral::test()
+{
+    auto f = s_dsc->faces_begin();
+    for (int i = 0; i < 1500; i++, f++) {
+        
+    }
+    auto fkey = grow_region(*f);
+    for (auto fk : fkey) {
+        s_dsc->set_label(fk, 1);
+    }
+}
+void dyn_integral::update_dsc(dsc_obj &dsc, image &img){
     s_dsc = &dsc;
     s_img = &img;
-    
-
     
     
     /*
@@ -64,7 +187,9 @@ void dyn_integral:: update_dsc(dsc_obj &dsc, image &img){
      */
     compute_mean_intensity(mean_inten_);
     
-    optimize_phase();
+    // optimize_phase();
+    if(g_param.bDisplay[9])
+        optimize_phase_region();
     
     s_dsc->deform();
     
@@ -92,7 +217,6 @@ void dyn_integral::optimize_phase(){
         auto pts = s_dsc->get_pos(fkey);
         
         int cur_label = s_dsc->get_label(fkey);
-        int total_pixel;
         double cur_energy = tri_energy_with_phase_assumtion(fkey, cur_label);
         
         int min_phase = -1;
@@ -106,18 +230,25 @@ void dyn_integral::optimize_phase(){
         }
         assert(min_phase != -1);
         
-        
-        if (cur_label != min_phase) {
+        if (cur_label != min_phase
+            and !is_boundary(fkey)) {
             s_dsc->set_label(fkey, min_phase);
         }
     }
 }
 
+bool dyn_integral::is_boundary(Face_key fkey){
+    for(auto hew = s_dsc->walker(fkey); !hew.full_circle(); hew = hew.circulate_vertex_cw()){
+        if (HMesh::boundary(*s_dsc->mesh, hew.vertex())) {
+            return true;
+        }
+    }
+    return false;
+}
+
 double dyn_integral::tri_energy_with_phase_assumtion(Face_key fkey, int assume_phase)
 {
     double E = 0.0;
-    
-    int cur_phase = s_dsc->get_label(fkey);
     
     double length = 0;
     for (auto hew = s_dsc->walker(fkey); !hew.full_circle();
@@ -239,7 +370,7 @@ void dyn_integral::compute_derivative(){
       //      force = Vec2(- dE[0]/ddE[0], - dE[1]/ddE[1]);
             force = Vec2(- dE[0]/de2, - dE[1]/de2);
         //    force = Vec2(-dE[0], -dE[1]);
-            force *= 0.05;
+            force *= 1;
             
             Vec2 des = s_dsc->get_pos(nkey) + force;
             s_dsc->set_destination(nkey, des);

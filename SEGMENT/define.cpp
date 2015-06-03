@@ -44,7 +44,7 @@ double DISCRETIZE_RES = 30;//11.0
 dynamics_param g_param(0.5,1.0,1.);
 
 std::string IMAGE_NAME = "test.png";
-double DISCRETIZE_RES = 51;//11.0
+double DISCRETIZE_RES = 71;//11.0
 
 /************************/
 /* test.bmp

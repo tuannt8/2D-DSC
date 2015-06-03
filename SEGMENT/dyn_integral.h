@@ -35,20 +35,23 @@ enum{
 
 class dyn_integral{
 private:
+    // Reference DSC object
     dsc_obj * s_dsc;
+    // Reference of image object
     image * s_img;
     
     // Distance to compute derivative
     // Displacement of vertices should be around or smaller
     double epsilon_deriv = 6.0;
     
+    // Mean intensity of regions
     std::map<int, double> mean_inten_;
     
 public:
     dyn_integral(){};
     ~dyn_integral(){};
     
-    
+    // Apply force and displace DSC
     void update_dsc(dsc_obj &dsc, image &img);
     
 private:
@@ -66,8 +69,29 @@ private:
     bool energy_with_location_1(double &E, Node_key nkey , Vec2 displace, double * real_dis = nullptr);
 
     bool energy_with_location(double &E, Node_key nkey , Vec2 displace, double * real_dis = nullptr);
+    
+    // Optimize phase by region
+    //  to avoid effect of edge length
+    void optimize_phase_region();
+    
+    /// Center point of triangle
+    Vec2 center_tri(Face_key fkey);
+    /// Neighbor of a triangle in same phase, in certain radius
+    std::vector<Face_key> grow_region(Face_key fkey);
+    
+    // Optimize phase individually
     void optimize_phase();
+    
+    /// Energy on a triangle
     double tri_energy_with_phase_assumtion(Face_key fkey, int assume_phase);
+    /// Energy on a region
+    double region_energy_assume_phase(std::vector<Face_key> region, int assumed_phase);
+    
+    // Check if a triangle is on boundary
+    bool is_boundary(Face_key fkey);
+    
+private:
+    void test();
 };
 
 #endif /* defined(__DSC_seg_integral__dyn_integral__) */

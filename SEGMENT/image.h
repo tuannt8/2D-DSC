@@ -26,6 +26,11 @@ typedef unsigned char BYTE;
  Scale: 0-1
  */
 
+struct intensity_out{
+    double total_differ;
+    int total_pixel;
+};
+
 class image: public cimg_library::CImg<BYTE>{
 private:
     // Row order storage idx = y * width + x
@@ -50,7 +55,9 @@ public:
 
     // total intensity inside a triangle
     void get_tri_intensity(Vec2_array tris, int * total_pixel, double * total_intensity);
+    // Intensity differ with assumed mean intensity.
     void get_tri_differ(Vec2_array tris, int *total_pixel, double * total_differ, double ci);
+    intensity_out get_tri_differ(Vec2_array tris, double ci);
     
     Vec2 size(){return Vec2(width(), height());}
     
