@@ -133,6 +133,27 @@ double image::get_intensity_f(double x, double y){
     return v;
 }
 
+double image::get_tri_intensity_f(Vec2_array tris, double * area_in){
+    double area = helper_t::area(tris);
+    int res = (int)std::sqrt(area) + 1;
+    double step = 1.0/(double)res;
+    
+    double inten = 0.0;
+    for (double ep1 = step/2.0; ep1 < 1.0; ep1 += step){
+        for(double ep2 = 1 - ep1 - step/2.0; ep2 > 0; ep2 -= step){
+            double ep3 = 1 - ep1 - ep2;
+            Vec2 pt = tris[0]*ep1 + tris[1]*ep2 + tris[2]*ep3;
+            inten += get_intensity_f(pt[0], pt[1]);
+        }
+        
+    }
+    
+    if (area_in) {
+        *area_in = area;
+    }
+    return inten;
+}
+
 void image::get_tri_intensity(Vec2_array tris, int * total_pixel, double * total_intensity){
     Vec2 min(INFINITY, INFINITY), max(-INFINITY, -INFINITY);
     for (auto p: tris){
@@ -281,7 +302,8 @@ double image::get_tri_differ_f(Vec2_array tris, double ci) {
         for(double ep2 = 1 - ep1 - step/2.0; ep2 > 0; ep2 -= step){
             double ep3 = 1 - ep1 - ep2;
             Vec2 pt = tris[0]*ep1 + tris[1]*ep2 + tris[2]*ep3;
-            energy += get_intensity_f(pt[0], pt[1]);
+            double g = get_intensity_f(pt[0], pt[1]);
+            energy += (g - ci)*(g - ci);
         }
 
     }

@@ -55,7 +55,7 @@ public:
     /// Computation base on its 4 neighbor pixel
     double get_intensity_f(double x, double y);
     double get_tri_differ_f(Vec2_array tris, double ci);
-
+    double get_tri_intensity_f(Vec2_array tris, double * area = nullptr);
 
     // total intensity inside a triangle
     void get_tri_intensity(Vec2_array tris, int * total_pixel, double * total_intensity);
