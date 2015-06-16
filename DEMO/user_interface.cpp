@@ -19,6 +19,7 @@
 #include "rotate_function.h"
 #include "average_function.h"
 #include "normal_function.h"
+#include "sph_function.h"
 
 #include "trializer.h"
 #include "object_generator.h"
@@ -111,7 +112,7 @@ UI::UI(int &argc, char** argv)
     {
         QUIT_ON_COMPLETION = true;
         CONTINUOUS = true;
-        RECORD = true;
+        RECORD = false;
         
         Util::ArgExtracter ext(argc, argv);
         ext.extract("nu", VELOCITY);
@@ -123,8 +124,8 @@ UI::UI(int &argc, char** argv)
         DISCRETIZATION = 25.;
         ACCURACY = 5.;
         
-        CONTINUOUS = false;
-        RECORD = true;
+        CONTINUOUS= false;
+        RECORD = false;
         QUIT_ON_COMPLETION = false;
     }
     update_title();
@@ -157,6 +158,8 @@ void UI::display()
     if(vel_fun && CONTINUOUS)
     {
         vel_fun->take_time_step(*dsc);
+      //  sph_mgr.gravity_down();
+        
         basic_log->write_timestep(*vel_fun);
         if (vel_fun->is_motion_finished(*dsc))
         {
@@ -197,7 +200,8 @@ void UI::keyboard(unsigned char key, int x, int y) {
             stop();
             break;
         case '1':
-            rotate_square();
+            // rotate_square();
+            sph_init();
             break;
         case '2':
             smooth_filled();
@@ -305,6 +309,8 @@ void UI::draw()
         {
             Painter::save_painting(WIN_SIZE_X, WIN_SIZE_Y, basic_log->get_path(), vel_fun->get_time_step());
         }
+        
+        sph_mgr.draw();
     }
     Painter::end();
 }
@@ -337,6 +343,31 @@ void UI::start()
 }
 
 using namespace DSC2D;
+
+void UI::sph_init(){
+    stop();
+    
+    int width = 450;
+    int height = 450;
+    
+    std::vector<real> points;
+    std::vector<int> faces;
+    Trializer::trialize(width, height, DISCRETIZATION, points, faces);
+    
+    DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, DISCRETIZATION);
+    
+    dsc = std::unique_ptr<DeformableSimplicialComplex>(new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
+    vel_fun = std::unique_ptr<VelocityFunc<>>(new sph_function(VELOCITY, ACCURACY));
+
+    reshape(width + 2*DISCRETIZATION, height + 2*DISCRETIZATION);
+    
+    // sph
+    sph_mgr.init(*dsc);
+    auto aa = dynamic_cast<sph_function*>(vel_fun.get());
+    aa->sph_mgr = &sph_mgr;
+    
+    start();
+}
 
 void UI::rotate_square()
 {

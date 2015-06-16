@@ -19,6 +19,7 @@
 #include "velocity_function.h"
 #include "DSC.h"
 #include "log.h"
+#include "sph.h"
 
 #ifdef WIN32
 #include <GL/glew.h>
@@ -50,6 +51,9 @@ class UI
     double DISCRETIZATION;
     double ACCURACY;
     static UI* instance;
+    
+private:
+    sph sph_mgr;
     
 public:
     
@@ -111,6 +115,8 @@ public:
     
     
 private:
+    void sph_init();
+    
     void rotate_square();
     
     void smooth_filled();
