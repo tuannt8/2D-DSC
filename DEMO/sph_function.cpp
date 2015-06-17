@@ -25,6 +25,7 @@ void sph_function::deform(DSC2D::DeformableSimplicialComplex& dsc){
     /*
      * Update display
      */
+
     
     update_compute_time(init_time);
     init_time = std::chrono::system_clock::now();

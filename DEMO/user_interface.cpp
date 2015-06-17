@@ -130,6 +130,8 @@ UI::UI(int &argc, char** argv)
     }
     update_title();
     check_gl_error();
+    
+    sph_init();
 }
 
 void UI::update_title()
@@ -356,7 +358,8 @@ void UI::sph_init(){
     
     DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, DISCRETIZATION);
     
-    dsc = std::unique_ptr<DeformableSimplicialComplex>(new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
+    dsc = std::unique_ptr<DeformableSimplicialComplex>
+            (new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
     vel_fun = std::unique_ptr<VelocityFunc<>>(new sph_function(VELOCITY, ACCURACY));
 
     reshape(width + 2*DISCRETIZATION, height + 2*DISCRETIZATION);
@@ -381,7 +384,8 @@ void UI::rotate_square()
     
     DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, DISCRETIZATION);
     
-    dsc = std::unique_ptr<DeformableSimplicialComplex>(new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
+    dsc = std::unique_ptr<DeformableSimplicialComplex>
+            (new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
     vel_fun = std::unique_ptr<VelocityFunc<>>(new RotateFunc(VELOCITY, ACCURACY));
     
     ObjectGenerator::create_square(*dsc, vec2(150., 150.), vec2(200., 200.), 1);
