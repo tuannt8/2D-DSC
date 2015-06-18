@@ -31,6 +31,7 @@
 #include <GLUT/glut.h>
 #endif
 
+#include "console_debug.h"
 /**
  A default user interface which utilize OpenGL, GLEW and GLUT. At least some of the motion functions should be overridden.
  */
@@ -52,9 +53,11 @@ class UI
     double ACCURACY;
     static UI* instance;
     
+    console_debug option_check;
 private:
     sph sph_mgr;
     
+    void update_sph();
 public:
     
     UI(int &argc, char** argv);

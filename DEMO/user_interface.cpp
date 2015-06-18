@@ -72,6 +72,9 @@ UI* UI::instance = NULL;
 
 UI::UI(int &argc, char** argv)
 {
+    
+
+    
     instance = this;
 	WIN_SIZE_X = 500;
     WIN_SIZE_Y = 500;
@@ -83,6 +86,8 @@ UI::UI(int &argc, char** argv)
 #else
     glutInitDisplayString("rgba double samples=16");
 #endif
+    option_check.init();
+    
     glutCreateWindow("");
     
     glEnable(GL_MULTISAMPLE);
@@ -132,6 +137,8 @@ UI::UI(int &argc, char** argv)
     check_gl_error();
     
     sph_init();
+
+
 }
 
 void UI::update_title()
@@ -148,6 +155,15 @@ void UI::update_title()
     glutSetWindowTitle(str.c_str());
 }
 
+void UI::update_sph(){
+    // vel_fun->take_time_step(*dsc);
+    //  sph_mgr.gravity_down();
+    
+    // Test
+    sph_mgr.gravity_down();
+    
+}
+
 void UI::display()
 {
     if (glutGet(GLUT_WINDOW_WIDTH) != WIN_SIZE_X || glutGet(GLUT_WINDOW_HEIGHT) != WIN_SIZE_Y) {
@@ -159,8 +175,7 @@ void UI::display()
     
     if(vel_fun && CONTINUOUS)
     {
-        vel_fun->take_time_step(*dsc);
-      //  sph_mgr.gravity_down();
+        update_sph();
         
         basic_log->write_timestep(*vel_fun);
         if (vel_fun->is_motion_finished(*dsc))
@@ -306,13 +321,29 @@ void UI::draw()
     Painter::begin();
     if (dsc)
     {
-        Painter::draw_complex(*dsc);
-        if(RECORD && CONTINUOUS)
-        {
-            Painter::save_painting(WIN_SIZE_X, WIN_SIZE_Y, basic_log->get_path(), vel_fun->get_time_step());
-        }
+      //  Painter::draw_complex(*dsc);
+//        if(RECORD && CONTINUOUS)
+//        {
+//            Painter::save_painting(WIN_SIZE_X, WIN_SIZE_Y, basic_log->get_path(), vel_fun->get_time_step());
+//        }
         
-        sph_mgr.draw();
+
+        
+        // Test
+        if (option_check("Face SPH color", true)) {
+            HMesh::FaceAttributeVector<DSC2D::vec3> colors(dsc->get_no_faces(), DSC2D::vec3(0.0));
+            for (auto fkey : dsc->faces()){
+                auto v_pos = dsc->get_pos(fkey);
+                auto center = (v_pos[0] + v_pos[1] + v_pos[2] ) / 3.0;
+                double rho = sph_mgr.get_intensity(center) / 2.0;
+                colors[fkey] = DSC2D::vec3(rho, rho, rho);
+            }
+            Painter::draw_faces(*dsc, colors);
+        }
+
+        if (option_check("SPH point and circle", true)) {
+            sph_mgr.draw();
+        }
     }
     Painter::end();
 }

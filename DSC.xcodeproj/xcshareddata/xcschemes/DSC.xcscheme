@@ -29,6 +29,15 @@
       buildConfiguration = "Debug">
       <Testables>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "7A51F3B917D6391500A8F8F2"
+            BuildableName = "DEMO"
+            BlueprintName = "DEMO"
+            ReferencedContainer = "container:DSC.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
@@ -39,15 +48,16 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "7A51F3D417D6399200A8F8F2"
-            BuildableName = "libDSC.a"
-            BlueprintName = "DSC"
+            BlueprintIdentifier = "7A51F3B917D6391500A8F8F2"
+            BuildableName = "DEMO"
+            BlueprintName = "DEMO"
             ReferencedContainer = "container:DSC.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>

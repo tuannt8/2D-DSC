@@ -50,8 +50,8 @@ void sph_function::re_index_dsc(){
             
             auto verts = dsc_ptr->get_verts(fkey);
             for (auto v : verts) {
-                if (verts[v] == INVALID_IDX) {
-                    verts[v] = v_idx++;
+                if (vert_idx[v] == INVALID_IDX) {
+                    vert_idx[v] = v_idx++;
                 }
             }
         }
@@ -65,7 +65,7 @@ void sph_function::init(){
     double mass = sph_mgr->get_total_mass();
     V0 = 0.0;
     for (auto fkey:dsc_ptr->faces()){
-        if (dsc_ptr->get_label(fkey)) != 0) {
+        if (dsc_ptr->get_label(fkey) != 0) {
             V0 += dsc_ptr->area(fkey);
         }
     }

@@ -18,19 +18,20 @@ void draw_point_region(DSC2D::vec2 pos, double r){
                         , pos + vec2(r,r)
                         , pos + vec2(-r, r)};
     // Interial
+    glColor4f(1.0, 0.0, 0.0, 0.1);
     glBegin(GL_QUADS);
     for (int i = 0; i<4; i++) {
         glVertex2d(pts[i][0], pts[i][1]);
     }
     glEnd();
-    // Edges
-    glBegin(GL_LINES);
-    for (int i = 0; i < 4; i++) {
-        glVertex2d(pts[i][0], pts[i][1]);
-        int idx = (i+1)%4;
-        glVertex2d(pts[idx][0], pts[idx][1]);
-    }
-    glEnd();
+//    // Edges
+//    glBegin(GL_LINES);
+//    for (int i = 0; i < 4; i++) {
+//        glVertex2d(pts[i][0], pts[i][1]);
+//        int idx = (i+1)%4;
+//        glVertex2d(pts[idx][0], pts[idx][1]);
+//    }
+//    glEnd();
 }
 
 double sph::omega(double r){
@@ -44,6 +45,10 @@ double sph::omega(double r){
 }
 
 void sph::draw(){
+    for (auto p: point_){
+        draw_point_region(p, radius_);
+    }
+    
     glPointSize(2.0);
     glColor3f(1, 0, 0);
     glBegin(GL_POINTS);
@@ -111,7 +116,7 @@ void sph::init(DSC2D::DeformableSimplicialComplex &complex){
         }
     }
     
-    radius_ = std::sqrt( (ru_[0] - ld_[0]) * (ru_[1] - ld_[1]) / size_ * size_);
+    radius_ = std::sqrt( (ru_[0] - ld_[0]) * (ru_[1] - ld_[1]) / size_ / size_);
     
     
     DSC2D::ObjectGenerator::create_square(complex, ld_, ru_-ld_, 1);
