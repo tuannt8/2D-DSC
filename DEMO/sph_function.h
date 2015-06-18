@@ -20,6 +20,7 @@ public:
     
 private:
     arma::mat A;
+    int nb_vert, nb_face; // No. of vertices and face inside
     HMesh::VertexAttributeVector<int> vert_idx;
     HMesh::FaceAttributeVector<int> face_idx;
     
@@ -27,6 +28,7 @@ private:
 private:
     void re_index_dsc();
     void build_matrix();
+    
 public:
     /**
      Creates a rotating velocity function.
@@ -56,6 +58,9 @@ public:
     {
         return false;
     }
+
+private:
+    DSC2D::vec2 get_area_derivative(DSC2D::vec2 P, DSC2D::vec2 A, DSC2D::vec2 B);
 };
 
 #endif /* defined(__DSC__sph_function__) */

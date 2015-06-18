@@ -13,12 +13,12 @@
 
 void sph_function::deform(DSC2D::DeformableSimplicialComplex& dsc){
     auto init_time = std::chrono::system_clock::now();
-
+    dsc_ptr = &dsc;
     
     /*
-     * Track the SPH interface
+     * Index DSC
      */
-    
+    re_index_dsc();
     
     /*
      * Stretch the sph to reserve volume
@@ -56,7 +56,39 @@ void sph_function::re_index_dsc(){
             }
         }
     }
-}
-void sph_function::build_matrix(){
     
+    nb_vert = v_idx;
+    nb_face = f_idx;
 }
+
+void sph_function::build_matrix(){
+    A = arma::zeros(nb_face, nb_vert*2);
+    for (auto fkey : dsc_ptr->faces()){
+        if (dsc_ptr->get_label(fkey) != 0) {
+            int fIdx = face_idx[fkey];
+            
+            auto verts = dsc_ptr->get_verts(fkey);
+            for (int i = 0; i < 3; i++) {
+                int vIdx = vert_idx[verts[i]];
+                
+                DSC2D::vec2 d = get_area_derivative(dsc_ptr->get_pos(verts[i]),
+                                               dsc_ptr->get_pos(verts[(i+1)%3]),
+                                               dsc_ptr->get_pos(verts[(i+2)%3]));
+                
+                A(fIdx, vIdx*2) = d[0];
+                A(fIdx, vIdx*2 + 1) = d[1];
+            }
+        }
+    }
+}
+
+DSC2D::vec2 sph_function::get_area_derivative(DSC2D::vec2 P, DSC2D::vec2 A, DSC2D::vec2 B){
+    double l = (B-A).length();
+    double t = CGLA::dot(P-A, B-A) / l;
+    DSC2D::vec2 V = A + (B-A)*t;
+    DSC2D::vec2 n = P - V;
+    n.normalize();
+    
+    return n*l;
+}
+
