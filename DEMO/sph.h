@@ -26,6 +26,8 @@ class sph{
 private:
     // Dynamics points; redius and position
     double radius_;
+    double mass = 0.1;
+    
     // Number of sph on each size
     int size_ = 10;
     std::vector<DSC2D::vec2> point_;
@@ -38,7 +40,11 @@ private:
     const DSC2D::vec2 GRAVITY = DSC2D::vec2(0,-1);
 private:
     // Check if sph go out of domain
-    bool is_outside(DSC2D::vec2 pt);
+    double omega(double r);
+    
+public:
+    double get_intensity(DSC2D::vec2 pt);
+    double get_total_mass();
     
 public:
     // draw function

@@ -33,6 +33,16 @@ void draw_point_region(DSC2D::vec2 pos, double r){
     glEnd();
 }
 
+double sph::omega(double r){
+    double xi = r / radius_;
+    if (xi >= 0 or xi <= 1) {
+        return 1 - 3.0/2.0*xi*xi + 3.0/4.0*xi*xi*xi;
+    } else if (xi <= 2){
+        return std::pow( 2-xi , 3) / 4.0;
+    } else
+        return 0.0;
+}
+
 void sph::draw(){
     glPointSize(2.0);
     glColor3f(1, 0, 0);
@@ -41,6 +51,24 @@ void sph::draw(){
         glVertex2d(p[0], p[1]);
     }
     glEnd();
+}
+
+double sph::get_intensity(DSC2D::vec2 pt){
+    // TODO: Performance gain later
+    double rho = 0;
+    
+    for (int i = 0; i < point_.size(); i++) {
+        double r = (point_[i] - pt).length();
+        if (r < 2*radius_) {
+            rho += omega(r) * mass;
+        }
+    }
+    
+    return rho;
+}
+
+double sph::get_total_mass(){
+    return mass * point_.size();
 }
 
 void sph::gravity_down(){

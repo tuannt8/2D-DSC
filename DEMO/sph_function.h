@@ -20,6 +20,10 @@ public:
     
 private:
     arma::mat A;
+    arma::colvec dV_col;
+    
+    double rho_0, V0; // Constant intensity
+    
     int nb_vert, nb_face; // No. of vertices and face inside
     HMesh::VertexAttributeVector<int> vert_idx;
     HMesh::FaceAttributeVector<int> face_idx;
@@ -28,8 +32,11 @@ private:
 private:
     void re_index_dsc();
     void build_matrix();
+    void compt_volume_change();
     
 public:
+    void init();
+    
     /**
      Creates a rotating velocity function.
      */
