@@ -73,7 +73,18 @@ void console_debug::mouse_func(int button, int state, int x, int y){
             }
             it->second = !it->second;
         }
+        
+        update_display();
     }
+}
+
+void console_debug::update_display(){
+    for (int i= 0; i < 10; i++) {
+        if (update[i]) {
+            (*update[i])();
+        }
+    }
+    glutPostRedisplay();
 }
 
 void console_debug::display(){

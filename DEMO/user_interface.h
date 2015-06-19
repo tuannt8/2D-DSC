@@ -53,9 +53,9 @@ class UI
     double ACCURACY;
     static UI* instance;
     
-    console_debug option_check;
-private:
+public:
     sph sph_mgr;
+    int winID;
     
     void update_sph();
 public:

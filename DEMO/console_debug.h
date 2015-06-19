@@ -56,23 +56,43 @@ class console_debug{
     const double mouse_over[3] = {1,0,1};
     const double check[3] = {0,0,1};
     const double un_check[3] = {1,0,0};
+    
+private:
+    // Call back
+    void (*update[10])(void) = {nullptr};
+    void update_display();
+public:
+    static void set_call_back(void (*func)(void)){
+        static int idx = 0;
+        console_debug::get_instance()->update[idx++] = (func);
+    }
+    
 private:
     void RenderString(vec2 p, const std::string &string);
     void draw_box(int idx, std::string name, bool state);
 public:
     static console_debug *instance;
     
-    static console_debug * get_instance(){return instance;}
+    static console_debug * get_instance(){
+        if (!instance) {
+            instance = new console_debug;
+        }
+        return instance;
+    }
+    static bool get_opt (std::string op, bool defalt){
+        return get_instance()->getOpt(op, defalt);
+    }
     
-public:
+private:
     console_debug(){
-        instance = this;
-    };
+        
+    }
+public:
     
     ~console_debug(){
     };
     
-    bool operator() (std::string op, bool defalt){
+    bool getOpt (std::string op, bool defalt){
         if (options.find(op) == options.end()) {
             options.insert(std::make_pair(op, defalt));
         }

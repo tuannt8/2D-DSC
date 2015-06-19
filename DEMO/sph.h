@@ -29,7 +29,7 @@ private:
     double mass = 0.1;
     
     // Number of sph on each size
-    int size_ = 10;
+    const int size_ = 20;
     std::vector<DSC2D::vec2> point_;
     
     // Domain
@@ -44,6 +44,7 @@ private:
     
 public:
     double get_intensity(DSC2D::vec2 pt);
+    double get_mean_intensity_tri(std::vector<DSC2D::vec2> pts);
     double get_total_mass();
     
 public:

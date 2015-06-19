@@ -70,6 +70,11 @@ void animate_(){
 
 UI* UI::instance = NULL;
 
+void update_option(){
+    
+    glutPostWindowRedisplay(UI::get_instance()->winID);
+}
+
 UI::UI(int &argc, char** argv)
 {
     
@@ -86,9 +91,10 @@ UI::UI(int &argc, char** argv)
 #else
     glutInitDisplayString("rgba double samples=16");
 #endif
-    option_check.init();
+    console_debug::get_instance()->init();
+    console_debug::set_call_back(update_option);
     
-    glutCreateWindow("");
+    winID = glutCreateWindow("");
     
     glEnable(GL_MULTISAMPLE);
 	
@@ -316,32 +322,32 @@ void UI::visible(int v)
         glutIdleFunc(0);
 }
 
+#pragma mark - DRAW
+
 void UI::draw()
 {
     Painter::begin();
     if (dsc)
     {
-      //  Painter::draw_complex(*dsc);
-//        if(RECORD && CONTINUOUS)
-//        {
-//            Painter::save_painting(WIN_SIZE_X, WIN_SIZE_Y, basic_log->get_path(), vel_fun->get_time_step());
-//        }
-        
 
         
-        // Test
-        if (option_check("Face SPH color", true)) {
+        if (console_debug::get_opt("DSC Face color by SPH", true)) {
             HMesh::FaceAttributeVector<DSC2D::vec3> colors(dsc->get_no_faces(), DSC2D::vec3(0.0));
             for (auto fkey : dsc->faces()){
                 auto v_pos = dsc->get_pos(fkey);
-                auto center = (v_pos[0] + v_pos[1] + v_pos[2] ) / 3.0;
-                double rho = sph_mgr.get_intensity(center) / 2.0;
+                double rho = sph_mgr.get_mean_intensity_tri(v_pos) / 0.0001;
                 colors[fkey] = DSC2D::vec3(rho, rho, rho);
             }
             Painter::draw_faces(*dsc, colors);
         }
+        
+        if (console_debug::get_opt("DSC edge", true)) {
+            glColor3f(0.7, 0.2, 0.4);
+            Painter::draw_edges(*dsc);
+        }
 
-        if (option_check("SPH point and circle", true)) {
+        //if (console_debug::get_opt("Draw SPH", true))
+        {
             sph_mgr.draw();
         }
     }
