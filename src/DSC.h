@@ -83,7 +83,7 @@ namespace DSC2D {
         vec3 OUTSIDE_FACE_COLOR;
         vec3 DEFAULT_FACE_COLOR;
         
-    private:
+    public:
         HMesh::Manifold *mesh;
         DesignDomain *design_domain;
         

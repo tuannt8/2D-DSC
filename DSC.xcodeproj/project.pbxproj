@@ -32,6 +32,7 @@
 		A625C9BF1B308C6900AD72B9 /* sph_function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A625C9BD1B308C6900AD72B9 /* sph_function.cpp */; };
 		A625C9C21B308D1F00AD72B9 /* sph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A625C9C01B308D1F00AD72B9 /* sph.cpp */; };
 		A6B3B9DF1B33246200CD6080 /* console_debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B3B9DE1B33246200CD6080 /* console_debug.cpp */; };
+		A6B3B9E31B344A9500CD6080 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6B3B9E21B344A9500CD6080 /* Accelerate.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -81,6 +82,8 @@
 		A625C9C11B308D1F00AD72B9 /* sph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sph.h; sourceTree = "<group>"; };
 		A6B3B9DD1B3318CD00CD6080 /* console_debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = console_debug.h; sourceTree = "<group>"; };
 		A6B3B9DE1B33246200CD6080 /* console_debug.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = console_debug.cpp; sourceTree = "<group>"; };
+		A6B3B9E01B344A1900CD6080 /* liblapack.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = liblapack.dylib; path = usr/lib/liblapack.dylib; sourceTree = SDKROOT; };
+		A6B3B9E21B344A9500CD6080 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +91,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A6B3B9E31B344A9500CD6080 /* Accelerate.framework in Frameworks */,
 				7A51F3E417D63A0800A8F8F2 /* GEL.framework in Frameworks */,
 				7A51F3E517D63A0E00A8F8F2 /* OpenGL.framework in Frameworks */,
 				7A51F3E617D63A0E00A8F8F2 /* GLUT.framework in Frameworks */,
@@ -109,6 +113,8 @@
 		7A51F38E17D6383500A8F8F2 = {
 			isa = PBXGroup;
 			children = (
+				A6B3B9E21B344A9500CD6080 /* Accelerate.framework */,
+				A6B3B9E01B344A1900CD6080 /* liblapack.dylib */,
 				7A51F3B417D638B500A8F8F2 /* GEL.framework */,
 				7A51F3B217D6388800A8F8F2 /* OpenGL.framework */,
 				7A51F3B017D6388200A8F8F2 /* GLUT.framework */,

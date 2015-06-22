@@ -23,7 +23,7 @@
 
 
 class sph{
-private:
+public:
     // Dynamics points; redius and position
     double radius_;
     double mass = 0.1;
@@ -44,7 +44,7 @@ private:
     
 public:
     double get_intensity(DSC2D::vec2 pt);
-    double get_mean_intensity_tri(std::vector<DSC2D::vec2> pts);
+    double get_mass_tri(std::vector<DSC2D::vec2> pts);
     double get_total_mass();
     
 public:

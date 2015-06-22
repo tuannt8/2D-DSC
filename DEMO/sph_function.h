@@ -13,7 +13,7 @@
 #include "sph.h"
 #include "armadillo"
 
-class sph_function: public DSC2D::VelocityFunc<>{
+class sph_function{
 public:
     sph *sph_mgr;
     DSC2D::DeformableSimplicialComplex *dsc_ptr;
@@ -21,6 +21,8 @@ public:
 private:
     arma::mat A;
     arma::colvec dV_col;
+    arma::colvec dP_col;
+    HMesh::VertexAttributeVector<DSC2D::vec2> vert_displace;
     
     double rho_0, V0; // Constant intensity
     
@@ -33,22 +35,26 @@ private:
     void re_index_dsc();
     void build_matrix();
     void compt_volume_change();
-    
+    void solve_displacement();
+    void solve_displacement_constraint();
+    void solve_displacement_tikhnov();
+    void displace_sph();
+    void displace_dsc();
 public:
     void init();
     
+    void draw();
+    
+    void get_info();
     /**
-     Creates a rotating velocity function.
+     * Fit DSC to SPH
      */
-    sph_function(double velocity, double accuracy): VelocityFunc(M_PI*velocity/180., accuracy)
-    {
-        
-    }
+    void fit_dsc_to_sph();
     
     /**
      Returns the name of the velocity function.
      */
-    virtual std::string get_name() const
+    std::string get_name() const
     {
         return std::string("SPH");
     }
@@ -56,18 +62,14 @@ public:
     /**
      Computes the motion of each interface vertex and stores the destination in the simplicial complex class.
      */
-    virtual void deform(DSC2D::DeformableSimplicialComplex&);
+    void deform(DSC2D::DeformableSimplicialComplex&);
     
-    /**
-     Returns wether the motion has finished.
-     */
-    virtual bool is_motion_finished(DSC2D::DeformableSimplicialComplex& dsc)
-    {
-        return false;
-    }
 
+    sph_function() {};
 private:
     DSC2D::vec2 get_area_derivative(DSC2D::vec2 P, DSC2D::vec2 A, DSC2D::vec2 B);
+    double get_barrycentric_coord(DSC2D::vec2 p, DSC2D::vec2 P,
+                                  DSC2D::vec2 B, DSC2D::vec2 C);
 };
 
 #endif /* defined(__DSC__sph_function__) */

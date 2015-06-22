@@ -164,11 +164,11 @@ void Painter::draw_arrows(const DeformableSimplicialComplex& dsc, const HMesh::V
         {
             a_hat = vec3(-arrow[1], arrow[0], 0.f);
             p = vec3(dsc.get_pos(*vi)[0], dsc.get_pos(*vi)[1], 0.);
-#ifdef DEBUG
-            if (dsc.is_movable(*vi)) {
-                p = vec3(dsc.get_destination(*vi)[0], dsc.get_destination(*vi)[1], 0.);
-            }
-#endif
+//#ifdef DEBUG
+//            if (dsc.is_movable(*vi)) {
+//                p = vec3(dsc.get_destination(*vi)[0], dsc.get_destination(*vi)[1], 0.);
+//            }
+//#endif
             glBegin(GL_LINES);
             glVertex3d(static_cast<double>(p[0]), static_cast<double>(p[1]), static_cast<double>(p[2]));
             glVertex3d(static_cast<double>((p + 0.7*arrow)[0]), static_cast<double>((p + 0.7*arrow)[1]), static_cast<double>((p + 0.7*arrow)[2]));
@@ -221,6 +221,30 @@ void Painter::draw_edges(const DeformableSimplicialComplex& dsc)
         glVertex3d(static_cast<double>(p2[0]), static_cast<double>(p2[1]), static_cast<double>(p2[2]));
     }
 	glEnd();
+}
+
+void RenderString(vec2 p, const std::string &string)
+{
+    glRasterPos2d(p[0], p[1]);
+    for (int n=0; n<string.size(); ++n) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, string[n]);
+    }
+}
+void Painter::draw_faces_idx(const DSC2D::DeformableSimplicialComplex& complex){
+    for (auto fkey : complex.faces()) {
+        auto v_pos = complex.get_pos(fkey);
+        auto center = (v_pos[0] + v_pos[1] + v_pos[2]) / 3.0;
+        RenderString(center, std::to_string(fkey.get_index()));
+    }
+}
+
+void Painter::draw_faces_text(const DSC2D::DeformableSimplicialComplex& complex,
+                            HMesh::FaceAttributeVector<std::string> &tex){
+    for (auto fkey : complex.faces()) {
+        auto v_pos = complex.get_pos(fkey);
+        auto center = (v_pos[0] + v_pos[1] + v_pos[2]) / 3.0;
+        RenderString(center, tex[fkey]);
+    }
 }
 
 void Painter::draw_faces(const DeformableSimplicialComplex& dsc)

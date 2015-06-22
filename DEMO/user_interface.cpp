@@ -75,10 +75,9 @@ void update_option(){
     glutPostWindowRedisplay(UI::get_instance()->winID);
 }
 
+#pragma mark Construction
 UI::UI(int &argc, char** argv)
 {
-    
-
     
     instance = this;
 	WIN_SIZE_X = 500;
@@ -132,7 +131,7 @@ UI::UI(int &argc, char** argv)
     }
     else {
         VELOCITY = 10.;
-        DISCRETIZATION = 25.;
+        DISCRETIZATION = 35.;
         ACCURACY = 5.;
         
         CONTINUOUS= false;
@@ -161,36 +160,18 @@ void UI::update_title()
     glutSetWindowTitle(str.c_str());
 }
 
-void UI::update_sph(){
-    // vel_fun->take_time_step(*dsc);
-    //  sph_mgr.gravity_down();
-    
-    // Test
-    sph_mgr.gravity_down();
-    
-}
 
 void UI::display()
 {
-    if (glutGet(GLUT_WINDOW_WIDTH) != WIN_SIZE_X || glutGet(GLUT_WINDOW_HEIGHT) != WIN_SIZE_Y) {
-        return;
-    }
-    
     draw();
     update_title();
     
-    if(vel_fun && CONTINUOUS)
+    if(CONTINUOUS)
     {
-        update_sph();
+        CONTINUOUS = false;
         
-        basic_log->write_timestep(*vel_fun);
-        if (vel_fun->is_motion_finished(*dsc))
-        {
-            stop();
-            if (QUIT_ON_COMPLETION) {
-                exit(0);
-            }
-        }
+        update_sph();
+       
     }
     check_gl_error();
 }
@@ -204,8 +185,15 @@ void UI::reshape(int width, int height)
         gluOrtho2D(0, WIN_SIZE_X, 0, WIN_SIZE_Y);
     }
     
-    glViewport(0, 0, WIN_SIZE_X, WIN_SIZE_Y);
-    glutReshapeWindow(WIN_SIZE_X, WIN_SIZE_Y);
+    double ratio = (double)width / (double)height;
+    
+    double gap = std::abs(height - width)/2;
+    if (ratio <= 1) {
+        glViewport(0, gap, width, height - 2*gap);
+    }else{
+        glViewport(gap, 0, width - 2*gap, height);
+    }
+    glutReshapeWindow(width, height);
 }
 
 void UI::animate()
@@ -242,19 +230,17 @@ void UI::keyboard(unsigned char key, int x, int y) {
             }
             CONTINUOUS = !CONTINUOUS;
             break;
+        case 'd': // D ---> regular distribute
+            sph_vel.deform(*dsc);
+            break;
+        case 'f': // F ---> Fit DSC
+            sph_vel.fit_dsc_to_sph();
+            break;
         case 'm':
-            if(vel_fun)
-            {
-                std::cout << "MOVE" << std::endl;
-                vel_fun->take_time_step(*dsc);
-            }
+            sph_mgr.gravity_down();
             break;
         case 't':
-            if(vel_fun)
-            {
-                std::cout << "TEST" << std::endl;
-                vel_fun->test(*dsc);
-            }
+            sph_vel.get_info();
             break;
         case '\t':
             if(dsc)
@@ -312,6 +298,8 @@ void UI::keyboard(unsigned char key, int x, int y) {
             }
             break;
     }
+    
+    glutPostRedisplay();
 }
 
 void UI::visible(int v)
@@ -329,26 +317,18 @@ void UI::draw()
     Painter::begin();
     if (dsc)
     {
-
-        
-        if (console_debug::get_opt("DSC Face color by SPH", true)) {
-            HMesh::FaceAttributeVector<DSC2D::vec3> colors(dsc->get_no_faces(), DSC2D::vec3(0.0));
-            for (auto fkey : dsc->faces()){
-                auto v_pos = dsc->get_pos(fkey);
-                double rho = sph_mgr.get_mean_intensity_tri(v_pos) / 0.0001;
-                colors[fkey] = DSC2D::vec3(rho, rho, rho);
-            }
-            Painter::draw_faces(*dsc, colors);
-        }
+    
+        sph_vel.draw();
         
         if (console_debug::get_opt("DSC edge", true)) {
             glColor3f(0.7, 0.2, 0.4);
             Painter::draw_edges(*dsc);
         }
-
-        //if (console_debug::get_opt("Draw SPH", true))
-        {
-            sph_mgr.draw();
+        
+        sph_mgr.draw();
+        
+        if(console_debug::get_opt("Face index", false)){
+            Painter::draw_faces_idx(*dsc);
         }
     }
     Painter::end();
@@ -373,41 +353,17 @@ void UI::stop()
 
 void UI::start()
 {
-    basic_log = std::unique_ptr<Log>(new Log(create_log_path()));
-    basic_log->write_message(vel_fun->get_name().c_str());
-    basic_log->write_log(*dsc);
-    basic_log->write_log(*vel_fun);
-    
-    update_title();
+//    basic_log = std::unique_ptr<Log>(new Log(create_log_path()));
+//    basic_log->write_message(vel_fun->get_name().c_str());
+//    basic_log->write_log(*dsc);
+//    basic_log->write_log(*vel_fun);
+//    
+//    update_title();
 }
 
 using namespace DSC2D;
 
-void UI::sph_init(){
-    stop();
-    
-    int width = 450;
-    int height = 450;
-    
-    std::vector<real> points;
-    std::vector<int> faces;
-    Trializer::trialize(width, height, DISCRETIZATION, points, faces);
-    
-    DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, DISCRETIZATION);
-    
-    dsc = std::unique_ptr<DeformableSimplicialComplex>
-            (new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
-    vel_fun = std::unique_ptr<VelocityFunc<>>(new sph_function(VELOCITY, ACCURACY));
 
-    reshape(width + 2*DISCRETIZATION, height + 2*DISCRETIZATION);
-    
-    // sph
-    sph_mgr.init(*dsc);
-    auto aa = dynamic_cast<sph_function*>(vel_fun.get());
-    aa->sph_mgr = &sph_mgr;
-    
-    start();
-}
 
 void UI::rotate_square()
 {
@@ -476,3 +432,40 @@ void UI::expand_blobs()
     start();
 }
 
+#pragma mark - Particle
+
+void UI::update_sph(){
+     sph_vel.deform(*dsc);
+    //  sph_mgr.gravity_down();
+    
+}
+
+void UI::sph_init(){
+    
+    DISCRETIZATION = 50;
+    
+    stop();
+    
+    int width = WIN_SIZE_X - 2*DISCRETIZATION;
+    int height = WIN_SIZE_Y - 2*DISCRETIZATION;
+    
+    std::vector<real> points;
+    std::vector<int> faces;
+    Trializer::trialize(width, height, DISCRETIZATION, points, faces);
+    
+    DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, DISCRETIZATION);
+    
+    dsc = std::unique_ptr<DeformableSimplicialComplex>
+    (new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
+    
+    reshape(width + 2*DISCRETIZATION, height + 2*DISCRETIZATION);
+    
+    // sph
+    sph_mgr.init(*dsc);
+    
+    sph_vel.sph_mgr = &sph_mgr;
+    sph_vel.dsc_ptr = &*dsc;
+    sph_vel.init();
+    
+    start();
+}

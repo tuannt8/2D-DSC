@@ -32,6 +32,7 @@
 #endif
 
 #include "console_debug.h"
+#include "sph_function.h"
 /**
  A default user interface which utilize OpenGL, GLEW and GLUT. At least some of the motion functions should be overridden.
  */
@@ -40,6 +41,8 @@ class UI
     std::unique_ptr<DSC2D::VelocityFunc<>> vel_fun;
     std::unique_ptr<DSC2D::DeformableSimplicialComplex> dsc;
     std::unique_ptr<Log> basic_log;
+    
+    sph_function sph_vel;
     
     int WIN_SIZE_X;
     int WIN_SIZE_Y;

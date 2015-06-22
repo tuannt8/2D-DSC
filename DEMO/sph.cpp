@@ -63,20 +63,29 @@ void draw_point_region(DSC2D::vec2 pos, double r){
 }
 
 double sph::omega(double r){
-    double xi = r / (double)radius_;
-    double w;
-    if (xi >= 0 or xi <= 1) {
-        w = 1 - 3.0/2.0*xi*xi + 3.0/4.0*xi*xi*xi;
-    } else if (xi <= 2){
-        w = std::pow( 2-xi , 3) / 4.0;
-    } else
-        w = 0.0;
-    
-    return w/(radius_*radius_*radius_*3.14159);
+//    { // Cubic
+//        double xi = r / (double)radius_;
+//        double w;
+//        if (xi >= 0 or xi <= 1) {
+//            w = 1 - 3.0/2.0*xi*xi + 3.0/4.0*xi*xi*xi;
+//        } else if (xi <= 2){
+//            w = std::pow( 2-xi , 3) / 4.0;
+//        } else
+//            w = 0.0;
+//        
+//        return w/(radius_*radius_*radius_*3.14159);
+//    }
+    { // Gaussian
+        if (r < radius_) {
+            return 15/(3.14 * std::pow(radius_, 6))*std::pow((radius_-r), 3);
+        }
+        else
+            return 0;
+    }
 }
 
 
-double sph::get_mean_intensity_tri(std::vector<DSC2D::vec2> pts){
+double sph::get_mass_tri(std::vector<DSC2D::vec2> pts){
     // Use 6 point integrationi
     double rho = 0.0;
     for (int i = 0; i < 6; i++) {
@@ -84,10 +93,13 @@ double sph::get_mean_intensity_tri(std::vector<DSC2D::vec2> pts){
         for (int j = 0; j<3; j++) {
             pt = pt + pts[j]*gauss_xi[i][j];
         }
+        
         rho += gauss_W[i] * get_intensity(pt);
     }
     rho /= 4.0;
-    return rho;
+    double V = std::abs(CGLA::cross(pts[1] - pts[0], pts[2] - pts[0]));
+    
+    return rho*V;
 }
 
 void sph::draw(){
@@ -150,7 +162,7 @@ void sph::init(DSC2D::DeformableSimplicialComplex &complex){
     auto corners = complex.get_design_domain()->get_corners();
     auto center = complex.get_center();
     vec2 diag = corners[2] - corners[0];
-    diag = diag/3;
+    diag = diag/3.5;
     
     ld_ = center - diag;
     ru_ = center + diag;
@@ -169,9 +181,9 @@ void sph::init(DSC2D::DeformableSimplicialComplex &complex){
     radius_ = std::sqrt(
                         (ru_[0] - ld_[0]) * (ru_[1] - ld_[1])
                         / size_ / size_)
-                * 2.0 / 3.0;
+                * 2.0 / 1.0;
     
-    
-    DSC2D::ObjectGenerator::create_square(complex, ld_, ru_-ld_, 1);
+    DSC2D::vec2 gap(10,10);
+    DSC2D::ObjectGenerator::create_square(complex, ld_ - gap, ru_- ld_ + gap, 1);
     
 }

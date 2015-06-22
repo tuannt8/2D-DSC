@@ -177,7 +177,7 @@ void console_debug::draw_box(int idx, std::string name, bool state){
 void console_debug::init(){
 
     
-        glutInit(NULL, NULL);
+   //     glutInit(NULL, NULL);
         glutInitWindowSize(WIN_SIZE_X,WIN_SIZE_Y);
 #ifdef WIN32
         glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_MULTISAMPLE);

@@ -18,6 +18,7 @@
 
 #include "DSC.h"
 #include "velocity_function.h"
+#include <string>
 
 const static double POINT_SIZE = 0.2;
 const static double LINE_WIDTH = 0.1;
@@ -80,6 +81,11 @@ public:
      Draws the faces with the colors defined by the get_face_colors function in the simplicial complex.
      */
     static void draw_faces(const DSC2D::DeformableSimplicialComplex& complex);
+    
+    static void draw_faces_idx(const DSC2D::DeformableSimplicialComplex& complex);
+    
+    static void draw_faces_text(const DSC2D::DeformableSimplicialComplex& complex,
+                                HMesh::FaceAttributeVector<std::string> &tex);
     
     /**
      Draws the faces with the colors given as input.
