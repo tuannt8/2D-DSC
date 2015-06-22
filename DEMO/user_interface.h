@@ -77,6 +77,8 @@ public:
         return s.str();
     }
     
+    void save_mesh();
+    
     void display();
     
     void animate();

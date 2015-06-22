@@ -251,8 +251,7 @@ void UI::keyboard(unsigned char key, int x, int y) {
         case 's':
             if(dsc)
             {
-                std::cout << "TAKING SCREEN SHOT" << std::endl;
-                Painter::save_painting(WIN_SIZE_X, WIN_SIZE_Y, "LOG");
+                save_mesh();
             }
             break;
         case '+':
@@ -300,6 +299,27 @@ void UI::keyboard(unsigned char key, int x, int y) {
     }
     
     glutPostRedisplay();
+}
+
+void UI::save_mesh(){
+    FILE * f = fopen("mesh.txt", "w");
+    
+    if (f) {
+        fprintf(f, "%d %d\n", dsc->get_no_vertices(), dsc->get_no_faces());
+        
+        for (auto nkey : dsc->vertices()){
+            auto p = dsc->get_pos(nkey);
+            fprintf(f, "%f %f\n", p[0], p[1]);
+        }
+        
+        for (auto fkey : dsc->faces()) {
+            auto verts = dsc->get_verts(fkey);
+            fprintf(f, "%d %d %d\n", (int)verts[0].get_index()+1,
+                    (int)verts[1].get_index()+1, (int)verts[2].get_index()+1);
+        }
+        
+        fclose(f);
+    }
 }
 
 void UI::visible(int v)
