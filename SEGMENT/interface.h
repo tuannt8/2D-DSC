@@ -51,6 +51,7 @@ public:
 private:
     int debug_num_[10];
     
+    void save_mesh();
 #pragma mark - Glut display
 public:
     void display();

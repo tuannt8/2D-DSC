@@ -155,6 +155,9 @@ void interface::keyboard(unsigned char key, int x, int y){
         case 'u':
             dynamics_image_seg();
             break;
+        case 's':
+            save_mesh();
+            break;
         default:
             break;
     }
@@ -366,6 +369,29 @@ interface::interface(int &argc, char** argv){
 
 #pragma mark - Data
 using namespace DSC2D;
+
+void interface::save_mesh(){
+    std::string file_path = std::string(DATA_PATH) + "mesh.txt";
+    FILE *f = fopen(file_path.c_str(), "w");
+    if (f) {
+        fprintf(f, "%d %d\n", dsc->get_no_vertices(), dsc->get_no_faces());
+        for(auto nkey : dsc->vertices()){
+            auto p = dsc->get_pos(nkey);
+            fprintf(f, "%f %f\n", p[0], p[1]);
+        }
+        for (auto fkey:dsc->faces()){
+            auto verts = dsc->get_verts(fkey);
+            fprintf(f, "%d %d %d\n", (int)verts[0].get_index() + 1,
+                    (int)verts[1].get_index() + 1, (int)verts[2].get_index() + 1);
+        }
+        
+        for (auto fkey:dsc->faces()) {
+            fprintf(f, "%d\n", dsc->get_label(fkey));
+        }
+        
+        fclose(f);
+    }
+}
 
 void interface::init_dsc(){
     int width = imageSize[0];
