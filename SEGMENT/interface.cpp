@@ -145,9 +145,12 @@ void interface::keyboard(unsigned char key, int x, int y){
         case ' ':
         {
             RUN = !RUN;
-            
+            break;
             //dynamics_image_seg();
         }
+        case 'o':
+            dyn_->optimize_phase();
+            
             break;
         case '\t':
             Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, LOG_PATH);
@@ -375,18 +378,35 @@ void interface::save_mesh(){
     FILE *f = fopen(file_path.c_str(), "w");
     if (f) {
         fprintf(f, "%d %d\n", dsc->get_no_vertices(), dsc->get_no_faces());
+        
+        // points
         for(auto nkey : dsc->vertices()){
             auto p = dsc->get_pos(nkey);
             fprintf(f, "%f %f\n", p[0], p[1]);
         }
+        
+        // faces
         for (auto fkey:dsc->faces()){
             auto verts = dsc->get_verts(fkey);
             fprintf(f, "%d %d %d\n", (int)verts[0].get_index() + 1,
                     (int)verts[1].get_index() + 1, (int)verts[2].get_index() + 1);
         }
         
+        // face intensity
         for (auto fkey:dsc->faces()) {
-            fprintf(f, "%d\n", dsc->get_label(fkey));
+            fprintf(f, "%f\n", g_param.mean_intensity[dsc->get_label(fkey)]);
+        }
+        
+        // edge topo
+        fprintf(f, "%d\n", dsc->get_no_halfedges()/2);
+        for (auto ekey : dsc->halfedges()){
+            auto hew = dsc->walker(ekey);
+            if (hew.vertex().get_index() > hew.opp().vertex().get_index()) {
+                fprintf(f, "%d %d %d %d\n", (int)hew.vertex().get_index(),
+                        (int)hew.opp().vertex().get_index(),
+                        (int)hew.face().get_index(),
+                        (int)hew.opp().face().get_index());
+            }
         }
         
         fclose(f);

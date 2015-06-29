@@ -96,7 +96,7 @@ private:
     void displace_dsc_2();
     void debug_optimum_dt();
     void debug_optimum_dt_2();
-    
+public:
     void optimize_phase();
     
     double furthest_move(Node_key nid, Vec2 direction);

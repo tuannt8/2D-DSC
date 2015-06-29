@@ -33,6 +33,7 @@
 		A61F33181A937CDF00C5C2F8 /* gl_debug_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F33161A937CDF00C5C2F8 /* gl_debug_helper.cpp */; };
 		A61F331B1A94860D00C5C2F8 /* image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F33191A94860D00C5C2F8 /* image.cpp */; };
 		A61F331D1A97745800C5C2F8 /* define.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F331C1A97745800C5C2F8 /* define.cpp */; };
+		A6466D7E1B413B25006F38D9 /* libpng15.15.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A6466D7D1B413B25006F38D9 /* libpng15.15.dylib */; };
 		A663DE681AD6B25B006CC422 /* libX11.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A663DE671AD6B25B006CC422 /* libX11.6.dylib */; };
 		A67962501AB965D400EACF40 /* DSC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A51F3A517D6386100A8F8F2 /* DSC.cpp */; };
 		A67FCCDA1AF9F3ED00A7631B /* dynamics_prob.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A67FCCD81AF9F3ED00A7631B /* dynamics_prob.cpp */; };
@@ -110,6 +111,7 @@
 		A61F33191A94860D00C5C2F8 /* image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = image.cpp; sourceTree = "<group>"; };
 		A61F331A1A94860D00C5C2F8 /* image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = image.h; sourceTree = "<group>"; };
 		A61F331C1A97745800C5C2F8 /* define.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = define.cpp; sourceTree = "<group>"; };
+		A6466D7D1B413B25006F38D9 /* libpng15.15.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng15.15.dylib; path = ../../../../../opt/X11/lib/libpng15.15.dylib; sourceTree = "<group>"; };
 		A663DE671AD6B25B006CC422 /* libX11.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libX11.6.dylib; path = ../../../../../opt/X11/lib/libX11.6.dylib; sourceTree = "<group>"; };
 		A67FCCD81AF9F3ED00A7631B /* dynamics_prob.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dynamics_prob.cpp; sourceTree = "<group>"; };
 		A67FCCD91AF9F3ED00A7631B /* dynamics_prob.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dynamics_prob.h; sourceTree = "<group>"; };
@@ -152,6 +154,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A6466D7E1B413B25006F38D9 /* libpng15.15.dylib in Frameworks */,
 				A699B3681AE4E7B500522DA2 /* Accelerate.framework in Frameworks */,
 				A699B3661AE1584800522DA2 /* libarmadillo.5.000.1.dylib in Frameworks */,
 				A663DE681AD6B25B006CC422 /* libX11.6.dylib in Frameworks */,
@@ -168,6 +171,7 @@
 		7A51F38E17D6383500A8F8F2 = {
 			isa = PBXGroup;
 			children = (
+				A6466D7D1B413B25006F38D9 /* libpng15.15.dylib */,
 				A699B3671AE4E7B500522DA2 /* Accelerate.framework */,
 				A699B3651AE1584800522DA2 /* libarmadillo.5.000.1.dylib */,
 				A663DE671AD6B25B006CC422 /* libX11.6.dylib */,
@@ -231,6 +235,7 @@
 		A615B7E31ABC8520001E1EA7 /* Lib */ = {
 			isa = PBXGroup;
 			children = (
+				A6EB2A0D1AE79B70008CBC7E /* CImg.h */,
 				A6FF355C1AC2C46E001071B3 /* tri_box_overlap.h */,
 			);
 			name = Lib;
@@ -253,7 +258,6 @@
 				A61F331C1A97745800C5C2F8 /* define.cpp */,
 				A615B7E51ABC8708001E1EA7 /* dynamics_mul.cpp */,
 				A615B7E61ABC8708001E1EA7 /* dynamics_mul.h */,
-				A6EB2A0D1AE79B70008CBC7E /* CImg.h */,
 				A69B8AD51AF7B3690031E45D /* polygon_f.cpp */,
 				A69B8AD61AF7B3690031E45D /* polygon_f.h */,
 				A67FCCD81AF9F3ED00A7631B /* dynamics_prob.cpp */,
@@ -509,8 +513,16 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = lib;
 				FRAMEWORK_SEARCH_PATHS = /Library/Frameworks;
-				HEADER_SEARCH_PATHS = /Library/Frameworks/GEL.framework/Headers;
-				LIBRARY_SEARCH_PATHS = /Library/Frameworks;
+				HEADER_SEARCH_PATHS = (
+					/Library/Frameworks/GEL.framework/Headers,
+					"$HOME/armadillo-5.000.1/include",
+					/opt/X11/include/libpng15,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/Library/Frameworks,
+					"/Users/tuannt8/armadillo-5.000.1",
+					/opt/X11/lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -521,8 +533,16 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = lib;
 				FRAMEWORK_SEARCH_PATHS = /Library/Frameworks;
-				HEADER_SEARCH_PATHS = /Library/Frameworks/GEL.framework/Headers;
-				LIBRARY_SEARCH_PATHS = /Library/Frameworks;
+				HEADER_SEARCH_PATHS = (
+					/Library/Frameworks/GEL.framework/Headers,
+					"$HOME/armadillo-5.000.1/include",
+					/opt/X11/include/libpng15,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/Library/Frameworks,
+					"/Users/tuannt8/armadillo-5.000.1",
+					/opt/X11/lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -550,6 +570,7 @@
 					../DEMO,
 					/opt/X11/include/,
 					"$HOME/armadillo-5.000.1/include",
+					/opt/X11/include/libpng15,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/X11/lib/,
@@ -586,6 +607,7 @@
 					../DEMO,
 					/opt/X11/include/,
 					"$HOME/armadillo-5.000.1/include",
+					/opt/X11/include/libpng15,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/X11/lib/,

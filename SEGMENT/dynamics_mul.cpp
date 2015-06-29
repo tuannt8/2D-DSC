@@ -62,7 +62,7 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
 //        printf("dt = %f \n", dt);
 //    }
     
-    optimize_phase();
+ //   optimize_phase();
     
     // 4. Update DSC
     displace_dsc();

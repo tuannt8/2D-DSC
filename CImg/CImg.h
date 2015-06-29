@@ -264,6 +264,8 @@
 //
 // PNG library may be used to get a native support of '.png' files.
 // (see methods 'CImg<T>::{load,save}_png()'.
+#define cimg_use_png
+
 #ifdef cimg_use_png
 extern "C" {
 #include "png.h"
