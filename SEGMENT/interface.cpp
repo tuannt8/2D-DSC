@@ -220,6 +220,10 @@ void interface::draw()
         Painter::draw_faces(*dsc);
     }
     
+    
+    if(bDiplay_[8])
+        draw_test();
+    
     if (bDiplay_[2] and dsc) {
         glColor3f(1, 0.4, 0.3);
         Painter::draw_edges(*dsc);
@@ -247,10 +251,25 @@ void interface::draw()
         // Painter::draw_vertices_index(*dsc);
         Painter::draw_faces_index(*dsc);
     }
+
+    
     
     gl_debug_helper::draw();
     
     Painter::end();
+}
+
+void interface::draw_test(){
+    HMesh::FaceAttributeVector<Vec3> intensity(dsc->get_no_faces(), Vec3(0.0));
+    for (auto fkey : dsc->faces()){
+        auto tris = dsc->get_pos(fkey);
+        auto sum = image_->get_sum_on_tri_intensity(tris);
+        auto area = dsc->area(fkey);
+        
+        intensity[fkey] = Vec3(sum)/area;
+    }
+    
+    Painter::draw_faces(*dsc, intensity);
 }
 
 std::vector<DSC2D::vec2> get_quad(double minx, double miny, double maxx, double maxy){

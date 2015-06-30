@@ -33,7 +33,7 @@ void image::load_image(std::string const file_path){
 //    printf("Image %d change \n", this->spectrum());
 
    
-    blur(BLUR);
+//    blur(BLUR);
 //    noise(NOISE);
 
     set_gl_texture();
@@ -42,21 +42,7 @@ void image::load_image(std::string const file_path){
 
 // Draw in OpenGL coordinate
 void image::draw_image(int window_width){
-    if(0){
-        double pointSize = (double)window_width / this->width();
-        glPointSize(pointSize);
-        glBegin(GL_POINTS);
-        for (int i = 0; i < width(); i++) {
-            for (int j = 0; j < height(); j++) {
-                double g = get_intensity(i, j);
-                glColor3f(g, g, g);
-                glVertex2d((double)i, (double)j);
-            }
-        }
-        glEnd();
-        glPointSize(1.0);
-    }
-    else{
+
         double w = width();
         double h = height();
 
@@ -81,7 +67,15 @@ void image::draw_image(int window_width){
         glEnd();
 
         glDisable(GL_TEXTURE_2D);
-    }
+    
+    // Draw border
+    glColor3f(1, 0, 0);
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(0.0, 0.0);
+    glVertex2f(w, 0.0);
+    glVertex2f(w, h);
+    glVertex2f(0.0, h);
+    glEnd();
 
 }
 
@@ -116,7 +110,9 @@ double image::get_intensity(int x, int y){
 // 0 - 1.0
 double image::get_intensity_f(double x, double y){
     if (x < 0 or x > width()
-        or y < 0 or y > height()) {
+        or y < 0 or y > height())
+    {
+        std::cout << "Out of image '\n";
         return 0;
     }
     
@@ -128,6 +124,24 @@ double image::get_intensity_f(double x, double y){
     double vdown = get_intensity(x_i, y_i)*(1-ep_x) + get_intensity(x_i + 1, y_i)*ep_x;
     double vup = get_intensity(x_i, y_i+1)*(1-ep_x) + get_intensity(x_i + 1, y_i+1)*ep_x;
     double v = vdown * (1 - ep_y) + vup * ep_y;
+    
+    return v;
+}
+
+Vec2 image::grad_f(double x, double y){
+    if (x < 0 or x > width()
+        or y < 0 or y > height()) {
+        return Vec2(0.0);
+    }
+    
+    int x_i = (int)x;
+    int y_i = (int)y;
+    double ep_x = x - x_i;
+    double ep_y = y - y_i;
+    
+    auto vdown = grad(x_i, y_i)*(1-ep_x) + grad(x_i + 1, y_i)*ep_x;
+    auto vup = grad(x_i, y_i+1)*(1-ep_x) + grad(x_i + 1, y_i+1)*ep_x;
+    auto v = vdown * (1 - ep_y) + vup * ep_y;
     
     return v;
 }
@@ -176,6 +190,61 @@ void image::get_tri_intensity(Vec2_array tris, int * total_pixel, double * total
     
     *total_intensity = total_inten;
     *total_pixel = t_pixel;
+}
+
+inline Vec2 get_coord_barry(Vec2_array & tris, double xi1, double xi2) {
+    return tris[0]*xi1 + tris[1]*xi2 + tris[2]*(1- xi1 -xi2);
+}
+
+double image::get_sum_on_tri_intensity(Vec2_array tris){
+    return get_sum_on_tri<double>(tris,
+                std::function<double(Vec2)>([this](Vec2 p)
+                    {
+                        return this->get_intensity_f(p[0], p[1]);
+                    }
+                ));
+}
+
+
+double image::get_sum_on_tri_variation(Vec2_array tris){
+    return get_sum_on_tri<double>(tris,
+          std::function<double(Vec2)>([this](Vec2 p)
+                                      {
+                                          return this->grad(p[0], p[1]).length();
+                                      }
+                                      ));
+}
+
+template <typename T>
+T image::get_sum_on_tri(Vec2_array tris, std::function<T(Vec2)> get_v){
+    double area = helper_t::area(tris);
+    int N = std::ceil(std::sqrt(2*area));
+    double dxi = 1./(double)N;
+    
+    double xi1, xi2;
+    Vec2 p;
+    T sum = T(0.0);
+    for (int i1 = 0; i1 < N; i1 ++) {
+        
+        xi1 = i1*dxi;
+        
+        for (int i2 = 0; i2 < N - i1; i2++) {
+        
+            xi2 = i2 * dxi;
+            
+            if (i1 + i2 == N - 1) {
+                p = get_coord_barry(tris, (xi1 + dxi/3.), xi2 + dxi/3.);
+                sum += get_v(p)*0.5;
+            }else{
+                p = get_coord_barry(tris, (xi1 + dxi/2.), xi2 + dxi/2.);
+                sum += get_v(p);
+            }
+        }
+    }
+    
+    sum *= 2*area/(double)(N*N); // |j| = 2A
+    
+    return sum;
 }
 
 intensity_out image::get_tri_differ(Vec2_array tris, double ci){

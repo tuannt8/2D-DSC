@@ -59,6 +59,14 @@ public:
 
     double get_sum_gradient_tri(Vec2_array tris, double * area = nullptr);
     
+    
+    // Get value on the whole triangle
+    template <typename T>
+    T get_sum_on_tri(Vec2_array tris, std::function<T(Vec2)> get_v);
+    
+    double get_sum_on_tri_intensity(Vec2_array tris);
+    double get_sum_on_tri_variation(Vec2_array tris);
+    
     // total intensity inside a triangle
     void get_tri_intensity(Vec2_array tris, int * total_pixel, double * total_intensity);
     // Intensity differ with assumed mean intensity.
@@ -67,8 +75,11 @@ public:
     
     Vec2 size(){return Vec2(width(), height());}
     
+    // gradient
     Vec2 grad(int x, int y);
-
+    // Interpolated gradient
+    Vec2 grad_f(double x, double y);
+    
     void set_gl_texture();
 };
 
