@@ -210,7 +210,7 @@ double image::get_sum_on_tri_variation(Vec2_array tris){
     return get_sum_on_tri<double>(tris,
           std::function<double(Vec2)>([this](Vec2 p)
                                       {
-                                          return this->grad(p[0], p[1]).length();
+                                          return this->grad_f(p[0], p[1]).length();
                                       }
                                       ));
 }
@@ -243,6 +243,7 @@ T image::get_sum_on_tri(Vec2_array tris, std::function<T(Vec2)> get_v){
     }
     
     sum *= 2*area/(double)(N*N); // |j| = 2A
+
     
     return sum;
 }
@@ -335,20 +336,20 @@ void image::compute_gradient(){
     
     for (int x = 0; x < width(); x++) {
         for (int y = 0; y< height(); y++) {
-            double x_g = (*gX)(x, height()-y)/(double)MAX_BYTE;
-            double y_g = -(*gY)(x, height()-y)/(double)MAX_BYTE;
+            double x_g = (*gX)(x, y)/(double)MAX_BYTE;
+            double y_g = -(*gY)(x, y)/(double)MAX_BYTE;
             gradient_[y * width() + x] = Vec2(x_g,y_g);
         }
     }
   
-    FILE *f = fopen("../grad.txt", "w");
-    for (int x = 0; x < width(); x++) {
-        for (int y = 0; y < height(); y++) {
-            fprintf(f, "%f ", grad(x, y)[0]);
-        }
-        fprintf(f, "\n");
-    }
-    fclose(f);
+//    FILE *f = fopen("../grad.txt", "w");
+//    for (int x = 0; x < width(); x++) {
+//        for (int y = 0; y < height(); y++) {
+//            fprintf(f, "%f ", grad(x, y)[0]);
+//        }
+//        fprintf(f, "\n");
+//    }
+//    fclose(f);
 //    gX->display("gX");
 //    gY->display("gY");
 //    grad_img.display();
@@ -356,6 +357,12 @@ void image::compute_gradient(){
 
 
 Vec2 image::grad(int x, int y){
+    if(x < 0 or x >= width()
+       or y < 0 or y >= height())
+    {
+        return Vec2(0.0);
+    }
+    
     return gradient_[y * width() + x];
 }
 

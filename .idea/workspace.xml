@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="228d2b36-9da2-4d69-87ce-6c049a856c9e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SEGMENT/gl_debug_helper.cpp" afterPath="$PROJECT_DIR$/SEGMENT/gl_debug_helper.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SEGMENT/gl_debug_helper.h" afterPath="$PROJECT_DIR$/SEGMENT/gl_debug_helper.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SEGMENT/helper.cpp" afterPath="$PROJECT_DIR$/SEGMENT/helper.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SEGMENT/helper.h" afterPath="$PROJECT_DIR$/SEGMENT/helper.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SEGMENT/image.cpp" afterPath="$PROJECT_DIR$/SEGMENT/image.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SEGMENT/image.h" afterPath="$PROJECT_DIR$/SEGMENT/image.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/imageSeg.iml" afterPath="$PROJECT_DIR$/.idea/imageSeg.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SEGMENT/interface.cpp" afterPath="$PROJECT_DIR$/SEGMENT/interface.cpp" />
-    </list>
+    <list default="true" id="228d2b36-9da2-4d69-87ce-6c049a856c9e" name="Default" comment="" />
     <ignored path="imageSeg.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -42,28 +33,18 @@
           <file leaf-file-name="dynamics_edge.h" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/SEGMENT/dynamics_edge.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="442" max-vertical-offset="663">
+                <state vertical-scroll-proportion="0.0" vertical-offset="510" max-vertical-offset="765">
                   <caret line="34" column="0" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="gl_debug_helper.h" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/SEGMENT/gl_debug_helper.h">
-              <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="1.1159618" vertical-offset="82" max-vertical-offset="1125">
-                  <caret line="62" column="40" selection-start-line="62" selection-start-column="40" selection-end-line="62" selection-end-column="40" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="dyn_integral.h" pinned="false" current-in-tab="false">
+          <file leaf-file-name="dyn_integral.h" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/SEGMENT/dyn_integral.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="910" max-vertical-offset="1339">
-                  <caret line="70" column="0" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
+                <state vertical-scroll-proportion="0.46486485" vertical-offset="695" max-vertical-offset="1620">
+                  <caret line="77" column="0" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -72,7 +53,7 @@
           <file leaf-file-name="draw.h" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/DEMO/draw.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="273" max-vertical-offset="1716">
+                <state vertical-scroll-proportion="0.0" vertical-offset="315" max-vertical-offset="1980">
                   <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
                   <folding />
                 </state>
@@ -82,8 +63,8 @@
           <file leaf-file-name="image.h" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/SEGMENT/image.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="472" max-vertical-offset="1185">
-                  <caret line="53" column="47" selection-start-line="53" selection-start-column="39" selection-end-line="53" selection-end-column="47" />
+                <state vertical-scroll-proportion="0.0" vertical-offset="810" max-vertical-offset="1185">
+                  <caret line="54" column="47" selection-start-line="53" selection-start-column="39" selection-end-line="53" selection-end-column="47" />
                   <folding>
                     <element signature="e#122#140#0" expanded="true" />
                   </folding>
@@ -94,7 +75,7 @@
           <file leaf-file-name="dynamics_mul.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/SEGMENT/dynamics_mul.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="9265" max-vertical-offset="27570">
+                <state vertical-scroll-proportion="0.0" vertical-offset="9540" max-vertical-offset="27630">
                   <caret line="636" column="47" selection-start-line="636" selection-start-column="47" selection-end-line="636" selection-end-column="47" />
                   <folding />
                 </state>
@@ -104,7 +85,7 @@
           <file leaf-file-name="trializer.h" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/trializer.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="598">
+                <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="690">
                   <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
                   <folding />
                 </state>
@@ -114,7 +95,7 @@
           <file leaf-file-name="util.h" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/util.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="1435" max-vertical-offset="5295">
+                <state vertical-scroll-proportion="0.0" vertical-offset="1875" max-vertical-offset="5370">
                   <caret line="125" column="11" selection-start-line="125" selection-start-column="11" selection-end-line="125" selection-end-column="11" />
                   <folding />
                 </state>
@@ -124,7 +105,7 @@
           <file leaf-file-name="main.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/SEGMENT/main.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="234" max-vertical-offset="312">
+                <state vertical-scroll-proportion="0.0" vertical-offset="270" max-vertical-offset="360">
                   <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
                   <folding />
                 </state>
@@ -138,8 +119,8 @@
           <file leaf-file-name="image.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/SEGMENT/image.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="1556" max-vertical-offset="4320">
-                  <caret line="128" column="0" selection-start-line="128" selection-start-column="0" selection-end-line="128" selection-end-column="0" />
+                <state vertical-scroll-proportion="0.0" vertical-offset="2235" max-vertical-offset="4770">
+                  <caret line="149" column="0" selection-start-line="149" selection-start-column="0" selection-end-line="149" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -148,8 +129,8 @@
           <file leaf-file-name="helper.h" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/SEGMENT/helper.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.6548431" vertical-offset="0" max-vertical-offset="733">
-                  <caret line="33" column="7" selection-start-line="33" selection-start-column="7" selection-end-line="33" selection-end-column="7" />
+                <state vertical-scroll-proportion="0.63243246" vertical-offset="0" max-vertical-offset="925">
+                  <caret line="40" column="1" selection-start-line="40" selection-start-column="1" selection-end-line="40" selection-end-column="1" />
                   <folding />
                 </state>
               </provider>
@@ -158,7 +139,7 @@
           <file leaf-file-name="helper.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/SEGMENT/helper.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="704" max-vertical-offset="1410">
+                <state vertical-scroll-proportion="0.0" vertical-offset="1290" max-vertical-offset="1410">
                   <caret line="86" column="26" selection-start-line="86" selection-start-column="26" selection-end-line="86" selection-end-column="26" />
                   <folding />
                 </state>
@@ -168,8 +149,8 @@
           <file leaf-file-name="interface.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/SEGMENT/interface.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="1751" max-vertical-offset="6720">
-                  <caret line="143" column="18" selection-start-line="143" selection-start-column="18" selection-end-line="143" selection-end-column="18" />
+                <state vertical-scroll-proportion="0.0" vertical-offset="2160" max-vertical-offset="6885">
+                  <caret line="144" column="17" selection-start-line="144" selection-start-column="17" selection-end-line="144" selection-end-column="17" />
                   <folding />
                 </state>
               </provider>
@@ -178,8 +159,8 @@
           <file leaf-file-name="dyn_integral.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/SEGMENT/dyn_integral.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="5720" max-vertical-offset="6162">
-                  <caret line="440" column="18" selection-start-line="440" selection-start-column="18" selection-end-line="440" selection-end-column="18" />
+                <state vertical-scroll-proportion="0.0" vertical-offset="9105" max-vertical-offset="9615">
+                  <caret line="607" column="18" selection-start-line="607" selection-start-column="18" selection-end-line="607" selection-end-column="18" />
                   <folding />
                 </state>
               </provider>
@@ -217,9 +198,9 @@
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="1440" />
-    <option name="y" value="-188" />
+    <option name="y" value="23" />
     <option name="width" value="1920" />
-    <option name="height" value="1140" />
+    <option name="height" value="1022" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -365,29 +346,29 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1440" y="-188" width="1920" height="1140" extended-state="6" />
-    <editor active="true" />
+    <frame x="1440" y="23" width="1920" height="1022" extended-state="6" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3286648" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.28944913" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960597" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2542373" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.14010416" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.15989584" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.28291318" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21302083" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960597" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3286648" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.28944913" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2542373" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.28291318" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -667,14 +648,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SEGMENT/dyn_integral.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="910" max-vertical-offset="1339">
-          <caret line="70" column="0" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/SEGMENT/define.h">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.34160584" vertical-offset="0" max-vertical-offset="988">
@@ -686,14 +659,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1189" max-vertical-offset="6370">
           <caret line="115" column="31" selection-start-line="115" selection-start-column="31" selection-end-line="115" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/SEGMENT/dyn_integral.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="5720" max-vertical-offset="6162">
-          <caret line="440" column="18" selection-start-line="440" selection-start-column="18" selection-end-line="440" selection-end-column="18" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="9105" max-vertical-offset="9615">
+          <caret line="607" column="18" selection-start-line="607" selection-start-column="18" selection-end-line="607" selection-end-column="18" />
           <folding />
         </state>
       </provider>
@@ -764,34 +736,26 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/SEGMENT/image.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="472" max-vertical-offset="1185">
-          <caret line="53" column="47" selection-start-line="53" selection-start-column="39" selection-end-line="53" selection-end-column="47" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="810" max-vertical-offset="1185">
+          <caret line="54" column="47" selection-start-line="53" selection-start-column="39" selection-end-line="53" selection-end-column="47" />
           <folding>
             <element signature="e#122#140#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SEGMENT/gl_debug_helper.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.1159618" vertical-offset="82" max-vertical-offset="1125">
-          <caret line="62" column="40" selection-start-line="62" selection-start-column="40" selection-end-line="62" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/SEGMENT/interface.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1751" max-vertical-offset="6720">
-          <caret line="143" column="18" selection-start-line="143" selection-start-column="18" selection-end-line="143" selection-end-column="18" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="2160" max-vertical-offset="6885">
+          <caret line="144" column="17" selection-start-line="144" selection-start-column="17" selection-end-line="144" selection-end-column="17" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/SEGMENT/image.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1556" max-vertical-offset="4320">
-          <caret line="128" column="0" selection-start-line="128" selection-start-column="0" selection-end-line="128" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="2235" max-vertical-offset="4770">
+          <caret line="149" column="0" selection-start-line="149" selection-start-column="0" selection-end-line="149" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -806,8 +770,24 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/SEGMENT/helper.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6548431" vertical-offset="0" max-vertical-offset="733">
-          <caret line="33" column="7" selection-start-line="33" selection-start-column="7" selection-end-line="33" selection-end-column="7" />
+        <state vertical-scroll-proportion="0.63243246" vertical-offset="0" max-vertical-offset="925">
+          <caret line="40" column="1" selection-start-line="40" selection-start-column="1" selection-end-line="40" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SEGMENT/gl_debug_helper.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5945946" vertical-offset="200" max-vertical-offset="1125">
+          <caret line="52" column="42" selection-start-line="52" selection-start-column="42" selection-end-line="52" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SEGMENT/dyn_integral.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.46486485" vertical-offset="695" max-vertical-offset="1620">
+          <caret line="77" column="0" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
           <folding />
         </state>
       </provider>

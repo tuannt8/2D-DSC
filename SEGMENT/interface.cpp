@@ -263,10 +263,10 @@ void interface::draw_test(){
     HMesh::FaceAttributeVector<Vec3> intensity(dsc->get_no_faces(), Vec3(0.0));
     for (auto fkey : dsc->faces()){
         auto tris = dsc->get_pos(fkey);
-        auto sum = image_->get_sum_on_tri_intensity(tris);
+        auto sum = image_->get_sum_on_tri_variation(tris);
         auto area = dsc->area(fkey);
         
-        intensity[fkey] = Vec3(sum)/area;
+        intensity[fkey] = Vec3(sum);
     }
     
     Painter::draw_faces(*dsc, intensity);
