@@ -154,7 +154,7 @@ void interface::keyboard(unsigned char key, int x, int y){
         }
             break;
         case '\t':
-            Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, LOG_PATH);
+            Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, "./LOG");
             break;
         case 'u':
             std::cout << g_param.alpha << " - New alpha: ";
@@ -242,9 +242,10 @@ void interface::draw()
         Painter::draw_external_force(*dsc);
     }
     
-    if(bDiplay_[7]){
+    if(!bDiplay_[7]){
         glColor3f(1, 0, 0);
-        Painter::draw_vertices_index(*dsc);
+        // Painter::draw_vertices_index(*dsc);
+        Painter::draw_faces_index(*dsc);
     }
     
     gl_debug_helper::draw();

@@ -199,6 +199,17 @@ void Painter::draw_vertices_index(const DSC2D::DeformableSimplicialComplex& dsc)
     }
 }
 
+void Painter::draw_faces_index(const DSC2D::DeformableSimplicialComplex& complex){
+    char idx_text[20];
+    for (auto fkey : complex.faces()){
+        auto tris = complex.get_pos(fkey);
+        auto center = (tris[0] + tris[1] + tris[2]) / 3;
+        
+        sprintf(idx_text, " %d", (int)fkey.get_index());
+        print_gl(center[0], center[1], idx_text);
+    }
+}
+
 void Painter::draw_interface(const DeformableSimplicialComplex& dsc, vec3 color)
 {
     glPointSize(std::max(std::floor(POINT_SIZE*dsc.get_avg_edge_length()), 1.));
@@ -367,6 +378,8 @@ void Painter::draw_faces(const DeformableSimplicialComplex& dsc, const HMesh::Fa
     }
     glEnd();
 }
+
+
 
 void Painter::draw_faces(const DeformableSimplicialComplex& dsc, const HMesh::FaceAttributeVector<double> &values)
 {

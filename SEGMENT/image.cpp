@@ -22,23 +22,22 @@
 #endif
 
 
-#define NOISE 50
-#define BLUR 0.0
+#define NOISE 20
+#define BLUR 5.0
 
 void image::load_image(std::string const file_path){
-    
     
     load(file_path.c_str());
     this->mirror('y');
 
 //    printf("Image %d change \n", this->spectrum());
 
-//    
-//    blur(BLUR);
-    noise(NOISE);
+   
+    blur(BLUR);
+//    noise(NOISE);
 
     set_gl_texture();
-//    compute_gradient();
+    compute_gradient();
 }
 
 // Draw in OpenGL coordinate
@@ -207,6 +206,30 @@ intensity_out image::get_tri_differ(Vec2_array tris, double ci){
     return out;
 }
 
+double image::get_sum_gradient_tri(Vec2_array tris, double * area){
+    double gE = 0;
+    Vec2 min(INFINITY, INFINITY), max(-INFINITY, -INFINITY);
+    for (auto p: tris){
+        min[0] = std::min(min[0], p[0]);
+        min[1] = std::min(min[1], p[1]);
+        max[0] = std::max(max[0], p[0]);
+        max[1] = std::max(max[1], p[1]);
+    }
+    
+    int t_pixel = 0;
+    
+    for (int i = floor(min[0]); i < ceil(max[0]); i++) {
+        for (int j = floor(min[1]); j < ceil(max[1]); j++) {
+            if (helper_t::is_point_in_tri(Vec2(i,j), tris)) {
+                t_pixel ++;
+                gE += grad(i, j).length();
+            }
+        }
+    }
+    
+    return gE/t_pixel;
+}
+
 void image::get_tri_differ(Vec2_array tris, int *total_pixel, double * total_differ, double ci){
     Vec2 min(INFINITY, INFINITY), max(-INFINITY, -INFINITY);
     for (auto p: tris){
@@ -268,8 +291,7 @@ Vec2 image::grad(int x, int y){
 }
 
 void image::set_gl_texture() {
-    BYTE* buffer = this->data();
-
+    
     BYTE* texture_buf = (BYTE*)malloc( width()* height() * 3 * sizeof(BYTE));
     BYTE* ptr = texture_buf;
     for (int j = 0; j < height(); ++j) {

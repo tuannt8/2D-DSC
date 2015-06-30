@@ -65,7 +65,7 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
 //        printf("dt = %f \n", dt);
 //    }
     
-//    optimize_phase();
+    optimize_phase();
     
     // 4. Update DSC
     displace_dsc();
@@ -1579,12 +1579,14 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
     if (!obj) {
         obj = s_dsc;
     }
+    dt = 10;
+    
     double total = 0.0;
     dE_0_ = 0.0;
     double max_move = 0.0;
     double el = obj->get_avg_edge_length();
     for (auto ni = obj->vertices_begin(); ni != obj->vertices_end(); ni++) {
-        Vec2 dis = (obj->get_node_internal_force(*ni)
+        Vec2 dis = (obj->get_node_internal_force(*ni) * 0.01
                     + obj->get_node_external_force(*ni));
         
         double d = obj->get_node_force(*ni, STAR_DIFFER)[0];
@@ -1726,7 +1728,7 @@ void dynamics_mul::compute_intensity_force(){
                 double I = s_img->get_intensity_f(p[0], p[1]);
                 
                 // Normalize force
-                int normalizedF = 1;
+                int normalizedF = 3;
                 double f ;
                 switch (normalizedF) {
                     case 1:
@@ -1744,8 +1746,8 @@ void dynamics_mul::compute_intensity_force(){
                 }
                 
                 // Barry Centric coordinate
-                f0 += f*(p-p1).length() / (double)length;
-                f1 += f*(p-p0).length() / (double)length;
+                f0 += f*(p-p1).length() / (double)length / (double)length;
+                f1 += f*(p-p0).length() / (double)length / (double)length;
             }
             
             // Set force

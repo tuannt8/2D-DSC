@@ -59,7 +59,7 @@ Vec2 dyn_integral::center_tri(Face_key fkey){
 
 std::vector<Face_key> dyn_integral::grow_region_smooth(Face_key fkey,
                                                        std::map<Face_key, double> & tri_mean_inten){
-    double dis = 100;
+    double dis = 20;
     int phase = s_dsc->get_label(fkey);
     
     bool touched_node[10000] = {false};
@@ -194,8 +194,11 @@ void dyn_integral::optimize_phase_region(){
     for (auto fkey : s_dsc->faces()) {
         std::vector<Face_key> regions = grow_region_smooth(fkey, tri_mean_inten);
         
-        if (grad_region(regions, tri_mean_inten) > 50) {
-            continue;
+        double t = grad_region(regions, tri_mean_inten);
+        printf("gradient = %f\n", t);
+        if (grad_region(regions, tri_mean_inten) > 0.01) {
+            printf("Abort because large gradient\n");
+            continue; // Smooth
         }
         
         int cur_phase = s_dsc->get_label(fkey);
@@ -257,14 +260,28 @@ void dyn_integral::optimize_phase_region(){
 double dyn_integral::grad_region(std::vector<Face_key> region,
                    std::map<Face_key, double> & tri_mean_inten)
 {
+    // Gradient should be taken inside triangles, by image gradient
+    
     double grad_E = 0.0;
-    for (auto fkey : region) {
-        for(auto hew = s_dsc->walker(fkey); !hew.full_circle(); hew = hew.circulate_face_cw()){
-            if (!HMesh::boundary(*s_dsc->mesh, hew.halfedge())
-                and std::find(region.begin(), region.end(), hew.opp().face()) != region.end()) {
-                double c1 = tri_mean_inten[hew.face()];
-                double c2 = tri_mean_inten[hew.opp().face()];
-                grad_E += s_dsc->length(hew.halfedge()) * (c1-c2) * (c1-c2);
+    
+    // Image gradient
+    for (auto fkey: region){
+        auto tris = s_dsc->get_pos(fkey);
+        grad_E += s_img->get_sum_gradient_tri(tris);
+    }
+    
+    grad_E /= region.size();
+    
+    
+    if(0){ // different between triangles. Not correct
+        for (auto fkey : region) {
+            for(auto hew = s_dsc->walker(fkey); !hew.full_circle(); hew = hew.circulate_face_cw()){
+                if (!HMesh::boundary(*s_dsc->mesh, hew.halfedge())
+                    and std::find(region.begin(), region.end(), hew.opp().face()) != region.end()) {
+                    double c1 = tri_mean_inten[hew.face()];
+                    double c2 = tri_mean_inten[hew.opp().face()];
+                    grad_E += s_dsc->length(hew.halfedge()) * (c1-c2) * (c1-c2);
+                }
             }
         }
     }
@@ -330,7 +347,7 @@ double dyn_integral::region_energy_assume_phase(std::vector<Face_key> region, in
 //    }
     
     
-    return E + 0.1*length;
+    return E + g_param.alpha *length;
 }
 
 void dyn_integral::test()
@@ -355,7 +372,8 @@ void dyn_integral::update_dsc(dsc_obj &dsc, image &img){
     compute_mean_intensity(mean_inten_);
     
     // optimize_phase();
-    if(g_param.bDisplay[9])
+    
+    if(!g_param.bDisplay[9])
         optimize_phase_region();
     
     s_dsc->deform();
@@ -457,7 +475,7 @@ void dyn_integral::displace_dsc(){
             
             Vec2 f(- dE[0]/ddE[0], - dE[1]/ddE[1]);
       //      Vec2 f(- dE[0], - dE[1]);
-            f = f * 0.05;
+            f = f * 0.1;
             
 //            double max = 2;
 //            double amp = f.length();

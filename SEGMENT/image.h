@@ -57,6 +57,8 @@ public:
     double get_tri_differ_f(Vec2_array tris, double ci);
     double get_tri_intensity_f(Vec2_array tris, double * area = nullptr);
 
+    double get_sum_gradient_tri(Vec2_array tris, double * area = nullptr);
+    
     // total intensity inside a triangle
     void get_tri_intensity(Vec2_array tris, int * total_pixel, double * total_intensity);
     // Intensity differ with assumed mean intensity.
