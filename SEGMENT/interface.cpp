@@ -263,10 +263,10 @@ void interface::draw_test(){
     HMesh::FaceAttributeVector<Vec3> intensity(dsc->get_no_faces(), Vec3(0.0));
     for (auto fkey : dsc->faces()){
         auto tris = dsc->get_pos(fkey);
-        auto sum = image_->get_sum_on_tri_variation(tris);
+        auto sum = image_->get_sum_on_tri_variation(tris, 3);
         auto area = dsc->area(fkey);
         
-        intensity[fkey] = Vec3(sum);
+        intensity[fkey] = Vec3(sum)/std::sqrt(2*area) ;
     }
     
     Painter::draw_faces(*dsc, intensity);
@@ -464,10 +464,10 @@ void interface::init_boundary(){
 }
 
 void interface:: dynamics_image_seg(){
-//    dyn_->update_dsc(*dsc, *image_);
+    dyn_->update_dsc(*dsc, *image_);
     
-    static dyn_integral dyn;
-    dyn.update_dsc(*dsc, *image_);
+//    static dyn_integral dyn;
+//    dyn.update_dsc(*dsc, *image_);
 
 //    static dynamics_edge dyn;
 //    dyn.update_dsc(*dsc, *image_);

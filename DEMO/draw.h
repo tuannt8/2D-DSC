@@ -20,6 +20,7 @@
 #include "velocity_function.h"
 #include "define.h"
 
+
 #define FORCE_SCALE 10
 
 const static double POINT_SIZE = 0.05;

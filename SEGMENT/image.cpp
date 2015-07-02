@@ -243,7 +243,6 @@ T image::get_sum_on_tri(Vec2_array tris, std::function<T(Vec2)> get_v){
     }
     
     sum *= 2*area/(double)(N*N); // |j| = 2A
-
     
     return sum;
 }
@@ -274,6 +273,51 @@ intensity_out image::get_tri_differ(Vec2_array tris, double ci){
     out.total_differ = total_diff;
     
     return out;
+}
+
+double image::smooth_filter(double xi1, double xi2, double xi3, double gap){
+    double xi123 = xi1 * xi2 * xi3;
+    if (xi123 < gap*(1-gap)*(1-gap)/4) {
+        return xi123/( gap*(1-gap)*(1-gap)/4.0 );
+    }else{
+        return 1;
+    }
+}
+
+double image::get_sum_on_tri_variation(Vec2_array tris, double pixel_gap){
+    double area = helper_t::area(tris);
+    int N = std::ceil(std::sqrt(2*area));
+    double dxi = 1./(double)N;
+    double gap = pixel_gap/std::sqrt(2*area);
+    
+    double xi1, xi2;
+    Vec2 p;
+    double sum = 0.0;
+    for (int i1 = 0; i1 < N; i1 ++) {
+        
+        xi1 = i1*dxi;
+        
+        for (int i2 = 0; i2 < N - i1; i2++) {
+            
+            xi2 = i2 * dxi;
+            
+            if (i1 + i2 == N - 1) {
+                p = get_coord_barry(tris, (xi1 + dxi/3.), xi2 + dxi/3.);
+                double filterd = smooth_filter(xi1+ dxi/3., xi2 + dxi/3.,
+                                               1 - xi1 - xi2 - 2*dxi/3., gap);
+                sum += grad_f(p[0], p[1]).length()*0.5 * filterd;
+            }else{
+                p = get_coord_barry(tris, (xi1 + dxi/2.), xi2 + dxi/2.);
+                double filterd = smooth_filter(xi1+ dxi/2., xi2 + dxi/2.,
+                                               1 - xi1 - xi2 - dxi, gap);
+                sum += grad_f(p[0], p[1]).length() * filterd;
+            }
+        }
+    }
+    
+    sum *= 2*area/(double)(N*N); // |j| = 2A
+    
+    return sum;
 }
 
 double image::get_sum_gradient_tri(Vec2_array tris, double * area){

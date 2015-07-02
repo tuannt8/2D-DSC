@@ -67,6 +67,12 @@ public:
     double get_sum_on_tri_intensity(Vec2_array tris);
     double get_sum_on_tri_variation(Vec2_array tris);
     
+    /*
+     * Get total variation with filtered
+     */
+    double get_sum_on_tri_variation(Vec2_array tris, double pixel_gap);
+    double smooth_filter(double xi1, double xi2, double xi3, double gap);
+    
     // total intensity inside a triangle
     void get_tri_intensity(Vec2_array tris, int * total_pixel, double * total_intensity);
     // Intensity differ with assumed mean intensity.
