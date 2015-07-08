@@ -35,6 +35,7 @@
 		A61F33181A937CDF00C5C2F8 /* gl_debug_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F33161A937CDF00C5C2F8 /* gl_debug_helper.cpp */; };
 		A61F331B1A94860D00C5C2F8 /* image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F33191A94860D00C5C2F8 /* image.cpp */; };
 		A61F331D1A97745800C5C2F8 /* define.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F331C1A97745800C5C2F8 /* define.cpp */; };
+		A635BFA51B4A7766003F2DE4 /* adapt_mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A635BFA31B4A7766003F2DE4 /* adapt_mesh.cpp */; };
 		A663DE681AD6B25B006CC422 /* libX11.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A663DE671AD6B25B006CC422 /* libX11.6.dylib */; };
 		A67962501AB965D400EACF40 /* DSC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A51F3A517D6386100A8F8F2 /* DSC.cpp */; };
 		A699B3661AE1584800522DA2 /* libarmadillo.5.000.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A699B3651AE1584800522DA2 /* libarmadillo.5.000.1.dylib */; };
@@ -116,6 +117,8 @@
 		A61F33191A94860D00C5C2F8 /* image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = image.cpp; sourceTree = "<group>"; };
 		A61F331A1A94860D00C5C2F8 /* image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = image.h; sourceTree = "<group>"; };
 		A61F331C1A97745800C5C2F8 /* define.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = define.cpp; sourceTree = "<group>"; };
+		A635BFA31B4A7766003F2DE4 /* adapt_mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = adapt_mesh.cpp; sourceTree = "<group>"; };
+		A635BFA41B4A7766003F2DE4 /* adapt_mesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = adapt_mesh.h; sourceTree = "<group>"; };
 		A663DE671AD6B25B006CC422 /* libX11.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libX11.6.dylib; path = ../../../../../opt/X11/lib/libX11.6.dylib; sourceTree = "<group>"; };
 		A699B3651AE1584800522DA2 /* libarmadillo.5.000.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libarmadillo.5.000.1.dylib; path = "../../../../armadillo-5.000.1/libarmadillo.5.000.1.dylib"; sourceTree = "<group>"; };
 		A699B3671AE4E7B500522DA2 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
@@ -267,6 +270,8 @@
 				A61E857D1B0E2F150064FB92 /* dyn_integral.h */,
 				A60796631B15CB6E00A70D70 /* dynamics_edge.cpp */,
 				A60796641B15CB6E00A70D70 /* dynamics_edge.h */,
+				A635BFA31B4A7766003F2DE4 /* adapt_mesh.cpp */,
+				A635BFA41B4A7766003F2DE4 /* adapt_mesh.h */,
 			);
 			path = SEGMENT;
 			sourceTree = "<group>";
@@ -419,6 +424,7 @@
 				A6B45F401A88F1AD0091F5A6 /* draw.cpp in Sources */,
 				A6B460EF1A8CADF30091F5A6 /* helper.cpp in Sources */,
 				A60796651B15CB6E00A70D70 /* dynamics_edge.cpp in Sources */,
+				A635BFA51B4A7766003F2DE4 /* adapt_mesh.cpp in Sources */,
 				A61F33181A937CDF00C5C2F8 /* gl_debug_helper.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -519,8 +525,20 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = lib;
 				FRAMEWORK_SEARCH_PATHS = /Library/Frameworks;
-				HEADER_SEARCH_PATHS = /Library/Frameworks/GEL.framework/Headers;
-				LIBRARY_SEARCH_PATHS = /Library/Frameworks;
+				HEADER_SEARCH_PATHS = (
+					/Library/Frameworks/GEL.framework/Headers,
+					../DEMO,
+					/opt/X11/include/,
+					"$HOME/armadillo-5.000.1/include",
+					../CImg/libtiff,
+					./CImg/libtiff,
+					/opt/X11/include/libpng15,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/opt/X11/lib/,
+					/opt/X11/lib,
+					"/Users/tuannt8/armadillo-5.000.1",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -531,8 +549,20 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = lib;
 				FRAMEWORK_SEARCH_PATHS = /Library/Frameworks;
-				HEADER_SEARCH_PATHS = /Library/Frameworks/GEL.framework/Headers;
-				LIBRARY_SEARCH_PATHS = /Library/Frameworks;
+				HEADER_SEARCH_PATHS = (
+					/Library/Frameworks/GEL.framework/Headers,
+					../DEMO,
+					/opt/X11/include/,
+					"$HOME/armadillo-5.000.1/include",
+					../CImg/libtiff,
+					./CImg/libtiff,
+					/opt/X11/include/libpng15,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/opt/X11/lib/,
+					/opt/X11/lib,
+					"/Users/tuannt8/armadillo-5.000.1",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

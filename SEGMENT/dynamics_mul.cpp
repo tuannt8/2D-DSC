@@ -38,13 +38,13 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
     
     // 1. Update mean intensity
     // <phase - mean intensity>
-    compute_mean_intensity(mean_inten_);
+//    compute_mean_intensity(mean_inten_);
     
     // 4. Update DSC
-    E0_ = get_total_energy(s_dsc, mean_inten_);
-    
-    static int iter = 0;
-    printf("%d %f \n", iter++, E0_);
+//    E0_ = get_total_energy(s_dsc, mean_inten_);
+//    
+//    static int iter = 0;
+//    printf("%d %f \n", iter++, E0_);
     
 //    displace_dsc();
     
@@ -69,6 +69,8 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
     
     // 4. Update DSC
     displace_dsc();
+    
+    compute_mean_intensity(mean_inten_);
     
   //  compute_mean_intensity(mean_inten_);
     g_param.mean_intensity = mean_inten_; // For drawing

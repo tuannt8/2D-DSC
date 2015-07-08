@@ -22,7 +22,7 @@
 #endif
 
 
-#define NOISE 20
+#define NOISE 10
 #define BLUR 5.0
 
 void image::load_image(std::string const file_path){
@@ -85,7 +85,7 @@ void image::draw_grad(int window_width){
     glBegin(GL_LINES);
     for (int i = 0; i < width(); i++) {
         for (int j = 0; j < height(); j++) {
-            Vec2 g = grad(i, j)*10;
+            Vec2 g = grad_f(i, j)*10;
             glColor3f(1.0, 0.0, 0.0);
             
             Vec2 pt((double)i+0.5, (double)j+0.5);
@@ -284,40 +284,66 @@ double image::smooth_filter(double xi1, double xi2, double xi3, double gap){
     }
 }
 
-double image::get_sum_on_tri_variation(Vec2_array tris, double pixel_gap){
-    double area = helper_t::area(tris);
-    int N = std::ceil(std::sqrt(2*area));
-    double dxi = 1./(double)N;
-    double gap = pixel_gap/std::sqrt(2*area);
+double image::get_edge_energy(Vec2 p1, Vec2 p2){
+    double ene = 0;
+    Vec2 p12 = p2 - p1;
+    Vec2 norm(p12[1], -p12[0]);
+    norm.normalize();
     
-    double xi1, xi2;
-    Vec2 p;
-    double sum = 0.0;
-    for (int i1 = 0; i1 < N; i1 ++) {
-        
-        xi1 = i1*dxi;
-        
-        for (int i2 = 0; i2 < N - i1; i2++) {
-            
-            xi2 = i2 * dxi;
-            
-            if (i1 + i2 == N - 1) {
-                p = get_coord_barry(tris, (xi1 + dxi/3.), xi2 + dxi/3.);
-                double filterd = smooth_filter(xi1+ dxi/3., xi2 + dxi/3.,
-                                               1 - xi1 - xi2 - 2*dxi/3., gap);
-                sum += grad_f(p[0], p[1]).length()*0.5 * filterd;
-            }else{
-                p = get_coord_barry(tris, (xi1 + dxi/2.), xi2 + dxi/2.);
-                double filterd = smooth_filter(xi1+ dxi/2., xi2 + dxi/2.,
-                                               1 - xi1 - xi2 - dxi, gap);
-                sum += grad_f(p[0], p[1]).length() * filterd;
-            }
-        }
+    double L = p12.length();
+    int N = (int)L;
+    double dl = L/(double)N;
+    for (int i = 0; i < N; i++) {
+        auto p = p1 + p12*((i+0.5)*dl);
+        ene += std::abs(CGLA::cross(norm, grad_f(p[0], p[1]))) * dl/L;
     }
     
-    sum *= 2*area/(double)(N*N); // |j| = 2A
+    return ene;
+}
+
+double image::get_sum_on_tri_variation(Vec2_array tris, double pixel_gap){
     
-    return sum;
+    Vec2 center = (tris[0] + tris[1] + tris[2])/3.0;
+    for (int i = 0; i < 3; i++) {
+        double  l = (tris[i] - center).length();
+        tris[i] = center + (tris[i] - center)*(l-pixel_gap)/l;
+    }
+    
+    return get_sum_on_tri_variation(tris);
+    
+//    double area = helper_t::area(tris);
+//    int N = std::ceil(std::sqrt(2*area));
+//    double dxi = 1./(double)N;
+//    double gap = pixel_gap/std::sqrt(2*area);
+//    
+//    double xi1, xi2;
+//    Vec2 p;
+//    double sum = 0.0;
+//    for (int i1 = 0; i1 < N; i1 ++) {
+//        
+//        xi1 = i1*dxi;
+//        
+//        for (int i2 = 0; i2 < N - i1; i2++) {
+//            
+//            xi2 = i2 * dxi;
+//            
+//            if (i1 + i2 == N - 1) {
+//                p = get_coord_barry(tris, (xi1 + dxi/3.), xi2 + dxi/3.);
+//                double filterd = smooth_filter(xi1+ dxi/3., xi2 + dxi/3.,
+//                                               1 - xi1 - xi2 - 2*dxi/3., gap);
+//                sum += grad_f(p[0], p[1]).length()*0.5 * filterd;
+//            }else{
+//                p = get_coord_barry(tris, (xi1 + dxi/2.), xi2 + dxi/2.);
+//                double filterd = smooth_filter(xi1+ dxi/2., xi2 + dxi/2.,
+//                                               1 - xi1 - xi2 - dxi, gap);
+//                sum += grad_f(p[0], p[1]).length() * filterd;
+//            }
+//        }
+//    }
+//    
+//    sum *= 2*area/(double)(N*N); // |j| = 2A
+//    
+//    return sum;
 }
 
 double image::get_sum_gradient_tri(Vec2_array tris, double * area){
@@ -381,7 +407,7 @@ void image::compute_gradient(){
     for (int x = 0; x < width(); x++) {
         for (int y = 0; y< height(); y++) {
             double x_g = (*gX)(x, y)/(double)MAX_BYTE;
-            double y_g = -(*gY)(x, y)/(double)MAX_BYTE;
+            double y_g = (*gY)(x, y)/(double)MAX_BYTE;
             gradient_[y * width() + x] = Vec2(x_g,y_g);
         }
     }

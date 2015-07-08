@@ -30,6 +30,12 @@
 
 //#define TUAN_SEG
 
+ #define TUAN_MULTI_RES
+
+#ifdef TUAN_MULTI_RES
+class image;
+#endif
+
 #define NB_FORCES 10
 
 struct node_atrr{
@@ -37,13 +43,19 @@ struct node_atrr{
 };
 
 namespace DSC2D {
-    
+
     
     /**
      The base class representing a simplicial complex.
      */
     class DeformableSimplicialComplex
     {
+#ifdef TUAN_MULTI_RES
+    public:
+        image * img;
+        int pixel_spread = 4;  // To avoid computing energy near edge
+        double collapse_ene_thres = 0.15;
+#endif
         friend class ObjectGenerator;
     public:
         enum LABEL_OPT {NO_LABEL = -3, OUTSIDE = 0, INTERFACE = -1, CROSSING = -2};
@@ -280,6 +292,11 @@ namespace DSC2D {
          Returns the positions of the vertices of the face with ID fid.
          */
         std::vector<vec2> get_pos(face_key fid) const;
+        
+        /**
+         Returns the positions of the vertices of the edge with ID fid.
+         */
+        std::vector<vec2> get_pos(edge_key fid) const;
         
         /**
          Returns the new position of the vertex with ID vid.

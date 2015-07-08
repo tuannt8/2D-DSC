@@ -15,6 +15,7 @@
 
 #include "gl_debug_helper.h"
 #include "dynamics_edge.h"
+#include "adapt_mesh.h"
 
 void _check_gl_error(const char *file, int line)
 {
@@ -149,12 +150,19 @@ void interface::keyboard(unsigned char key, int x, int y){
         case ' ':
         {
             RUN = !RUN;
-            
+            update_title();
             //dynamics_image_seg();
-        }
             break;
+        }
+
         case '\t':
             Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, "./LOG");
+            break;
+        case 's':
+        {
+            adapt_mesh am;
+            am.split_edge(*dsc, *image_);
+        }
             break;
         case 'u':
             std::cout << g_param.alpha << " - New alpha: ";
@@ -259,17 +267,43 @@ void interface::draw()
     Painter::end();
 }
 
+ #define TEST_FACE_ENERGY
+// #define TEST_EDGE_ENERGY
+// #define DRAW_GRADIENT
+
 void interface::draw_test(){
+#ifdef TEST_FACE_ENERGY
     HMesh::FaceAttributeVector<Vec3> intensity(dsc->get_no_faces(), Vec3(0.0));
     for (auto fkey : dsc->faces()){
         auto tris = dsc->get_pos(fkey);
         auto sum = image_->get_sum_on_tri_variation(tris, 3);
         auto area = dsc->area(fkey);
         
-        intensity[fkey] = Vec3(sum)/std::sqrt(2*area) ;
+        intensity[fkey] = Vec3(sum)/std::sqrt(area);
     }
     
     Painter::draw_faces(*dsc, intensity);
+#endif
+
+#ifdef TEST_EDGE_ENERGY
+    glBegin(GL_LINES);
+    for (auto ekey : dsc->halfedges()){
+        if (dsc->is_interface(ekey))
+        {
+            auto pts = dsc->get_pos(ekey);
+            double energy = std::abs(image_->get_edge_energy(pts[0], pts[1]))*400;
+            std::cout<<"Energy = " << energy << "\n";
+            glColor3f(energy, 0, 0);
+            glVertex2dv(pts[0].get());
+            glVertex2dv(pts[1].get());
+        }
+    }
+    glEnd();
+#endif
+    
+#ifdef DRAW_GRADIENT
+    image_->draw_grad(WIN_SIZE_X);
+#endif
 }
 
 std::vector<DSC2D::vec2> get_quad(double minx, double miny, double maxx, double maxy){
@@ -354,6 +388,9 @@ void interface::update_title()
 {
     std::ostringstream oss;
     oss << "2D DSC\t";
+    if (RUN) {
+        oss << " running\t";
+    }
 
     std::string str(oss.str());
     glutSetWindowTitle(str.c_str());
@@ -419,7 +456,9 @@ void interface::init_dsc(){
     dsc = std::unique_ptr<DeformableSimplicialComplex>(
                             new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
     
- //   thres_hold_init();
+#ifdef TUAN_MULTI_RES
+    dsc->img = &*image_;
+#endif
     
     printf("Average edge length: %f \n", dsc->get_avg_edge_length());
 }

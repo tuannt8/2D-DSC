@@ -73,8 +73,14 @@ public:
     double get_sum_on_tri_variation(Vec2_array tris, double pixel_gap);
     double smooth_filter(double xi1, double xi2, double xi3, double gap);
     
+    /*
+     * Edge energy
+     */
+    double get_edge_energy(Vec2 p1, Vec2 p2);
+    
     // total intensity inside a triangle
     void get_tri_intensity(Vec2_array tris, int * total_pixel, double * total_intensity);
+    
     // Intensity differ with assumed mean intensity.
     void get_tri_differ(Vec2_array tris, int *total_pixel, double * total_differ, double ci);
     intensity_out get_tri_differ(Vec2_array tris, double ci);

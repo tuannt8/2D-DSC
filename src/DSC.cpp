@@ -17,6 +17,11 @@
 #include "DSC.h"
 #include "draw.h"
 
+#ifdef TUAN_MULTI_RES
+#include "image.h"
+#endif
+
+
 namespace DSC2D
 {    
     DeformableSimplicialComplex::DeformableSimplicialComplex(real AVG_EDGE_LENGTH, const std::vector<real>& points, const std::vector<int>& faces, DesignDomain *domain): design_domain(domain)
@@ -27,14 +32,14 @@ namespace DSC2D
         DEG_ANGLE = 0.2*MIN_ANGLE;
         
         MAX_LENGTH = 2.;
-        MIN_LENGTH = 0.5;
+        MIN_LENGTH = 0.05;// 0.5;
         DEG_LENGTH = 0.2*MIN_LENGTH;
         
         MAX_AREA = 5.;
 #ifdef TUAN_SEG
         MIN_AREA = 2.;
 #else
-        MIN_AREA = 0.2;
+        MIN_AREA = 0.01;// 0.2;
 #endif
         DEG_AREA = 0.2*MIN_AREA;
         
@@ -398,6 +403,16 @@ namespace DSC2D
         return vec2(mesh->pos(vid)[0], mesh->pos(vid)[1]);
     }
     
+    std::vector<vec2> DeformableSimplicialComplex::get_pos(edge_key eid) const
+    {
+        std::vector<vec2> positions;
+        
+        auto hew = walker(eid);
+        positions.push_back(get_pos(hew.opp().vertex()));
+        positions.push_back(get_pos(hew.vertex()));
+        return positions;
+    }
+    
     std::vector<vec2> DeformableSimplicialComplex::get_pos(face_key fid) const
     {
         std::vector<vec2> positions;
@@ -693,6 +708,24 @@ namespace DSC2D
     
     bool DeformableSimplicialComplex::is_collapsable(HMesh::Walker hew, bool safe)
     {
+#ifdef TUAN_MULTI_RES
+//        if(is_interface(hew.halfedge()))
+//        {
+//            // Get the energy
+//            // Optimize later by building predefined triangle energy
+//            auto tris1 = get_pos(hew.face());
+//            auto tris2 = get_pos(hew.opp().face());
+//            
+//            double e = img->get_sum_on_tri_variation(tris1, pixel_spread) +
+//            img->get_sum_on_tri_variation(tris2, pixel_spread);
+//            e = e / length(hew.halfedge());
+//            
+//            if (e > collapse_ene_thres) {
+//                return false;
+//            }
+//        }
+#endif
+        
         if(safe)
         {
             if(safe_editable(hew.opp().vertex()))
@@ -706,6 +739,7 @@ namespace DSC2D
                 return true;
             }
         }
+        
         if(is_interface(hew.halfedge()))
         {
             vec2 p0 = get_pos(hew.opp().vertex());
@@ -730,9 +764,9 @@ namespace DSC2D
     
     bool DeformableSimplicialComplex::collapse(const edge_key& eid, bool safe)
     {
-#ifdef TUAN_SEG
-        if(is_interface(eid))
-            return false;
+#ifdef TUAN_MULTI_RES
+//        if(is_interface(eid))
+//            return false;
 #endif
         
         if (!precond_collapse_edge(*mesh, eid) || !unsafe_editable(eid))
