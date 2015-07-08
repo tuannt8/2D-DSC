@@ -303,13 +303,28 @@ double image::get_edge_energy(Vec2 p1, Vec2 p2){
 
 double image::get_sum_on_tri_variation(Vec2_array tris, double pixel_gap){
     
-    Vec2 center = (tris[0] + tris[1] + tris[2])/3.0;
+//    Vec2 center = (tris[0] + tris[1] + tris[2])/3.0;
+//    for (int i = 0; i < 3; i++) {
+//        double  l = (tris[i] - center).length();
+//        tris[i] = center + (tris[i] - center)*(l-pixel_gap)/l;
+//    }
+
+    Vec2_array new_tris;
     for (int i = 0; i < 3; i++) {
-        double  l = (tris[i] - center).length();
-        tris[i] = center + (tris[i] - center)*(l-pixel_gap)/l;
+        auto p0 = tris[i];
+        auto p1 = tris[(i+1)%3];
+        auto p2 = tris[(i+2)%3];
+        
+        auto p01 = p1 - p0; p01.normalize();
+        auto p02 = p2 - p0; p02.normalize();
+        auto pd = p01 + p02;
+        double sinA = std::abs(CGLA::cross(p01, p02));
+        
+        Vec2 pn = p0 + pd*(pixel_gap/sinA);
+        new_tris.push_back(pn);
     }
     
-    return get_sum_on_tri_variation(tris);
+    return get_sum_on_tri_variation(new_tris);
     
 //    double area = helper_t::area(tris);
 //    int N = std::ceil(std::sqrt(2*area));

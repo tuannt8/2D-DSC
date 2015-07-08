@@ -24,7 +24,7 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     HMesh::FaceAttributeVector<double> intensity(dsc.get_no_faces(), 0);
     for (auto fkey : dsc.faces()){
         auto tris = dsc.get_pos(fkey);
-        auto sum = img.get_sum_on_tri_variation(tris, 3);
+        auto sum = img.get_sum_on_tri_variation(tris, 2);
         
         intensity[fkey] = sum;
     }
@@ -41,7 +41,7 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
         }
     }
     
-    double thres = 0.15;
+    double thres = 0.01;
     // Edge total variation
     for (auto ekey : edges){
         auto hew = dsc.walker(ekey);

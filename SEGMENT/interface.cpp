@@ -272,18 +272,44 @@ void interface::draw()
 // #define DRAW_GRADIENT
 
 void interface::draw_test(){
+    
+
+    
 #ifdef TEST_FACE_ENERGY
     HMesh::FaceAttributeVector<Vec3> intensity(dsc->get_no_faces(), Vec3(0.0));
     for (auto fkey : dsc->faces()){
         auto tris = dsc->get_pos(fkey);
-        auto sum = image_->get_sum_on_tri_variation(tris, 3);
+        auto sum = image_->get_sum_on_tri_variation(tris, 2);
         auto area = dsc->area(fkey);
         
-        intensity[fkey] = Vec3(sum)/std::sqrt(area);
+        intensity[fkey] = Vec3(sum)/std::sqrt(area)*10;
     }
     
     Painter::draw_faces(*dsc, intensity);
 #endif
+    
+    double pixel_gap = 4;
+    auto fkey = dsc->faces_begin();
+    auto tris = dsc->get_pos(*fkey);
+    Vec2_array new_tris;
+    for (int i = 0; i < 3; i++) {
+        auto p0 = tris[i];
+        auto p1 = tris[(i+1)%3];
+        auto p2 = tris[(i+2)%3];
+        
+        auto p01 = p1 - p0; p01.normalize();
+        auto p02 = p2 - p0; p02.normalize();
+        auto pd = p01 + p02;
+        double sinA = std::abs(CGLA::cross(p01, p02));
+        Vec2 pn = p0 + pd*(pixel_gap/sinA);
+        new_tris.push_back(pn);
+    }
+    glColor3f(0, 0, 1);
+    glBegin(GL_TRIANGLES);
+    glVertex2dv(new_tris[0].get());
+    glVertex2dv(new_tris[1].get());
+    glVertex2dv(new_tris[2].get());
+    glEnd();
 
 #ifdef TEST_EDGE_ENERGY
     glBegin(GL_LINES);
