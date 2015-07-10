@@ -124,5 +124,5 @@ public:
     static void draw_lines(const DSC2D::DeformableSimplicialComplex& complex, const HMesh::VertexAttributeVector<DSC2D::vec2> &lines, DSC2D::vec3 color = GREEN);
     
     // Utility
-    static void print_gl(const double &x, const double &y, char* str);
+    static void print_gl(const double &x, const double &y, const char* str);
 };

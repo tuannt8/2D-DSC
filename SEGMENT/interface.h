@@ -79,7 +79,10 @@ private:
     void draw_coord();
     void update_title();
     void thres_hold_init();
+    
+private:
     void draw_test();
+    void draw_edge_energy();
     
 #pragma mark - data
 public:

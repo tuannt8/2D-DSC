@@ -232,6 +232,10 @@ void interface::draw()
     if(bDiplay_[8])
         draw_test();
     
+    if(bDiplay_[5]){
+        image_->draw_grad(WIN_SIZE_X);
+    }
+    
     if (bDiplay_[2] and dsc) {
         glColor3f(1, 0.4, 0.3);
         Painter::draw_edges(*dsc);
@@ -246,12 +250,10 @@ void interface::draw()
     }
     
     
-    if(bDiplay_[5]){
-        Painter::draw_internal_force(*dsc);
-    }
+
     
     if(bDiplay_[6]){
-        Painter::draw_external_force(*dsc);
+        draw_edge_energy();
     }
     
     if(!bDiplay_[7]){
@@ -267,68 +269,119 @@ void interface::draw()
     Painter::end();
 }
 
+void interface::draw_edge_energy(){
+    // Face total variation
+    HMesh::FaceAttributeVector<double> intensity(dsc->get_no_faces(), 0);
+    for (auto fkey : dsc->faces()){
+        auto tris = dsc->get_pos(fkey);
+        // auto sum = img.get_sum_on_tri_variation(tris, 2);
+        
+        auto area = dsc->area(fkey);
+        double ci = g_param.mean_intensity[dsc->get_label(fkey)];
+        double sum = image_->get_tri_differ(tris, ci).total_differ / area;
+        
+        intensity[fkey] = sum;
+    }
+    
+    std::vector<Edge_key> edges;
+    for(auto hei = dsc->halfedges_begin(); hei != dsc->halfedges_end(); ++hei)
+    {
+        if (dsc->is_interface(*hei)) {
+            auto hew = dsc->walker(*hei);
+            if(dsc->is_movable(*hei)
+               and dsc->get_label(hew.face()) < dsc->get_label(hew.opp().face()))
+            {
+                edges.push_back(*hei);
+            }
+        }
+    }
+    
+    glColor3f(0, 0, 0);
+    // Edge total variation
+    for (auto ekey : edges){
+        auto hew = dsc->walker(ekey);
+        
+        double ev = intensity[hew.face()] + intensity[hew.opp().face()];
+        //  ev = ev / dsc.length(ekey);
+        
+        auto tris = dsc->get_pos(ekey);
+        auto center = (tris[0] + tris[1])/2.0;
+        std::ostringstream is;
+        is << ev;
+        Painter::print_gl(center[0], center[1], is.str().c_str());
+    }
+}
+
  #define TEST_FACE_ENERGY
 // #define TEST_EDGE_ENERGY
-// #define DRAW_GRADIENT
 
 void interface::draw_test(){
     
 
     
 #ifdef TEST_FACE_ENERGY
+    if (g_param.mean_intensity.size() == 0) {
+        return;
+    }
+    
     HMesh::FaceAttributeVector<Vec3> intensity(dsc->get_no_faces(), Vec3(0.0));
+    glColor3f(0, 0, 0);
     for (auto fkey : dsc->faces()){
         auto tris = dsc->get_pos(fkey);
-        auto sum = image_->get_sum_on_tri_variation(tris, 2);
+       // auto sum = image_->get_sum_on_tri_variation(tris, 2);
+        
+        double ci = g_param.mean_intensity[dsc->get_label(fkey)];
+        double sum = image_->get_tri_differ(tris, ci).total_differ;
+        
         auto area = dsc->area(fkey);
         
-        intensity[fkey] = Vec3(sum)/std::sqrt(area)*10;
+        auto center = (tris[0] + tris[1] + tris[2])/3.0;
+        std::ostringstream is;
+        is << sum/area;
+        Painter::print_gl(center[0], center[1], is.str().c_str());
     }
     
-    Painter::draw_faces(*dsc, intensity);
+//    double pixel_gap = 4;
+//    auto fkey = dsc->faces_begin();
+//    auto tris = dsc->get_pos(*fkey);
+//    Vec2_array new_tris;
+//    for (int i = 0; i < 3; i++) {
+//        auto p0 = tris[i];
+//        auto p1 = tris[(i+1)%3];
+//        auto p2 = tris[(i+2)%3];
+//        
+//        auto p01 = p1 - p0; p01.normalize();
+//        auto p02 = p2 - p0; p02.normalize();
+//        auto pd = p01 + p02;
+//        double sinA = std::abs(CGLA::cross(p01, p02));
+//        Vec2 pn = p0 + pd*(pixel_gap/sinA);
+//        new_tris.push_back(pn);
+//    }
+//    glColor3f(0, 0, 1);
+//    glBegin(GL_TRIANGLES);
+//    glVertex2dv(new_tris[0].get());
+//    glVertex2dv(new_tris[1].get());
+//    glVertex2dv(new_tris[2].get());
+//    glEnd();
+
 #endif
     
-    double pixel_gap = 4;
-    auto fkey = dsc->faces_begin();
-    auto tris = dsc->get_pos(*fkey);
-    Vec2_array new_tris;
-    for (int i = 0; i < 3; i++) {
-        auto p0 = tris[i];
-        auto p1 = tris[(i+1)%3];
-        auto p2 = tris[(i+2)%3];
-        
-        auto p01 = p1 - p0; p01.normalize();
-        auto p02 = p2 - p0; p02.normalize();
-        auto pd = p01 + p02;
-        double sinA = std::abs(CGLA::cross(p01, p02));
-        Vec2 pn = p0 + pd*(pixel_gap/sinA);
-        new_tris.push_back(pn);
-    }
-    glColor3f(0, 0, 1);
-    glBegin(GL_TRIANGLES);
-    glVertex2dv(new_tris[0].get());
-    glVertex2dv(new_tris[1].get());
-    glVertex2dv(new_tris[2].get());
-    glEnd();
+
 
 #ifdef TEST_EDGE_ENERGY
-    glBegin(GL_LINES);
     for (auto ekey : dsc->halfedges()){
-        if (dsc->is_interface(ekey))
+        auto hew = dsc->walker(ekey);
+        if (dsc->is_interface(ekey) and
+            hew.vertex().get_index() > hew.opp().vertex().get_index())
         {
             auto pts = dsc->get_pos(ekey);
-            double energy = std::abs(image_->get_edge_energy(pts[0], pts[1]))*400;
-            std::cout<<"Energy = " << energy << "\n";
-            glColor3f(energy, 0, 0);
-            glVertex2dv(pts[0].get());
-            glVertex2dv(pts[1].get());
+            double energy = std::abs(image_->get_edge_energy(pts[0], pts[1], 1));
+            auto c = (pts[0] + pts[1])/2;
+            std::ostringstream str;
+            str << energy;
+            Painter::print_gl(c[0], c[1], str.str().c_str());
         }
     }
-    glEnd();
-#endif
-    
-#ifdef DRAW_GRADIENT
-    image_->draw_grad(WIN_SIZE_X);
 #endif
 }
 

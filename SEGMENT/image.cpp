@@ -22,7 +22,7 @@
 #endif
 
 
-#define NOISE 10
+#define NOISE 50
 #define BLUR 5.0
 
 void image::load_image(std::string const file_path){
@@ -34,7 +34,7 @@ void image::load_image(std::string const file_path){
 
    
 //    blur(BLUR);
-//    noise(NOISE);
+    noise(NOISE);
 
     set_gl_texture();
     compute_gradient();
@@ -299,6 +299,28 @@ double image::get_edge_energy(Vec2 p1, Vec2 p2){
     }
     
     return ene;
+}
+
+double image::get_edge_energy(Vec2 p1, Vec2 p2, double spread){
+    double ene = 0;
+    Vec2 p12 = p2 - p1;
+    Vec2 norm(p12[1], -p12[0]);
+    norm.normalize();
+    
+    double L = p12.length();
+    int N = (int)L;
+    double dl = L/(double)N;
+    for (int i = 0; i < N; i++) {
+        auto p = p1 + p12*((i+0.5)*dl);
+        auto p1 = p + norm*spread;
+        auto p2 = p - norm*spread;
+        
+        ene += std::abs(CGLA::dot(norm, grad_f(p[0], p[1])));
+        ene += std::abs(CGLA::dot(norm, grad_f(p1[0], p1[1])));
+        ene += std::abs(CGLA::dot(norm, grad_f(p2[0], p2[1])));
+    }
+    
+    return ene * dl/L;
 }
 
 double image::get_sum_on_tri_variation(Vec2_array tris, double pixel_gap){

@@ -75,8 +75,10 @@ public:
     
     /*
      * Edge energy
+     * By multiply gradient with normal of the edge
      */
     double get_edge_energy(Vec2 p1, Vec2 p2);
+    double get_edge_energy(Vec2 p1, Vec2 p2, double spread);
     
     // total intensity inside a triangle
     void get_tri_intensity(Vec2_array tris, int * total_pixel, double * total_intensity);

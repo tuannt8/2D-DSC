@@ -175,9 +175,9 @@ void Painter::draw_vertices(const DeformableSimplicialComplex& dsc)
 	glEnd();
 }
 
-void Painter::print_gl(const double &x, const double &y, char* str){
+void Painter::print_gl(const double &x, const double &y, const char* str){
     glRasterPos2f(x, y);
-    for (char *c = str; *c != '\0'; c++) {
+    for (const char *c = str; *c != '\0'; c++) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *c);
     }
 }
