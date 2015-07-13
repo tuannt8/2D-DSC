@@ -341,6 +341,8 @@ void interface::draw_test(){
         auto area = dsc->area(fkey);
         double ci = g_param.mean_intensity[dsc->get_label(fkey)];
         double sum = image_->get_sum_on_tri_differ(tris, ci);
+        
+        if(sum < 0.001) sum = 0;
 
         auto center = (tris[0] + tris[1] + tris[2])/3.0;
         std::ostringstream is;

@@ -20,7 +20,7 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     dsc_ = & dsc;
     
     // Face total variation
-    double thread = 0.02;
+    double thread = 0.03;
     HMesh::FaceAttributeVector<double> intensity(dsc_->get_no_faces(), 0);
     std::vector<Face_key> to_split;
     for (auto fkey : dsc_->faces()){
@@ -29,10 +29,11 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
         
         auto area = dsc_->area(fkey);
         double ci = g_param.mean_intensity[dsc_->get_label(fkey)];
-        double sum = img.get_tri_differ(tris, ci).total_differ / area;
+        double sum = img.get_sum_on_tri_differ(tris, ci) / area;
         
         intensity[fkey] = sum;
-        if (sum > thread) {
+        if (sum > thread
+            and area > 10) {
             to_split.push_back(fkey);
         }
     }
@@ -79,7 +80,8 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
                 double ev = intensity[hew.face()] + intensity[hew.opp().face()];
                 //  ev = ev / dsc.length(ekey);
                 
-                if (ev > thres) {
+                if (ev > thres
+                    and dsc.length(*hei) > 5) {
                     edges.push_back(edge_s_e(*hei, dsc_->length(*hei)));
                 }
 

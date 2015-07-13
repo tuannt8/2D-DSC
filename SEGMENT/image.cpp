@@ -34,7 +34,7 @@ void image::load_image(std::string const file_path){
 
    
 //    blur(BLUR);
-    noise(NOISE);
+//    noise(NOISE);
 
     set_gl_texture();
     compute_gradient();
