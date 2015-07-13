@@ -66,6 +66,8 @@ public:
     
     double get_sum_on_tri_intensity(Vec2_array tris);
     double get_sum_on_tri_variation(Vec2_array tris);
+    double get_sum_on_tri_differ(Vec2_array tris, double ci);
+    double ci_temp;
     
     /*
      * Get total variation with filtered

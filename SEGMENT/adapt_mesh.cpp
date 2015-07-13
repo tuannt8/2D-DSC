@@ -16,6 +16,39 @@ adapt_mesh::~adapt_mesh(){
     
 }
 
+void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img){
+    dsc_ = & dsc;
+    
+    // Face total variation
+    double thread = 0.02;
+    HMesh::FaceAttributeVector<double> intensity(dsc_->get_no_faces(), 0);
+    std::vector<Face_key> to_split;
+    for (auto fkey : dsc_->faces()){
+        auto tris = dsc_->get_pos(fkey);
+        // auto sum = img.get_sum_on_tri_variation(tris, 2);
+        
+        auto area = dsc_->area(fkey);
+        double ci = g_param.mean_intensity[dsc_->get_label(fkey)];
+        double sum = img.get_tri_differ(tris, ci).total_differ / area;
+        
+        intensity[fkey] = sum;
+        if (sum > thread) {
+            to_split.push_back(fkey);
+        }
+    }
+    
+    // Split high energy face
+    for (auto fkey : to_split) {
+        dsc_->split(fkey);
+    }
+}
+
+struct edge_s_e{
+    edge_s_e(Edge_key ekey_, double length_):ekey(ekey_), length(length_){}
+    Edge_key ekey;
+    double length;
+};
+
 void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img){
     
     dsc_ = & dsc;
@@ -33,7 +66,9 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
         intensity[fkey] = sum;
     }
     
-    std::vector<Edge_key> edges;
+    double thres = 0.08;
+    
+    std::vector<edge_s_e> edges;
     for(auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei)
     {
         if (dsc.is_interface(*hei)) {
@@ -41,23 +76,20 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
             if(dsc.is_movable(*hei)
                and dsc.get_label(hew.face()) < dsc.get_label(hew.opp().face()))
             {
-                edges.push_back(*hei);
+                double ev = intensity[hew.face()] + intensity[hew.opp().face()];
+                //  ev = ev / dsc.length(ekey);
+                
+                if (ev > thres) {
+                    edges.push_back(edge_s_e(*hei, dsc_->length(*hei)));
+                }
+
             }
         }
     }
     
-    double thres = 0.04;
-    // Edge total variation
-    for (auto ekey : edges){
-        auto hew = dsc.walker(ekey);
-        
-        double ev = intensity[hew.face()] + intensity[hew.opp().face()];
-      //  ev = ev / dsc.length(ekey);
-        
-        if (ev > thres) {
-            //split_single_edge(ekey);
-            dsc_->split(ekey);
-        }
+    // Split long edge fist
+    for (auto e: edges){
+        dsc_->split(e.ekey);
     }
 }
 

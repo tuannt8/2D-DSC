@@ -196,6 +196,16 @@ inline Vec2 get_coord_barry(Vec2_array & tris, double xi1, double xi2) {
     return tris[0]*xi1 + tris[1]*xi2 + tris[2]*(1- xi1 -xi2);
 }
 
+double image::get_sum_on_tri_differ(Vec2_array tris, double ci){
+    ci_temp = ci;
+    return get_sum_on_tri<double>(tris,
+              std::function<double(Vec2)>([this](Vec2 p)
+                  {
+                      return std::pow((this->get_intensity_f(p[0], p[1]) - ci_temp), 2);
+                  }
+                  ));
+}
+
 double image::get_sum_on_tri_intensity(Vec2_array tris){
     return get_sum_on_tri<double>(tris,
                 std::function<double(Vec2)>([this](Vec2 p)

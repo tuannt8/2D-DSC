@@ -312,6 +312,24 @@ void Painter::draw_edges(const DeformableSimplicialComplex& dsc)
 	glEnd();
 }
 
+void Painter::draw_edges_index(const DSC2D::DeformableSimplicialComplex& dsc){
+    vec3 p1, p2;
+    for(auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei)
+    {
+        auto hew = dsc.walker(*hei);
+        if (hew.vertex().get_index() > hew.opp().vertex().get_index()) {
+            p1 = vec3(dsc.get_pos(hew.vertex())[0], dsc.get_pos(hew.vertex())[1], 0.);
+            p2 = vec3(dsc.get_pos(hew.opp().vertex())[0], dsc.get_pos(hew.opp().vertex())[1], 0.);
+            
+            auto c = (p1 + p2)/2;
+            std::ostringstream s;
+            s << hew.halfedge().get_index() << ", " << hew.opp().halfedge().get_index();
+            print_gl(c[0], c[1], s.str().c_str());
+        }
+
+    }
+}
+
 void Painter::draw_faces(const DeformableSimplicialComplex& dsc)
 {
     glEnable(GL_BLEND);

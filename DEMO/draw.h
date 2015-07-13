@@ -89,6 +89,7 @@ public:
      Draws the edges with the colors defined by the get_edge_colors function in the simplicial complex.
      */
     static void draw_edges(const DSC2D::DeformableSimplicialComplex& complex);
+    static void draw_edges_index(const DSC2D::DeformableSimplicialComplex& complex);
     
     /**
      Draws the faces with the colors defined by the get_face_colors function in the simplicial complex.

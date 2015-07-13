@@ -92,7 +92,7 @@ private:
     
     void compute_difference();
     
-private:
+public:
     void displace_dsc_2();
     void debug_optimum_dt();
     void debug_optimum_dt_2();

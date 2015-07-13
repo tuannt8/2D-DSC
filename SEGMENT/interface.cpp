@@ -158,7 +158,13 @@ void interface::keyboard(unsigned char key, int x, int y){
         case '\t':
             Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, "./LOG");
             break;
-        case 's':
+        case 'f': // Flipping phase
+        {
+         //   dyn_->optimize_phase();
+            adapt_mesh am;
+            am.split_face(*dsc, *image_);
+        }
+        case 's': // Split edge
         {
             adapt_mesh am;
             am.split_edge(*dsc, *image_);
@@ -259,7 +265,8 @@ void interface::draw()
     if(!bDiplay_[7]){
         glColor3f(1, 0, 0);
         // Painter::draw_vertices_index(*dsc);
-        Painter::draw_faces_index(*dsc);
+        // Painter::draw_faces_index(*dsc);
+        Painter::draw_edges_index(*dsc);
     }
 
     
@@ -328,13 +335,13 @@ void interface::draw_test(){
     glColor3f(0, 0, 0);
     for (auto fkey : dsc->faces()){
         auto tris = dsc->get_pos(fkey);
-       // auto sum = image_->get_sum_on_tri_variation(tris, 2);
         
-        double ci = g_param.mean_intensity[dsc->get_label(fkey)];
-        double sum = image_->get_tri_differ(tris, ci).total_differ;
+//        auto sum = image_->get_sum_on_tri_differ(tris, 2);
         
         auto area = dsc->area(fkey);
-        
+        double ci = g_param.mean_intensity[dsc->get_label(fkey)];
+        double sum = image_->get_sum_on_tri_differ(tris, ci);
+
         auto center = (tris[0] + tris[1] + tris[2])/3.0;
         std::ostringstream is;
         is << sum/area;

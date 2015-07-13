@@ -21,6 +21,7 @@ public:
     
     void split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img);
     
+    void split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img);
 private:
     DSC2D::DeformableSimplicialComplex *dsc_;
     void split_single_edge(Edge_key ekey);

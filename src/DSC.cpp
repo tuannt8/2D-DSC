@@ -1228,7 +1228,10 @@ namespace DSC2D
         for (auto e : edges)
         {
             auto hew = walker(e);
-            if(length(e) > MAX_LENGTH*AVG_LENGTH || is_crossing(hew.vertex()) || is_crossing(hew.opp().vertex()))
+            if(length(e) > MAX_LENGTH*AVG_LENGTH
+     //          || is_crossing(hew.vertex())
+     //          || is_crossing(hew.opp().vertex())
+               )
             {
                 bool success = split(e);
 #ifdef DEBUG

@@ -1581,7 +1581,7 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
     if (!obj) {
         obj = s_dsc;
     }
-    dt = 0.3;
+    dt = 1;
     
     double total = 0.0;
     dE_0_ = 0.0;
@@ -1608,8 +1608,6 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
             dE_0_ += -dis.length()*dis.length()*dt;
         }
     }
-    
-//    printf("Max dis: %f\n", max_move);
     
     obj->deform();
 }
