@@ -17,6 +17,8 @@
 #include "dynamics_edge.h"
 #include "adapt_mesh.h"
 
+#include "options_disp.h"
+
 void _check_gl_error(const char *file, int line)
 {
     GLenum err (glGetError());
@@ -62,7 +64,9 @@ void animate_(){
 
 void glutMouseFunc_(int button, int state, int x, int y){
     gl_debug_helper::mouseDown(button, state, x, y);
-};
+    options_disp::mouse_func(button, state, x, y);
+};;
+
 
 void glutMotion_(int x, int y){
     gl_debug_helper::mouseMove(x, y);
@@ -102,24 +106,26 @@ void interface::animate(){
 void interface::reshape(int width, int height){
     WIN_SIZE_X = width;
     WIN_SIZE_Y = height;
+    
+    double real_width = width - options_disp::width_view;
     if(dsc)
     {
         double image_ratio = imageSize[1] / imageSize[0];
-        double gl_ratio = (double)WIN_SIZE_Y / WIN_SIZE_X;
+        double gl_ratio = (double)WIN_SIZE_Y / real_width;
         
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         gluOrtho2D(0, imageSize[0], 0, imageSize[1]);
         
-        double lx = (gl_ratio < image_ratio)? WIN_SIZE_Y/image_ratio : WIN_SIZE_X;
-        double ly = (gl_ratio < image_ratio)? WIN_SIZE_Y : WIN_SIZE_X*image_ratio;
+        double lx = (gl_ratio < image_ratio)? WIN_SIZE_Y/image_ratio : real_width;
+        double ly = (gl_ratio < image_ratio)? WIN_SIZE_Y : real_width*image_ratio;
 
 
-        glViewport((WIN_SIZE_X - lx)/2, (WIN_SIZE_Y - ly)/2, lx, ly);
-        glutReshapeWindow(WIN_SIZE_X, WIN_SIZE_Y);
+        glViewport(options_disp::width_view + (real_width - lx)/2, (WIN_SIZE_Y - ly)/2, lx, ly);
+      //  glutReshapeWindow(WIN_SIZE_X, WIN_SIZE_Y);
         
         
-        gl_debug_helper::coord_transform(Vec2((WIN_SIZE_X - lx)/2, (WIN_SIZE_Y - ly)/2),
+        gl_debug_helper::coord_transform(Vec2(options_disp::width_view + (real_width - lx)/2, (WIN_SIZE_Y - ly)/2),
                                          Vec2(imageSize[0] / lx, imageSize[1] / ly),
                                          WIN_SIZE_Y);
     }
@@ -226,23 +232,25 @@ void interface::draw()
 {
     Painter::begin();
     
-    if (bDiplay_[1]) {
+    reshape(WIN_SIZE_X, WIN_SIZE_Y);
+    
+    if (options_disp::get_option("Image", true)) {
         image_->draw_image(WIN_SIZE_X);
     }
     
-    if (bDiplay_[3] and dsc) {
+    if (options_disp::get_option("DSC faces", true) and dsc) {
         Painter::draw_faces(*dsc);
     }
     
     
-    if(bDiplay_[8])
+
         draw_test();
     
-    if(bDiplay_[5]){
+    if(options_disp::get_option("Image gradient", false)){
         image_->draw_grad(WIN_SIZE_X);
     }
     
-    if (bDiplay_[2] and dsc) {
+    if (options_disp::get_option("Edge and vertices ", true) and dsc) {
         glColor3f(1, 0.4, 0.3);
         Painter::draw_edges(*dsc);
         glColor3f(1, 0.0, 0.0);
@@ -251,18 +259,18 @@ void interface::draw()
     
 
     
-    if (!bDiplay_[4] and dsc) {
+    if (options_disp::get_option("Face intensity", false) and dsc) {
         Painter::draw_faces_intensity(*dsc);
     }
     
     
 
     
-    if(bDiplay_[6]){
+    if(options_disp::get_option("Edge energy", false)){
         draw_edge_energy();
     }
     
-    if(!bDiplay_[7]){
+    if(options_disp::get_option("Edge index", false)){
         glColor3f(1, 0, 0);
         // Painter::draw_vertices_index(*dsc);
         // Painter::draw_faces_index(*dsc);
@@ -272,6 +280,8 @@ void interface::draw()
     
     
     gl_debug_helper::draw();
+    
+    options_disp::draw(WIN_SIZE_X, WIN_SIZE_Y);
     
     Painter::end();
 }
@@ -319,79 +329,50 @@ void interface::draw_edge_energy(){
     }
 }
 
- #define TEST_FACE_ENERGY
-// #define TEST_EDGE_ENERGY
 
 void interface::draw_test(){
     
-
-    
-#ifdef TEST_FACE_ENERGY
-    if (g_param.mean_intensity.size() == 0) {
-        return;
-    }
-    
-    HMesh::FaceAttributeVector<Vec3> intensity(dsc->get_no_faces(), Vec3(0.0));
-    glColor3f(0, 0, 0);
-    for (auto fkey : dsc->faces()){
-        auto tris = dsc->get_pos(fkey);
+    if (options_disp::get_option("Face energy", false)) {
+        if (g_param.mean_intensity.size() == 0) {
+            return;
+        }
         
-//        auto sum = image_->get_sum_on_tri_differ(tris, 2);
-        
-        auto area = dsc->area(fkey);
-        double ci = g_param.mean_intensity[dsc->get_label(fkey)];
-        double sum = image_->get_sum_on_tri_differ(tris, ci);
-        
-        if(sum < 0.001) sum = 0;
-
-        auto center = (tris[0] + tris[1] + tris[2])/3.0;
-        std::ostringstream is;
-        is << sum/area;
-        Painter::print_gl(center[0], center[1], is.str().c_str());
-    }
-    
-//    double pixel_gap = 4;
-//    auto fkey = dsc->faces_begin();
-//    auto tris = dsc->get_pos(*fkey);
-//    Vec2_array new_tris;
-//    for (int i = 0; i < 3; i++) {
-//        auto p0 = tris[i];
-//        auto p1 = tris[(i+1)%3];
-//        auto p2 = tris[(i+2)%3];
-//        
-//        auto p01 = p1 - p0; p01.normalize();
-//        auto p02 = p2 - p0; p02.normalize();
-//        auto pd = p01 + p02;
-//        double sinA = std::abs(CGLA::cross(p01, p02));
-//        Vec2 pn = p0 + pd*(pixel_gap/sinA);
-//        new_tris.push_back(pn);
-//    }
-//    glColor3f(0, 0, 1);
-//    glBegin(GL_TRIANGLES);
-//    glVertex2dv(new_tris[0].get());
-//    glVertex2dv(new_tris[1].get());
-//    glVertex2dv(new_tris[2].get());
-//    glEnd();
-
-#endif
-    
-
-
-#ifdef TEST_EDGE_ENERGY
-    for (auto ekey : dsc->halfedges()){
-        auto hew = dsc->walker(ekey);
-        if (dsc->is_interface(ekey) and
-            hew.vertex().get_index() > hew.opp().vertex().get_index())
+        HMesh::FaceAttributeVector<Vec3> intensity(dsc->get_no_faces(), Vec3(0.0));
+        glColor3f(0, 0, 0);
+        for (auto fkey : dsc->faces())
         {
-            auto pts = dsc->get_pos(ekey);
-            double energy = std::abs(image_->get_edge_energy(pts[0], pts[1], 1));
-            auto c = (pts[0] + pts[1])/2;
-            std::ostringstream str;
-            str << energy;
-            Painter::print_gl(c[0], c[1], str.str().c_str());
+            auto tris = dsc->get_pos(fkey);
+            auto area = dsc->area(fkey);
+            double ci = g_param.mean_intensity[dsc->get_label(fkey)];
+            
+            double sum = image_->get_sum_on_tri_differ(tris, ci);
+            //        double sum = image_->get_sum_on_tri_variation(tris, 3);
+            
+            if(sum < 0.001) sum = 0;
+            
+            auto center = (tris[0] + tris[1] + tris[2])/3.0;
+            std::ostringstream is;
+            is << sum/area;
+            Painter::print_gl(center[0], center[1], is.str().c_str());
         }
     }
-#endif
+
+//    if (options_disp::get_option("Edge energy", false)) {
+//        for (auto ekey : dsc->halfedges()){
+//            auto hew = dsc->walker(ekey);
+//            if (dsc->is_interface(ekey) and
+//                hew.vertex().get_index() > hew.opp().vertex().get_index())
+//            {
+//                auto pts = dsc->get_pos(ekey);
+//                double energy = std::abs(image_->get_edge_energy(pts[0], pts[1], 1));
+//                auto c = (pts[0] + pts[1])/2;
+//                std::ostringstream str;
+//                str << energy;
+//                Painter::print_gl(c[0], c[1], str.str().c_str());
+//            }
+//        }
+//    }
+
 }
 
 std::vector<DSC2D::vec2> get_quad(double minx, double miny, double maxx, double maxy){
