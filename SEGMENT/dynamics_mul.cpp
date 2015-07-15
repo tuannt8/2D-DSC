@@ -1581,7 +1581,7 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
     if (!obj) {
         obj = s_dsc;
     }
-    dt = 1;
+    dt = 2;
     
     double total = 0.0;
     dE_0_ = 0.0;

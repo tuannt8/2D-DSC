@@ -21,6 +21,9 @@
 #include "image.h"
 #endif
 
+#include <iostream>
+#include <fstream>
+
 
 namespace DSC2D
 {    
@@ -349,6 +352,49 @@ namespace DSC2D
     bool DeformableSimplicialComplex::safe_editable(edge_key eid) const
     {
         return unsafe_editable(eid) && !is_interface(eid);
+    }
+    
+    bool DeformableSimplicialComplex::save(const char * filePath)
+    {
+        std::ofstream myfile(filePath);
+        if (myfile.is_open()) {
+            myfile << get_no_vertices() << " " << get_no_faces() << "\n";
+            
+            // Write vertices
+            std::map<int,int> index_map;
+            int idx = 0;
+            for (auto vkey : vertices())
+            {
+                index_map.insert(std::make_pair(vkey.get_index(), idx++));
+                auto p = get_pos(vkey);
+                myfile << p[0] << " " << p[1] << "\n";
+            }
+            
+            // write face
+            for (auto fkey : faces())
+            {
+                auto verts = get_verts(fkey);
+                myfile << index_map[(int)verts[0].get_index()] << " "
+                        << index_map[(int)verts[1].get_index()] << " "
+                        << index_map[(int)verts[2].get_index()] << "\n";
+            }
+            
+            myfile.close();
+            return true;
+        }else{
+            return false;
+        }
+    }
+    bool DeformableSimplicialComplex::load(char * filePath)
+    {
+        std::ifstream myfile(filePath);
+        if (myfile.is_open()) {
+            
+            myfile.close();
+            return true;
+        }else{
+            return false;
+        }
     }
     
     real DeformableSimplicialComplex::max_move_distance() const

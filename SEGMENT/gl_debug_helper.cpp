@@ -97,6 +97,8 @@ void gl_debug_helper::update_dsc(){
             dsc->set_label(*fid, new_label);
         }
     }
+    
+    dsc->clean_attributes();
 }
 
 void gl_debug_helper::mouseDown(int button, int state, int x, int y){

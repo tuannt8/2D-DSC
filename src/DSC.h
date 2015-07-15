@@ -790,6 +790,12 @@ namespace DSC2D {
         
     public:
         /**
+         Load and save
+         */
+        bool save(const char * filePath);
+        bool load(char * filePath);
+        
+        /**
          Returns the length of the edge with ID eid.
          */
         real length(edge_key eid) const;

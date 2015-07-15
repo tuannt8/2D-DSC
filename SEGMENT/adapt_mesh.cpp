@@ -21,7 +21,7 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     dsc_ = & dsc;
     
     // Face total variation
-    double thread = 0.03;
+    double thread = 0.02; // Potential for face splitting and relabeling
     HMesh::FaceAttributeVector<double> intensity(dsc_->get_no_faces(), 0);
     std::vector<Face_key> to_split;
     for (auto fkey : dsc_->faces())
@@ -40,10 +40,35 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     }
     
     // Split high energy face
+    double flip_thres = 0.05;
     for (auto fkey : to_split)
     {
-        dsc_->split(fkey);
+        if (intensity[fkey] > flip_thres) {
+            // Consider flipping
+            int min_label = -1;
+            double min_differ = INFINITY;
+            auto c_array = g_param.mean_intensity;
+            auto tris = dsc_->get_pos(fkey);
+            auto area = dsc_->area(fkey);
+            
+            for (int i = 0; i < c_array.size(); i++) {
+                double ci = c_array[i];
+                double c_sum = img.get_sum_on_tri_differ(tris, ci) / area;
+                
+                if (c_sum < min_differ) {
+                    min_differ = c_sum;
+                    min_label = i;
+                }
+            }
+            
+     //       assert(min_label != -1 and min_label != dsc_->get_label(fkey));
+            dsc_->set_label(fkey, min_label);
+        }else{
+            dsc_->split(fkey);
+        }
     }
+    
+    dsc_->clean_attributes();
 }
 
 struct edge_s_e

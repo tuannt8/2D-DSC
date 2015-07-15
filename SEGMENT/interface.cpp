@@ -166,14 +166,24 @@ void interface::keyboard(unsigned char key, int x, int y){
             break;
         case 'f': // Flipping phase
         {
-         //   dyn_->optimize_phase();
             adapt_mesh am;
             am.split_face(*dsc, *image_);
         }
+            break;
         case 's': // Split edge
         {
             adapt_mesh am;
             am.split_edge(*dsc, *image_);
+        }
+            break;
+        case 'b': // Split edge
+        {
+            back_up_dsc();
+        }
+            break;
+        case 'l': // Split edge
+        {
+            load_dsc();
         }
             break;
         case 'u':
@@ -193,6 +203,62 @@ void interface::keyboard(unsigned char key, int x, int y){
     g_param.bDisplay = bDiplay_;
     
     glutPostRedisplay();
+}
+
+using namespace DSC2D;
+void interface::load_dsc()
+{
+    std::ostringstream os;
+    os << LOG_PATH << "dsc.dsc";
+    
+    std::ifstream myfile(os.str().c_str());
+    
+    if (myfile.is_open()) {
+        int nb_vertice, nb_face;
+        myfile >> nb_vertice;
+        myfile >> nb_face;
+        
+        std::vector<double> points(3*nb_vertice, 0);
+        for (int i = 0; i < nb_vertice; i++) {
+            myfile >> points[3*i];
+            myfile >> points[3*i+1];
+        }
+        std::vector<int> faces; faces.resize(3*nb_face);
+        for (int i = 0; i < nb_face; i++) {
+            myfile >> faces[3*i];
+            myfile >> faces[3*i + 1];
+            myfile >> faces[3*i + 2];
+        }
+        
+        // Init DSC
+        double width = imageSize[0];
+        double height = imageSize[1];
+        
+        DISCRETIZATION = (double) height / (double)DISCRETIZE_RES;
+        
+        width -= 2*DISCRETIZATION;
+        height -= 2*DISCRETIZATION;
+        
+        DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, 0 /* DISCRETIZATION */);
+        
+        dsc = std::unique_ptr<DeformableSimplicialComplex>(
+                                                           new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
+#ifdef TUAN_MULTI_RES
+        dsc->img = &*image_;
+#endif
+        gl_debug_helper::set_dsc(&(*dsc));
+        
+        myfile.close();
+    }else{
+        std::cout << "Fail to load dsc mesh \n";
+    }
+}
+void interface::back_up_dsc()
+{
+    std::ostringstream os;
+    os << LOG_PATH << "dsc.dsc";
+    
+    dsc->save(os.str().c_str());
 }
 
 void interface::initGL(){
@@ -275,6 +341,10 @@ void interface::draw()
         // Painter::draw_vertices_index(*dsc);
         // Painter::draw_faces_index(*dsc);
         Painter::draw_edges_index(*dsc);
+    }
+    
+    if (options_disp::get_option("Face index")){
+        Painter::draw_faces_index(*dsc);
     }
 
     

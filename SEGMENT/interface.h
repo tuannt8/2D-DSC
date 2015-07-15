@@ -84,6 +84,9 @@ private:
     void draw_test();
     void draw_edge_energy();
     
+    void load_dsc();
+    void back_up_dsc();
+    
 #pragma mark - data
 public:
     void init_dsc();
