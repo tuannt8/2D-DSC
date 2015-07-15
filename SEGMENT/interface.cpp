@@ -308,9 +308,7 @@ void interface::draw()
         Painter::draw_faces(*dsc);
     }
     
-    
-
-        draw_test();
+    draw_test();
     
     if(options_disp::get_option("Image gradient", false)){
         image_->draw_grad(WIN_SIZE_X);
@@ -323,14 +321,9 @@ void interface::draw()
         Painter::draw_vertices(*dsc);
     }
     
-
-    
     if (options_disp::get_option("Face intensity", false) and dsc) {
         Painter::draw_faces_intensity(*dsc);
     }
-    
-    
-
     
     if(options_disp::get_option("Edge energy", false)){
         draw_edge_energy();
@@ -346,8 +339,6 @@ void interface::draw()
     if (options_disp::get_option("Face index")){
         Painter::draw_faces_index(*dsc);
     }
-
-    
     
     gl_debug_helper::draw();
     
