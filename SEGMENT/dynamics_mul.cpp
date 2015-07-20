@@ -1581,7 +1581,7 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
     if (!obj) {
         obj = s_dsc;
     }
-    dt = 1 ;
+    dt = 0.1 ;
     
     double total = 0.0;
     dE_0_ = 0.0;
@@ -1711,8 +1711,6 @@ void dynamics_mul::compute_intensity_force(){
         if( s_dsc->is_interface(*eit) and
            !touched[*eit])
         {
-            
-            
             double c0 = mean_inten_[s_dsc->get_label(hew.face())];
             double c1 = mean_inten_[s_dsc->get_label(hew.opp().face())];
             
@@ -1746,8 +1744,8 @@ void dynamics_mul::compute_intensity_force(){
                 }
                 
                 // Barry Centric coordinate
-                f0 += f*(p-p1).length() / (double)length / (double)length;
-                f1 += f*(p-p0).length() / (double)length / (double)length;
+                f0 += f*(p-p1).length() / (double)length;
+                f1 += f*(p-p0).length() / (double)length;
             }
             
             // Set force
