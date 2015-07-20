@@ -32,9 +32,13 @@ dynamics_mul::~dynamics_mul(){
 }
 
 void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
-    
-    s_img = &img;
-    s_dsc = &dsc;
+
+    if(!s_dsc)
+    {
+        s_img = &img;
+        s_dsc = &dsc;
+        s_dsc->set_default_dt(0.1);
+    }
     
     // 1. Update mean intensity
     // <phase - mean intensity>
@@ -1581,7 +1585,7 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
     if (!obj) {
         obj = s_dsc;
     }
-    dt = 0.1 ;
+
     
     double total = 0.0;
     dE_0_ = 0.0;
@@ -1595,10 +1599,11 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
         
         double differ = 1.0; // std::atan(d/1) * 2 / PI_V1;
         
+        double n_dt = s_dsc->time_step(*ni);
 
         if ((obj->is_interface(*ni) or obj->is_crossing(*ni)))
         {
-            obj->set_destination(*ni, obj->get_pos(*ni) + dis*dt*differ);
+            obj->set_destination(*ni, obj->get_pos(*ni) + dis*n_dt*differ);
             total += dis.length();
             
             if (max_move < dis.length()) {

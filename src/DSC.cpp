@@ -67,6 +67,7 @@ namespace DSC2D
                                                                   vec2(0.0f));
         forces = HMesh::VertexAttributeVector<std::vector<vec2>>(get_no_vertices(),
                                                     std::vector<vec2>(NB_FORCES, Vec2(0.0)));
+        dts = HMesh::VertexAttributeVector<double>(get_no_vertices(), 0.0);
         node_att_i = HMesh::VertexAttributeVector<std::vector<int>>(get_no_vertices(),
                                                     std::vector<int>(NB_FORCES, 0) );
         
@@ -86,6 +87,7 @@ namespace DSC2D
         destination.cleanup(cleanup_map.vmap);
         internal_node_forces.cleanup(cleanup_map.vmap);
         external_node_forces.cleanup(cleanup_map.vmap);
+        dts.cleanup(cleanup_map.vmap);
         
   //     node_att_i.cleanup(cleanup_map.vmap);
         forces.cleanup(cleanup_map.vmap);
@@ -252,45 +254,7 @@ namespace DSC2D
     
     DeformableSimplicialComplex * DeformableSimplicialComplex::clone(){
         DeformableSimplicialComplex * new_dsc = new DeformableSimplicialComplex;
-//        
-//        new_dsc->AVG_LENGTH = AVG_LENGTH;
-//        new_dsc->AVG_AREA = AVG_AREA;
-//        
-//        new_dsc->DEG_ANGLE = DEG_ANGLE;
-//        new_dsc->MIN_ANGLE = MIN_ANGLE;
-//        new_dsc->COS_MIN_ANGLE = COS_MIN_ANGLE;
-//        
-//        new_dsc->DEG_AREA = DEG_AREA;
-//        new_dsc->MIN_AREA = MIN_AREA;
-//        new_dsc->MAX_AREA = MAX_AREA;
-//        
-//        new_dsc->DEG_LENGTH = DEG_LENGTH;
-//        new_dsc->MIN_LENGTH = MIN_LENGTH;
-//        new_dsc->MAX_LENGTH = MAX_LENGTH;
-//        
-//        new_dsc->INTERFACE_COLOR = INTERFACE_COLOR;
-//        new_dsc->OUTSIDE_COLOR = OUTSIDE_COLOR;
-//        new_dsc->CROSSING_COLOR = CROSSING_COLOR;
-//        new_dsc->DEFAULT_COLOR = DEFAULT_COLOR;
-//        new_dsc->OUTSIDE_FACE_COLOR = OUTSIDE_FACE_COLOR;
-//        new_dsc->DEFAULT_FACE_COLOR = DEFAULT_FACE_COLOR;
-//        
-//        new_dsc->destination = destination;
-//        new_dsc->internal_node_forces = internal_node_forces;
-//        new_dsc->external_node_forces = external_node_forces;
-//        new_dsc->forces = forces;
-//        new_dsc->vertex_labels = vertex_labels;
-//        new_dsc->edge_labels = edge_labels;
-//        new_dsc->face_labels = face_labels;
-//        
-//        new_dsc->mesh = new HMesh::Manifold;
-//        new_dsc->mesh->kernel = mesh->kernel;
-//        new_dsc->mesh->positions = mesh->positions;
-//        
-//        new_dsc->design_domain = new DesignDomain;
-//        new_dsc->design_domain->corners = design_domain->corners;
-//        new_dsc->design_domain->volume = design_domain->volume;
-        
+
         return new_dsc;
     }
     
@@ -573,6 +537,11 @@ namespace DSC2D
         destination[vid] = get_pos(vid);
         internal_node_forces[vid] = vec2(0.0);
         external_node_forces[vid] = vec2(0.0);
+        
+
+        dts[vid] = default_dt;
+        
+        
         forces[vid] = std::vector<vec2>(NB_FORCES, Vec2(0.0));
     }
     
@@ -584,6 +553,13 @@ namespace DSC2D
         }
     }
     
+    void DeformableSimplicialComplex::set_default_dt(double dt_)
+    {
+        default_dt = dt_;
+        for (auto nkey : vertices()) {
+            dts[nkey] = default_dt;
+        }
+    }
     
     void DeformableSimplicialComplex::update_attributes(node_key vid, int label)
     {
@@ -716,6 +692,10 @@ namespace DSC2D
         init_attributes(newf2, get_label(f2));
         
         update_locally(vid);
+        
+        // Linear interpolation
+        dts[vid] = (dts[v1] + dts[v2])/2;
+        
         return true;
     }
     

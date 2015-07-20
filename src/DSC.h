@@ -112,6 +112,10 @@ namespace DSC2D {
         HMesh::VertexAttributeVector<vec2> external_node_forces;
         
         HMesh::VertexAttributeVector<std::vector<vec2>> forces;
+        
+        double default_dt = 0.0;
+        HMesh::VertexAttributeVector<double> dts;
+        void set_default_dt(double dt_);
 
         
         HMesh::VertexAttributeVector<int> vertex_labels;
@@ -382,6 +386,16 @@ namespace DSC2D {
         
         void add_node_force(node_key vid, vec2 f, int index){
             forces[vid][index] += f;
+        }
+        
+        /*
+         Time step
+         */
+        void set_time(node_key vid, double new_t){
+            dts[vid] = new_t;
+        };
+        double time_step(node_key const vid) const{
+            return dts[vid];
         }
         
         //************** SETTERS ***************
