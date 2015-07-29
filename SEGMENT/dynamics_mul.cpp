@@ -37,7 +37,7 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
     {
         s_img = &img;
         s_dsc = &dsc;
-        s_dsc->set_default_dt(0.1);
+        s_dsc->set_default_dt(0.01);
     }
     
     // 1. Update mean intensity
@@ -442,8 +442,6 @@ void dynamics_mul::update_dsc_explicit_whole_domain(dsc_obj &dsc, image &img){
             max[1] = std::max(max[1], p[1]);
         }
         
-
-        
         double area = s_dsc->area(*fid);
         
         for (int i = floor(min[0]); i < ceil(max[0]); i++) {
@@ -758,6 +756,52 @@ void dynamics_mul::update_dsc_explicit_whole_domain(dsc_obj &dsc, image &img){
     
     printf("Max move: %f \n", max_move);
 }
+
+bool dynamics_mul::energy_with_location(double &E, Node_key nkey , Vec2 displace, double * real_dis)
+{
+    
+    // double ep = 1e-5;
+    
+    // Check if it move out of the star
+    Vec2 cur_pos = s_dsc->get_pos(nkey);
+    E = 0.;
+    //    if((displace.length() < ep) or
+    //       s_dsc->intersection_with_link(nkey, cur_pos + displace) < 1.0)
+    if(1) // Error check later
+    {
+        
+        double length = 0.0;
+        double differ = 0.0;
+        
+        for(auto hew = s_dsc->walker(nkey); !hew.full_circle(); hew = hew.circulate_vertex_cw()){
+            
+            if (s_dsc->is_interface(hew.halfedge())) {
+                length += (s_dsc->get_pos(hew.vertex()) - (cur_pos + displace)).length();
+            }
+            
+            Vec2_array tris;
+            tris.push_back(cur_pos + displace);
+            tris.push_back(s_dsc->get_pos(hew.vertex()));
+            tris.push_back(s_dsc->get_pos(hew.next().vertex()));
+            int total_pixel = 0;
+            double total_differ = 0.0;
+            double ci = mean_inten_[s_dsc->get_label(hew.face())];
+            s_img->get_tri_differ(tris, &total_pixel, &total_differ, ci);
+            
+            differ += total_differ;
+        }
+        
+        E += differ*g_param.beta + length*g_param.alpha;
+        return true;
+        
+    }else{
+        // TODO: Too large movement
+        assert(0);
+        return false;
+    }
+}
+
+
 
 void dynamics_mul::optimize_phase(){
     int nb_phase = (int)mean_inten_.size();
@@ -1285,7 +1329,8 @@ double dynamics_mul::energy_gradient_by_moving_distance(dsc_obj *obj,
     // 3. Curvature
     double dEl = gradient_length(obj);
     
-    std::cout << dEu << "  " << dEg << " " << dEl << " | u-grad; image-frad; length-grad" << std::endl;
+    std::cout << dEu << "  " << dEg << " " << dEl
+                << " | u-grad; image-frad; length-grad" << std::endl;
     
     return dEu + dEl + dEg;
 }
@@ -1599,7 +1644,7 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
         
         double differ = 1.0; // std::atan(d/1) * 2 / PI_V1;
         
-        double n_dt = s_dsc->time_step(*ni);
+        double n_dt = 0.005;//s_dsc->time_step(*ni);
 
         if ((obj->is_interface(*ni) or obj->is_crossing(*ni)))
         {
@@ -1731,7 +1776,7 @@ void dynamics_mul::compute_intensity_force(){
                 double I = s_img->get_intensity_f(p[0], p[1]);
                 
                 // Normalize force
-                int normalizedF = 3;
+                int normalizedF = 1;
                 double f ;
                 switch (normalizedF) {
                     case 1:
@@ -1769,6 +1814,40 @@ void dynamics_mul::compute_intensity_force(){
             touched[hew.opp().halfedge()] = 1;
         }
     }
+    
+//    // Check the gradient value
+//    for (auto nkey : s_dsc->vertices())
+//    {
+//        if (s_dsc->is_interface(nkey)
+//            or s_dsc->is_crossing(nkey))
+//        {
+//            auto grad = -s_dsc->get_node_external_force(nkey);
+//            double dt_ = s_dsc->time_step(nkey);
+//            auto dis = -grad*dt_;
+//            
+//            double predict_dE = CGLA::dot(grad, dis);
+//            
+//            double E0, E1;
+//            energy_with_location(E0, nkey, Vec2(0.0));
+//            energy_with_location(E1, nkey, dis);
+//            
+//            double beta = 0.8;
+//            if (E1 - E0 > predict_dE/2) {
+//                
+//                double pre_t = s_dsc->time_step(nkey);
+//                
+//                s_dsc->set_time(nkey, beta*s_dsc->time_step(nkey));
+//                
+//                cout << "Node: " <<(int)nkey.get_index() << "; dE = " << E1 - E0
+//                << "; predict: " << predict_dE << "t = " << pre_t
+//                << " -- reduced dt = " << s_dsc->time_step(nkey) << endl;
+//            }else{
+//                cout<<"Node: " <<(int)nkey.get_index() << "; dE = " << E1 - E0
+//                    << "; predict: " << predict_dE << endl;
+//            }
+//        }
+//    }
+//    cout << "=======================\n";
 }
 
 double dynamics_mul::star_energy(Node_key nid, Vec2 new_pos){

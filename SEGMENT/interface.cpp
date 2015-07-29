@@ -329,6 +329,11 @@ void interface::draw()
         draw_edge_energy();
     }
     
+    if(options_disp::get_option("Vertices index", false)){
+        glColor3f(1, 0, 0);
+        Painter::draw_vertices_index(*dsc);
+    }
+    
     if(options_disp::get_option("Edge index", false)){
         glColor3f(1, 0, 0);
         // Painter::draw_vertices_index(*dsc);
@@ -339,6 +344,12 @@ void interface::draw()
     if (options_disp::get_option("Face index")){
         Painter::draw_faces_index(*dsc);
     }
+    
+    if (options_disp::get_option("Node external force")) {
+        Painter::draw_external_force(*dsc);
+    }
+    
+    
     
     gl_debug_helper::draw();
     
@@ -380,6 +391,8 @@ void interface::draw_edge_energy(){
         auto hew = dsc->walker(ekey);
         
         double ev = intensity[hew.face()] + intensity[hew.opp().face()];
+        ev = ev / std::pow(g_param.mean_intensity[dsc->get_label(hew.face())]
+                           - g_param.mean_intensity[dsc->get_label(hew.opp().face())], 2);
         //  ev = ev / dsc.length(ekey);
         
         auto tris = dsc->get_pos(ekey);
@@ -633,8 +646,10 @@ void interface::init_boundary(){
 }
 
 void interface:: dynamics_image_seg(){
+    // Old approach
     dyn_->update_dsc(*dsc, *image_);
     
+    // Virtual displacement
 //    static dyn_integral dyn;
 //    dyn.update_dsc(*dsc, *image_);
 

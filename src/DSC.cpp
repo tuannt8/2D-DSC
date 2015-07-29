@@ -539,7 +539,10 @@ namespace DSC2D
         external_node_forces[vid] = vec2(0.0);
         
 
-        dts[vid] = default_dt;
+//        if (is_interface(vid)) {
+//            std::cout << "Reinit node " << (int)vid.get_index() << "\n";
+//        }
+//        dts[vid] = default_dt;
         
         
         forces[vid] = std::vector<vec2>(NB_FORCES, Vec2(0.0));

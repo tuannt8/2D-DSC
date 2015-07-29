@@ -21,7 +21,7 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     dsc_ = & dsc;
     
     // Face total variation
-    double thread = 0.02; // Potential for face splitting and relabeling
+    double thread = 0.014; // Potential for face splitting and relabeling
     HMesh::FaceAttributeVector<double> intensity(dsc_->get_no_faces(), 0);
     std::vector<Face_key> to_split;
     for (auto fkey : dsc_->faces())
@@ -40,7 +40,7 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     }
     
     // Split high energy face
-    double flip_thres = 0.05;
+    double flip_thres = 0.03;
     for (auto fkey : to_split)
     {
         if (intensity[fkey] > flip_thres) {
@@ -96,7 +96,8 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
         intensity[fkey] = sum;
     }
     
-    double thres = 0.08;
+    double thres = 0.4;
+    double sortest_e = 10;
     
     std::vector<edge_s_e> edges;
     for(auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei)
@@ -108,10 +109,12 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
                and dsc.get_label(hew.face()) < dsc.get_label(hew.opp().face()))
             {
                 double ev = intensity[hew.face()] + intensity[hew.opp().face()];
-                //  ev = ev / dsc.length(ekey);
+                ev = ev / std::pow(g_param.mean_intensity[dsc.get_label(hew.face())]
+                           - g_param.mean_intensity[dsc.get_label(hew.opp().face())], 2);
+                
                 
                 if (ev > thres
-                    and dsc.length(*hei) > 5)
+                    and dsc.length(*hei) > sortest_e)
                 {
                     edges.push_back(edge_s_e(*hei, dsc_->length(*hei)));
                 }

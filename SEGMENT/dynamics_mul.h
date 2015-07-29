@@ -125,6 +125,9 @@ private:
     Vec2 get_vertex_norm(dsc_obj *obj, HMesh::Walker hew);
     HMesh::Walker pre_edge(dsc_obj *obj, HMesh::Walker hew);
     HMesh::Walker next_edge(dsc_obj *obj, HMesh::Walker hew);
+    
+    // Energy within a star of the node
+    bool energy_with_location(double &E, Node_key nkey , Vec2 displace, double * real_dis = nullptr);
 };
 
 #endif /* defined(__DSC__dynamics_mul__) */
