@@ -22,7 +22,7 @@
 #endif
 
 
-#define NOISE 40
+#define NOISE 20
 #define BLUR 5.0
 
 void image::load_image(std::string const file_path){
@@ -33,7 +33,7 @@ void image::load_image(std::string const file_path){
 //    printf("Image %d change \n", this->spectrum());
 
    
-//    blur(BLUR);
+    blur(BLUR);
     noise(NOISE);
 
     set_gl_texture();

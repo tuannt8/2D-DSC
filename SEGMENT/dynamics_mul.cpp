@@ -1637,14 +1637,14 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
     double max_move = 0.0;
     double el = obj->get_avg_edge_length();
     for (auto ni = obj->vertices_begin(); ni != obj->vertices_end(); ni++) {
-        Vec2 dis = (obj->get_node_internal_force(*ni) * 0.01
+        Vec2 dis = (obj->get_node_internal_force(*ni) * 0.1
                     + obj->get_node_external_force(*ni));
         
         double d = obj->get_node_force(*ni, STAR_DIFFER)[0];
         
         double differ = 1.0; // std::atan(d/1) * 2 / PI_V1;
         
-        double n_dt = 0.005;//s_dsc->time_step(*ni);
+        double n_dt = 0.05;//s_dsc->time_step(*ni);
 
         if ((obj->is_interface(*ni) or obj->is_crossing(*ni)))
         {

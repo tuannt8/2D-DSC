@@ -21,7 +21,7 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     dsc_ = & dsc;
     
     // Face total variation
-    double thread = 0.014; // Potential for face splitting and relabeling
+    double thread = 0.01; // Potential for face splitting and relabeling
     HMesh::FaceAttributeVector<double> intensity(dsc_->get_no_faces(), 0);
     std::vector<Face_key> to_split;
     for (auto fkey : dsc_->faces())
@@ -40,7 +40,7 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     }
     
     // Split high energy face
-    double flip_thres = 0.03;
+    double flip_thres = 0.02;
     for (auto fkey : to_split)
     {
         if (intensity[fkey] > flip_thres) {
@@ -80,52 +80,115 @@ struct edge_s_e
 
 void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
 {
-    dsc_ = & dsc;
-    
-    // Face total variation
-    HMesh::FaceAttributeVector<double> intensity(dsc.get_no_faces(), 0);
-    for (auto fkey : dsc.faces())
+    if(0)
     {
-        auto tris = dsc.get_pos(fkey);
-//        auto sum = img.get_sum_on_tri_variation(tris, 2);
+        dsc_ = & dsc;
         
-        auto area = dsc.area(fkey);
-        double ci = g_param.mean_intensity[dsc.get_label(fkey)];
-        double sum = img.get_tri_differ(tris, ci).total_differ / area;
+        // Face total variation
+        HMesh::FaceAttributeVector<double> intensity(dsc.get_no_faces(), 0);
+        for (auto fkey : dsc.faces())
+        {
+            auto tris = dsc.get_pos(fkey);
+    //        auto sum = img.get_sum_on_tri_variation(tris, 2);
+            
+            auto area = dsc.area(fkey);
+            double ci = g_param.mean_intensity[dsc.get_label(fkey)];
+            double sum = img.get_tri_differ(tris, ci).total_differ / area;
+            
+            intensity[fkey] = sum;
+        }
         
-        intensity[fkey] = sum;
+        double thres = 0.04;
+        double sortest_e = 10;
+        
+        std::vector<edge_s_e> edges;
+        for(auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei)
+        {
+            if (dsc.is_interface(*hei))
+            {
+                auto hew = dsc.walker(*hei);
+                if(dsc.is_movable(*hei)
+                   and dsc.get_label(hew.face()) < dsc.get_label(hew.opp().face()))
+                {
+                    double ev = intensity[hew.face()] + intensity[hew.opp().face()];
+                    ev = ev / std::pow(g_param.mean_intensity[dsc.get_label(hew.face())]
+                               - g_param.mean_intensity[dsc.get_label(hew.opp().face())], 2);
+                    
+                    
+                    if (ev > thres
+                        and dsc.length(*hei) > sortest_e)
+                    {
+                        edges.push_back(edge_s_e(*hei, dsc_->length(*hei)));
+                    }
+                }
+            }
+        }
+        
+        // Split long edge fist
+        for (auto e: edges)
+        {
+            dsc_->split(e.ekey);
+        }
     }
     
-    double thres = 0.4;
-    double sortest_e = 10;
+    if(1)
+    {
+    double thres = 0.12;
     
-    std::vector<edge_s_e> edges;
+    std::vector<Edge_key> edges;
     for(auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei)
     {
-        if (dsc.is_interface(*hei))
-        {
+        if (dsc.is_interface(*hei)) {
             auto hew = dsc.walker(*hei);
             if(dsc.is_movable(*hei)
                and dsc.get_label(hew.face()) < dsc.get_label(hew.opp().face()))
             {
-                double ev = intensity[hew.face()] + intensity[hew.opp().face()];
-                ev = ev / std::pow(g_param.mean_intensity[dsc.get_label(hew.face())]
-                           - g_param.mean_intensity[dsc.get_label(hew.opp().face())], 2);
-                
-                
-                if (ev > thres
-                    and dsc.length(*hei) > sortest_e)
-                {
-                    edges.push_back(edge_s_e(*hei, dsc_->length(*hei)));
-                }
+                edges.push_back(*hei);
             }
         }
     }
     
-    // Split long edge fist
-    for (auto e: edges)
-    {
-        dsc_->split(e.ekey);
+    auto mean_inten_ = g_param.mean_intensity;
+    
+    for (auto ekey : edges){
+        auto hew = dsc.walker(ekey);
+        
+        double ev = 0;
+        double c0 = mean_inten_[dsc.get_label(hew.face())];
+        double c1 = mean_inten_[dsc.get_label(hew.opp().face())];
+        
+        // Loop on the edge
+        auto p0 = dsc.get_pos(hew.opp().vertex());
+        auto p1 = dsc.get_pos(hew.vertex());
+//        int length = (int)(p1 - p0).length();
+//        for (int i = 0; i <= length; i++) {
+//            auto p = p0 + (p1 - p0)*(double(i)/(double)length);
+//            double I = img.get_intensity_f(p[0], p[1]);
+//            
+//            // Normalize force
+//            double f = (2*I - c0 - c1) / (c0-c1);
+//            
+//            ev += std::abs(f);
+//        }
+        double length = (p1 - p0).length();
+        int N = (int)length;
+        double dl = length/(double)N;
+        for (int i = 0; i <= N; i++) {
+            auto p = p0 + (p1 - p0)*(i/(double)N)*dl;
+            double I = img.get_intensity_f(p[0], p[1]);
+            
+            // Normalize force
+            double f = (2*I - c0 - c1) / (c0-c1);
+            
+            ev += std::abs(f)*dl;
+        }
+        
+        ev = ev / (length + 5);
+        
+        if (ev > thres) {
+            dsc.split(ekey);
+        }
+    }
     }
 }
 

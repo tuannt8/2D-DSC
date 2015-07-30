@@ -359,47 +359,122 @@ void interface::draw()
 }
 
 void interface::draw_edge_energy(){
-    // Face total variation
-    HMesh::FaceAttributeVector<double> intensity(dsc->get_no_faces(), 0);
-    for (auto fkey : dsc->faces()){
-        auto tris = dsc->get_pos(fkey);
-        // auto sum = img.get_sum_on_tri_variation(tris, 2);
-        
-        auto area = dsc->area(fkey);
-        double ci = g_param.mean_intensity[dsc->get_label(fkey)];
-        double sum = image_->get_tri_differ(tris, ci).total_differ / area;
-        
-        intensity[fkey] = sum;
-    }
     
-    std::vector<Edge_key> edges;
-    for(auto hei = dsc->halfedges_begin(); hei != dsc->halfedges_end(); ++hei)
+    // By face energy
+    if (0)
     {
-        if (dsc->is_interface(*hei)) {
-            auto hew = dsc->walker(*hei);
-            if(dsc->is_movable(*hei)
-               and dsc->get_label(hew.face()) < dsc->get_label(hew.opp().face()))
-            {
-                edges.push_back(*hei);
+        // Face total variation
+        HMesh::FaceAttributeVector<double> intensity(dsc->get_no_faces(), 0);
+        for (auto fkey : dsc->faces()){
+            auto tris = dsc->get_pos(fkey);
+            // auto sum = img.get_sum_on_tri_variation(tris, 2);
+            
+            auto area = dsc->area(fkey);
+            double ci = g_param.mean_intensity[dsc->get_label(fkey)];
+            double sum = image_->get_tri_differ(tris, ci).total_differ / area;
+            
+            intensity[fkey] = sum;
+        }
+        
+        std::vector<Edge_key> edges;
+        for(auto hei = dsc->halfedges_begin(); hei != dsc->halfedges_end(); ++hei)
+        {
+            if (dsc->is_interface(*hei)) {
+                auto hew = dsc->walker(*hei);
+                if(dsc->is_movable(*hei)
+                   and dsc->get_label(hew.face()) < dsc->get_label(hew.opp().face()))
+                {
+                    edges.push_back(*hei);
+                }
             }
+        }
+        
+        glColor3f(0, 0, 0);
+        // Edge total variation
+        for (auto ekey : edges){
+            auto hew = dsc->walker(ekey);
+            
+            double ev = intensity[hew.face()] + intensity[hew.opp().face()];
+            ev = ev / std::pow(g_param.mean_intensity[dsc->get_label(hew.face())]
+                               - g_param.mean_intensity[dsc->get_label(hew.opp().face())], 2);
+            //  ev = ev / dsc.length(ekey);
+            
+            auto tris = dsc->get_pos(ekey);
+            auto center = (tris[0] + tris[1])/2.0;
+            std::ostringstream is;
+            is << ev;
+            Painter::print_gl(center[0], center[1], is.str().c_str());
         }
     }
     
-    glColor3f(0, 0, 0);
-    // Edge total variation
-    for (auto ekey : edges){
-        auto hew = dsc->walker(ekey);
+    // By total force energy
+    if (1) {
         
-        double ev = intensity[hew.face()] + intensity[hew.opp().face()];
-        ev = ev / std::pow(g_param.mean_intensity[dsc->get_label(hew.face())]
-                           - g_param.mean_intensity[dsc->get_label(hew.opp().face())], 2);
-        //  ev = ev / dsc.length(ekey);
+        glColor3f(0, 0, 0);
         
-        auto tris = dsc->get_pos(ekey);
-        auto center = (tris[0] + tris[1])/2.0;
-        std::ostringstream is;
-        is << ev;
-        Painter::print_gl(center[0], center[1], is.str().c_str());
+        std::vector<Edge_key> edges;
+        for(auto hei = dsc->halfedges_begin(); hei != dsc->halfedges_end(); ++hei)
+        {
+            if (dsc->is_interface(*hei)) {
+                auto hew = dsc->walker(*hei);
+                if(dsc->is_movable(*hei)
+                   and dsc->get_label(hew.face()) < dsc->get_label(hew.opp().face()))
+                {
+                    edges.push_back(*hei);
+                }
+            }
+        }
+        
+        auto mean_inten_ = g_param.mean_intensity;
+        
+        for (auto ekey : edges){
+            auto hew = dsc->walker(ekey);
+            
+            double ev = 0;
+            double c0 = mean_inten_[dsc->get_label(hew.face())];
+            double c1 = mean_inten_[dsc->get_label(hew.opp().face())];
+            
+            // Loop on the edge
+            auto p0 = dsc->get_pos(hew.opp().vertex());
+            auto p1 = dsc->get_pos(hew.vertex());
+            
+            
+                double length = (p1 - p0).length();
+                int N = (int)length;
+                double dl = length/(double)N;
+                for (int i = 0; i <= N; i++) {
+                    auto p = p0 + (p1 - p0)*(i/(double)N)*dl;
+                    double I = image_->get_intensity_f(p[0], p[1]);
+                    
+                    // Normalize force
+                    double f = (2*I - c0 - c1) / (c0-c1);
+                    
+                    ev += std::abs(f)*dl;
+                }
+            
+            
+    //        ev = 0;
+    //        
+    //        int length = (int)(p1 - p0).length();
+    //        for (int i = 0; i <= length; i++) {
+    //            auto p = p0 + (p1 - p0)*(double(i)/(double)length);
+    //            double I = image_->get_intensity_f(p[0], p[1]);
+    //            
+    //            // Normalize force
+    //            double f = (2*I - c0 - c1) / (c0-c1);
+    //            
+    //            ev += std::abs(f);
+    //        }
+            
+            ev = ev / ((double)length + 5);
+            
+            // draw
+            auto tris = dsc->get_pos(ekey);
+            auto center = (tris[0] + tris[1])/2.0;
+            std::ostringstream is;
+            is << ev;
+            Painter::print_gl(center[0], center[1], is.str().c_str());
+        }
     }
 }
 
