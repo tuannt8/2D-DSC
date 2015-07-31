@@ -466,7 +466,7 @@ void interface::draw_edge_energy(){
     //            ev += std::abs(f);
     //        }
             
-            ev = ev / ((double)length + 5);
+            ev = ev / ((double)length + 10);
             
             // draw
             auto tris = dsc->get_pos(ekey);

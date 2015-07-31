@@ -133,7 +133,7 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     
     if(1)
     {
-    double thres = 0.12;
+    double thres = 0.3;
     
     std::vector<Edge_key> edges;
     for(auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei)
@@ -183,7 +183,7 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
             ev += std::abs(f)*dl;
         }
         
-        ev = ev / (length + 5);
+        ev = ev / (length + 10);
         
         if (ev > thres) {
             dsc.split(ekey);

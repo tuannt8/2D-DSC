@@ -363,9 +363,9 @@ void Painter::draw_faces_intensity(const DeformableSimplicialComplex& dsc)
         double c = g_param.mean_intensity[dsc.get_label(*fi)];
         
         glColor3f(c, c, c);
-        if (dsc.get_label(*fi) == 0) {
-            continue;
-        }
+//        if (dsc.get_label(*fi) == 0) {
+//            continue;
+//        }
         for (auto hew = dsc.walker(*fi); !hew.full_circle(); hew = hew.circulate_face_cw())
         {
             vec2 p = dsc.get_pos(hew.vertex());
