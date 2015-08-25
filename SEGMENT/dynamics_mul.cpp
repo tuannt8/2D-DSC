@@ -40,36 +40,9 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
         s_dsc->set_default_dt(0.01);
     }
     
-    // 1. Update mean intensity
-    // <phase - mean intensity>
-//    compute_mean_intensity(mean_inten_);
-    
-    // 4. Update DSC
-//    E0_ = get_total_energy(s_dsc, mean_inten_);
-//    
-//    static int iter = 0;
-//    printf("%d %f \n", iter++, E0_);
-    
-//    displace_dsc();
-    
-//    E1_ = get_total_energy(s_dsc, mean_inten_);
-//
-//    if (dE_0_ < 0.) {
-//        double ee = E0_ - E1_;
-//        double gap = -1./2.*dE_0_/(E1_ - E0_ - dE_0_);
-//        
-//        if(gap < 0){
-//            // The prediction is so incorrect
-//            // Energy reduce more than expected
-//            
-//        }
-//        else if(gap < 1)
-//            dt = dt*gap;
-//
-//        printf("dt = %f \n", dt);
-//    }
-    
  //   optimize_phase();
+    
+    helper_t::start_timer();
     
     // 4. Update DSC
     displace_dsc();
@@ -87,6 +60,20 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
     compute_curvature_force();
     
 //    compute_difference();
+    
+    double t = helper_t::get_time_and_start();
+
+//    static int it = 0;
+//    std::cout << it++ << "\n";
+    
+//    static int nb_spli = 0;
+//    if (nb_spli < 10) {
+//        std::cout << s_dsc->get_no_faces() <<" " << t << "\n";
+//        
+//        for (auto fkey : s_dsc->faces()) {
+//            s_dsc->split(fkey);
+//        }
+//    }
 }
 void dynamics_mul::compute_difference()
 {
@@ -1644,7 +1631,7 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
         
         double differ = 1.0; // std::atan(d/1) * 2 / PI_V1;
         
-        double n_dt = 0.05;//s_dsc->time_step(*ni);
+        double n_dt = 0.01;//s_dsc->time_step(*ni);
 
         if ((obj->is_interface(*ni) or obj->is_crossing(*ni)))
         {

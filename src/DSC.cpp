@@ -35,14 +35,14 @@ namespace DSC2D
         DEG_ANGLE = 0.2*MIN_ANGLE;
         
         MAX_LENGTH = 2.;
-        MIN_LENGTH = 0.05;// 0.5;
+        MIN_LENGTH = 0.5;// 0.01;// 0.05 // 0.5;
         DEG_LENGTH = 0.2*MIN_LENGTH;
         
         MAX_AREA = 5.;
 #ifdef TUAN_SEG
         MIN_AREA = 2.;
 #else
-        MIN_AREA = 0.01;// 0.2;
+        MIN_AREA = 0.2; // 0.001;//0.01;// 0.2;
 #endif
         DEG_AREA = 0.2*MIN_AREA;
         

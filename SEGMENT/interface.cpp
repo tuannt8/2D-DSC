@@ -303,6 +303,8 @@ void interface::draw()
     if (options_disp::get_option("Image", true)) {
         image_->draw_image(WIN_SIZE_X);
     }
+    else
+        glColor3f(0.4, 0.4, 0.4);
     
     if (options_disp::get_option("DSC faces", true) and dsc) {
         Painter::draw_faces(*dsc);
@@ -314,6 +316,10 @@ void interface::draw()
         image_->draw_grad(WIN_SIZE_X);
     }
     
+    if (options_disp::get_option("Face intensity", false) and dsc) {
+        Painter::draw_faces_intensity(*dsc);
+    }
+    
     if (options_disp::get_option("Edge and vertices ", true) and dsc) {
         glColor3f(1, 0.4, 0.3);
         Painter::draw_edges(*dsc);
@@ -321,9 +327,7 @@ void interface::draw()
         Painter::draw_vertices(*dsc);
     }
     
-    if (options_disp::get_option("Face intensity", false) and dsc) {
-        Painter::draw_faces_intensity(*dsc);
-    }
+
     
     if(options_disp::get_option("Edge energy", false)){
         draw_edge_energy();
@@ -678,7 +682,7 @@ void interface::init_dsc(){
     dsc->img = &*image_;
 #endif
     
-    printf("Average edge length: %f \n", dsc->get_avg_edge_length());
+    printf("Average edge length: %f ; # faces: %d\n", dsc->get_avg_edge_length(), dsc->get_no_faces());
 }
 
 void interface::thres_hold_init(){

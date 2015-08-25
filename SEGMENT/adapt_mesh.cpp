@@ -133,7 +133,7 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     
     if(1)
     {
-    double thres = 0.3;
+    double thres = 0.4;
     
     std::vector<Edge_key> edges;
     for(auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei)
@@ -160,16 +160,7 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
         // Loop on the edge
         auto p0 = dsc.get_pos(hew.opp().vertex());
         auto p1 = dsc.get_pos(hew.vertex());
-//        int length = (int)(p1 - p0).length();
-//        for (int i = 0; i <= length; i++) {
-//            auto p = p0 + (p1 - p0)*(double(i)/(double)length);
-//            double I = img.get_intensity_f(p[0], p[1]);
-//            
-//            // Normalize force
-//            double f = (2*I - c0 - c1) / (c0-c1);
-//            
-//            ev += std::abs(f);
-//        }
+
         double length = (p1 - p0).length();
         int N = (int)length;
         double dl = length/(double)N;

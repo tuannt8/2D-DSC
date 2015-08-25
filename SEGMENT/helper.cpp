@@ -58,8 +58,8 @@ namespace helper_t {
             Vec3(1,0,0)     // red
             ,Vec3(0,1,0)    // green
             , Vec3(0,0,1)  // Blue
-            , Vec3(1, 1, 0)
-            , Vec3(1, 0, 1)
+            , Vec3(1, 1, 0) // yellow
+            , Vec3(1, 0, 1) // pink
             , Vec3(0, 1, 1)
             , Vec3(0.3, 0.3, 0.3)
         };
