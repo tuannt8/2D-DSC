@@ -42,7 +42,7 @@ namespace DSC2D
 #ifdef TUAN_SEG
         MIN_AREA = 2.;
 #else
-        MIN_AREA = 0.2; // 0.001;//0.01;// 0.2;
+        MIN_AREA =  0.2; //0.001;//0.01;// 0.2;
 #endif
         DEG_AREA = 0.2*MIN_AREA;
         

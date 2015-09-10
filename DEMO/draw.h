@@ -26,7 +26,7 @@
 const static double POINT_SIZE = 0.05;
 const static double LINE_WIDTH = 0.03;
 
-const static DSC2D::vec3 BACKGROUND_COLOR = DSC2D::vec3(1.0);//DSC2D::vec3(0.7);
+const static DSC2D::vec3 BACKGROUND_COLOR = DSC2D::vec3(0.7); // DSC2D::vec3(1.0);
 const static DSC2D::vec3 INVISIBLE = DSC2D::vec3(-1.);
 const static DSC2D::vec3 DARK_RED = DSC2D::vec3(0.66,0.11,0.15);
 const static DSC2D::vec3 RED = DSC2D::vec3(0.96,0.11,0.15);
@@ -96,6 +96,7 @@ public:
      */
     static void draw_faces(const DSC2D::DeformableSimplicialComplex& complex);
     static void draw_faces_index(const DSC2D::DeformableSimplicialComplex& complex);
+    // Draw faces with color from phase intensity
     static void draw_faces_intensity(const DSC2D::DeformableSimplicialComplex& complex);
     /**
      Draws the faces with the colors given as input.

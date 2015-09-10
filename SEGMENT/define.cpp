@@ -38,6 +38,15 @@ std::string IMAGE_NAME = "mm.bmp";
 double DISCRETIZE_RES = 10;//11.0
 
 /************************/
+/* square.bmp
+ */
+#elif defined BRAIN_PNG
+dynamics_param g_param(0.1,1,0.01);
+
+std::string IMAGE_NAME = "brain.png";
+double DISCRETIZE_RES = 40;//11.0
+
+/************************/
 /* test.bmp
  */
 #elif defined TEST_BMP
@@ -47,7 +56,7 @@ dynamics_param g_param(0.1, // alpha
                        );
 
 std::string IMAGE_NAME = "test.png";
-double DISCRETIZE_RES = 6;//11.0
+double DISCRETIZE_RES = 30.0;//11.0
 
 /************************/
 /* test.bmp

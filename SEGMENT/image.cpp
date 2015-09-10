@@ -22,7 +22,7 @@
 #endif
 
 
-#define NOISE 20
+#define NOISE 10
 #define BLUR 5.0
 
 void image::load_image(std::string const file_path){
@@ -32,9 +32,9 @@ void image::load_image(std::string const file_path){
 
 //    printf("Image %d change \n", this->spectrum());
 
-   
-    blur(BLUR);
-    noise(NOISE);
+//   
+//    blur(BLUR);
+//    noise(NOISE);
 
     set_gl_texture();
     compute_gradient();
@@ -487,6 +487,7 @@ void image::set_gl_texture() {
     
     BYTE* texture_buf = (BYTE*)malloc( width()* height() * 3 * sizeof(BYTE));
     BYTE* ptr = texture_buf;
+    
     for (int j = 0; j < height(); ++j) {
     for (int i = 0; i < width(); ++i) {
             *(ptr++) = (*this)(i,j, 0);

@@ -1631,7 +1631,7 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
         
         double differ = 1.0; // std::atan(d/1) * 2 / PI_V1;
         
-        double n_dt = 0.01;//s_dsc->time_step(*ni);
+        double n_dt = 0.03;//s_dsc->time_step(*ni);
 
         if ((obj->is_interface(*ni) or obj->is_crossing(*ni)))
         {

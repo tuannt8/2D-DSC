@@ -647,6 +647,8 @@ interface::interface(int &argc, char** argv){
 //    init_sqaure_boundary();
 //   init_boundary();
     
+//    init_boundary_brain();
+    
     reshape(WIN_SIZE_X, WIN_SIZE_Y);
     display();
 }
@@ -662,12 +664,6 @@ void interface::init_dsc(){
     
     width -= 2*DISCRETIZATION;
     height -= 2*DISCRETIZATION;
-    
-//    int width = 600;
-//    int height = 400;
-//    DISCRETIZATION = 100;
-    
-    
     
     std::vector<real> points;
     std::vector<int> faces;
@@ -724,14 +720,57 @@ void interface::init_boundary(){
     ObjectGenerator::label_tris(*dsc, faceKeys, 1);
 }
 
-void interface:: dynamics_image_seg(){
+void interface::dynamics_image_seg(){
     // Old approach
+    // Edge-based force
     dyn_->update_dsc(*dsc, *image_);
     
     // Virtual displacement
+    // Compute energy change with assumed movement
 //    static dyn_integral dyn;
 //    dyn.update_dsc(*dsc, *image_);
 
 //    static dynamics_edge dyn;
 //    dyn.update_dsc(*dsc, *image_);
+}
+
+int closest(std::vector<double> & array, double v){
+    
+    int idx = -1;
+    double smallest = INFINITY;
+    
+    for (int i = 0; i < array.size(); i++) {
+        double dis = std::abs(v - array[i]);
+        if (dis < smallest) {
+            smallest = dis;
+            idx = i;
+        }
+    }
+    
+    return idx;
+}
+
+void interface::init_boundary_brain(){
+    // Threshold initialization
+    std::vector<double> threshold = {0.0, 70./255., 77./255.};
+    
+    std::vector<vector<Face_key>> labels_list;
+    labels_list.resize(threshold.size());
+    
+    for (auto fkey : dsc->faces()) {
+        auto pts = dsc->get_pos(fkey);
+        double area;
+        double inten = image_->get_tri_intensity_f(pts, &area);
+        
+        double mean_i = inten / area;
+        
+        int idx = closest(threshold, mean_i);
+        labels_list[idx].push_back(fkey);
+    }
+    
+    
+    for (int i = 0; i < labels_list.size(); i++) {
+        ObjectGenerator::label_tris(*dsc, labels_list[i], i);
+        std::cout << labels_list[i].size() << " in phase " << i << std::endl;
+    }
 }
