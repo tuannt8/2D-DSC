@@ -56,8 +56,6 @@ private:
     std::map<int, double> mean_inten_;
     std::map<int, double> alpha_map_;
 
-    std::map<int, double> total_inten_;
-    std::map<int, int> total_pixel;
     
     // Adaptive dt
     double E0_ = 0.0, E1_ = 0.0, dE_0_ = 0., dE2 = 0.;
@@ -98,6 +96,9 @@ public:
     void debug_optimum_dt_2();
     
     void optimize_phase();
+    
+    // Phase relabeling with small variant condition
+    void optimize_phase_with_variant();
     
     double furthest_move(Node_key nid, Vec2 direction);
     double energy_change(Node_key nid, Vec2 new_pos);

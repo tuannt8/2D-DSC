@@ -327,6 +327,10 @@ void interface::draw()
         Painter::draw_vertices(*dsc);
     }
     
+    
+    if(options_disp::get_option("Triangle variation", false)){
+        draw_tri_variant();
+    }
 
     
     if(options_disp::get_option("Edge energy", false)){
@@ -360,6 +364,21 @@ void interface::draw()
     options_disp::draw(WIN_SIZE_X, WIN_SIZE_Y);
     
     Painter::end();
+}
+
+void interface::draw_tri_variant(){
+    for (auto fkey : dsc->faces()){
+        auto pts = dsc->get_pos(fkey);
+        double area;
+        double mi = image_->get_tri_intensity_f(pts, &area); mi /= area;
+        double e = image_->get_tri_differ_f(pts, mi)/area;
+        
+        auto center = (pts[0] + pts[1] + pts[2])/3.0;
+        
+        std::ostringstream is;
+        is << e;
+        Painter::print_gl(center[0], center[1], is.str().c_str());
+    }
 }
 
 void interface::draw_edge_energy(){

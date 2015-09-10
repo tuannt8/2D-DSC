@@ -56,7 +56,7 @@ dynamics_param g_param(0.1, // alpha
                        );
 
 std::string IMAGE_NAME = "test.png";
-double DISCRETIZE_RES = 30.0;//11.0
+double DISCRETIZE_RES = 8.0;//11.0
 
 /************************/
 /* test.bmp

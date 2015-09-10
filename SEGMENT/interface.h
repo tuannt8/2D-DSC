@@ -83,6 +83,7 @@ private:
 private:
     void draw_test();
     void draw_edge_energy();
+    void draw_tri_variant();
     
     void load_dsc();
     void back_up_dsc();

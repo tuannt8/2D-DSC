@@ -112,7 +112,7 @@ double image::get_intensity_f(double x, double y){
     if (x < 0 or x > width()
         or y < 0 or y > height())
     {
-        std::cout << "Out of image '\n";
+        std::cout << "Out of image [" << x << ", " << y << "]\n";
         return 0;
     }
     
@@ -152,19 +152,48 @@ double image::get_tri_intensity_f(Vec2_array tris, double * area_in){
     double step = 1.0/(double)res;
     
     double inten = 0.0;
-    for (double ep1 = step/2.0; ep1 < 1.0; ep1 += step){
-        for(double ep2 = 1 - ep1 - step/2.0; ep2 > 0; ep2 -= step){
-            double ep3 = 1 - ep1 - ep2;
-            Vec2 pt = tris[0]*ep1 + tris[1]*ep2 + tris[2]*ep3;
-            inten += get_intensity_f(pt[0], pt[1]);
+    
+    for (int i = 0; i < res; i++) {
+        double s1 = i*step;
+        for (int j = res - i; j > 0; j--) {
+            double s2 = j*step;
+            
+            // Triangle 1
+            {
+                double ep1 = s1 + step/3.0;
+                double ep2 = s2 - step*2.0/3.;
+                double ep3 = 1 - ep1 - ep2;
+                Vec2 pt = tris[0]*ep1 + tris[1]*ep2 + tris[2]*ep3;
+                inten += get_intensity_f(pt[0], pt[1]);
+            }
+            // Triangle 2
+            {
+                double ep1 = s1 + step*2/3;
+                double ep2 = s2 - step*4/3;
+                if (ep2 > 0) {
+                    double ep3 = 1 - ep1 - ep2;
+                    Vec2 pt = tris[0]*ep1 + tris[1]*ep2 + tris[2]*ep3;
+                    inten += get_intensity_f(pt[0], pt[1]);
+
+                }
+            }
+            
         }
-        
     }
+//    for (double ep1 = step/2.0; ep1 < 1.0; ep1 += step){
+//        for(double ep2 = 1 - ep1 - step/2.0; ep2 > 0; ep2 -= step){
+//            double ep3 = 1 - ep1 - ep2;
+//            Vec2 pt = tris[0]*ep1 + tris[1]*ep2 + tris[2]*ep3;
+//            inten += get_intensity_f(pt[0], pt[1]);
+//        }
+//        
+//    }
     
     if (area_in) {
         *area_in = area;
     }
-    return inten;
+    
+    return inten * area / (double)(res*res);
 }
 
 void image::get_tri_intensity(Vec2_array tris, int * total_pixel, double * total_intensity){
@@ -514,14 +543,34 @@ double image::get_tri_differ_f(Vec2_array tris, double ci) {
     double step = 1.0/(double)res;
 
     double energy = 0.0;
-    for (double ep1 = step/2.0; ep1 < 1.0; ep1 += step){
-        for(double ep2 = 1 - ep1 - step/2.0; ep2 > 0; ep2 -= step){
-            double ep3 = 1 - ep1 - ep2;
-            Vec2 pt = tris[0]*ep1 + tris[1]*ep2 + tris[2]*ep3;
-            double g = get_intensity_f(pt[0], pt[1]);
-            energy += (g - ci)*(g - ci);
+    
+    for (int i = 0; i < res; i++) {
+        double s1 = i*step;
+        for (int j = res - i; j > 0; j--) {
+            double s2 = j*step;
+            
+            // Triangle 1
+            {
+                double ep1 = s1 + step/3.0;
+                double ep2 = s2 - step*2.0/3.;
+                double ep3 = 1 - ep1 - ep2;
+                Vec2 pt = tris[0]*ep1 + tris[1]*ep2 + tris[2]*ep3;
+                double g = get_intensity_f(pt[0], pt[1]);
+                energy += (g - ci)*(g - ci);
+            }
+            // Triangle 2
+            {
+                double ep1 = s1 + step*2/3;
+                double ep2 = s2 - step*4/3;
+                if (ep2 > 0) {
+                    double ep3 = 1 - ep1 - ep2;
+                    Vec2 pt = tris[0]*ep1 + tris[1]*ep2 + tris[2]*ep3;
+                    double g = get_intensity_f(pt[0], pt[1]);
+                    energy += (g - ci)*(g - ci);
+                }
+            }
+            
         }
-
     }
 
     return energy * area / (double)(res*res);

@@ -51,10 +51,14 @@ public:
     // double: 0 - 1.0
     double get_intensity(int x, int y);
     
+    /**
     // Interpolate intensity to smooth function
     /// Computation base on its 4 neighbor pixel
+     */
     double get_intensity_f(double x, double y);
+    // get \int (g - ci)^2 d\Omega
     double get_tri_differ_f(Vec2_array tris, double ci);
+    // \int g d\Omega
     double get_tri_intensity_f(Vec2_array tris, double * area = nullptr);
 
     double get_sum_gradient_tri(Vec2_array tris, double * area = nullptr);

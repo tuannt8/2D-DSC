@@ -47,6 +47,8 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
     // 4. Update DSC
     displace_dsc();
     
+    optimize_phase_with_variant();
+    
     compute_mean_intensity(mean_inten_);
     
   //  compute_mean_intensity(mean_inten_);
@@ -788,7 +790,43 @@ bool dynamics_mul::energy_with_location(double &E, Node_key nkey , Vec2 displace
     }
 }
 
-
+void dynamics_mul::optimize_phase_with_variant(){
+    
+    // First loop. Phase intensity have not computed
+    if (mean_inten_.size() == 0) {
+        compute_mean_intensity(mean_inten_);
+    }
+    
+    double varient_thres = 0.0001;
+    
+    // Optimize later
+    int nb_phase = (int)mean_inten_.size();
+    for (auto fkey : s_dsc->faces()){
+        auto pts = s_dsc->get_pos(fkey);
+        
+        double area;
+        double mi = s_img->get_tri_intensity_f(pts, &area); mi /= area;
+        double e = s_img->get_tri_differ_f(pts, mi);
+        
+        if (e < varient_thres) {
+            // Consider flipping phase if possible
+            double minE = INFINITY;
+            int phase_idx = -1;
+            for (int i = 0; i < nb_phase; i++) {
+                double triE = s_img->get_tri_differ_f(pts, mean_inten_[i]);
+                if (triE < minE) {
+                    minE = triE;
+                    phase_idx = i;
+                }
+            }
+            
+            if (phase_idx != (int)fkey.get_index()) {
+                // change phase
+                s_dsc->update_attributes(fkey, phase_idx);
+            }
+        }
+    }
+}
 
 void dynamics_mul::optimize_phase(){
     int nb_phase = (int)mean_inten_.size();
@@ -1650,30 +1688,35 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
 }
 
 void dynamics_mul::compute_mean_intensity(std::map<int, double> & mean_inten_o){
-    std::map<int, int> num_pixel_array;
+
+    std::map<int, double> total_inten_;
+    std::map<int, double> total_area;
+    
     
     for (auto fid = s_dsc->faces_begin(); fid != s_dsc->faces_end(); fid++) {
-        int num_pixel = 0;
-        double num_inten = 0.0;
+        double area = 0.0;
         
         auto tris = s_dsc->get_pos(*fid);
-        s_img->get_tri_intensity(tris, &num_pixel, &num_inten);
+        double total_inten = s_img->get_tri_intensity_f(tris, &area);
+        
         
         int phase = s_dsc->get_label(*fid);
-        if (mean_inten_o.find(phase) != mean_inten_o.end()) {//Existed
-            mean_inten_o[phase] += num_inten;
-            num_pixel_array[phase] += num_pixel;
-        }else{
-            num_pixel_array.insert(std::make_pair(phase, num_pixel));
-            mean_inten_o.insert(std::make_pair(phase, num_inten));
+        if (mean_inten_o.find(phase) != mean_inten_o.end())
+        {//Existed
+            mean_inten_o[phase] += total_inten;
+            total_area[phase] += area;
+        }
+        else
+        {
+            total_area.insert(std::make_pair(phase, area));
+            mean_inten_o.insert(std::make_pair(phase, total_inten));
         }
     }
     
-    total_inten_ = mean_inten_o;
-    total_pixel = num_pixel_array;
     
-    for (auto mit = mean_inten_o.begin(); mit != mean_inten_o.end(); mit++) {
-        mit->second /= (double)num_pixel_array[mit->first];
+    for (auto mit = mean_inten_o.begin(); mit != mean_inten_o.end(); mit++)
+    {
+        mit->second /= (double)total_area[mit->first];
     }
 }
 
