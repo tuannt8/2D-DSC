@@ -47,7 +47,7 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
     // 4. Update DSC
     displace_dsc();
     
-    optimize_phase_with_variant();
+//    optimize_phase_with_variant();
     
     compute_mean_intensity(mean_inten_);
     
@@ -1599,45 +1599,49 @@ void dynamics_mul::compute_curvature_force_implicit(){
 }
 
 void dynamics_mul::compute_curvature_force(){
-    for (auto eid = s_dsc->halfedges_begin(); eid != s_dsc->halfedges_end(); eid++) {
-
-        if (s_dsc->is_interface(*eid)) {
-            auto hew0 = s_dsc->walker(*eid);
-            
-            // Find next edge on the boundary
-            auto hew1 = hew0.next().opp();
-            while (1) {
-                if (s_dsc->is_interface(hew1.halfedge())) {
-                    hew1 = hew1.opp();
-                    break;
-                }
-                
-                hew1 = hew1.next().opp();
-            }
-            
-            assert(hew0.halfedge() != hew1.halfedge());
-            
-            Vec2 p0 = s_dsc->get_pos(hew0.vertex()) - s_dsc->get_pos(hew0.opp().vertex());
-            Vec2 p1 = s_dsc->get_pos(hew1.vertex()) - s_dsc->get_pos(hew1.opp().vertex());
-            
-            Vec2 norm0(p0[1], -p0[0]); norm0.normalize();
-            Vec2 norm1(p1[1], -p1[0]); norm1.normalize();
-            Vec2 norm = norm0 + norm1; norm.normalize();
-
-#ifdef DEBUG
-            assert(norm.length() < 1.1 and norm.length() > 0.9);
-#endif
-            
-            
-            double l0 = p0.length();
-            double l1 = p1.length();
-            double angle = std::atan2(CGLA::cross(p0, p1), DSC2D::Util::dot(p0, p1));
-            double curvature = angle / (l0/2.0 + l1/2.0);
-            
-            s_dsc->add_node_internal_force(
-                    hew0.vertex(), -norm*curvature*s_dsc->get_avg_edge_length()*g_param.alpha);
-        }
-    }
+//    for (auto eid = s_dsc->halfedges_begin(); eid != s_dsc->halfedges_end(); eid++) {
+//
+//        if (s_dsc->is_interface(*eid)) {
+//            auto hew0 = s_dsc->walker(*eid);
+//            
+//            // Find next edge on the boundary
+//            auto hew1 = hew0.next().opp();
+//            while (1) {
+//                if (s_dsc->is_interface(hew1.halfedge())) {
+//                    hew1 = hew1.opp();
+//                    break;
+//                }
+//                
+//                hew1 = hew1.next().opp();
+//            }
+//            
+//            assert(hew0.halfedge() != hew1.halfedge());
+//            
+//            Vec2 p0 = s_dsc->get_pos(hew0.vertex()) - s_dsc->get_pos(hew0.opp().vertex());
+//            Vec2 p1 = s_dsc->get_pos(hew1.vertex()) - s_dsc->get_pos(hew1.opp().vertex());
+//            
+//            Vec2 norm0(p0[1], -p0[0]); norm0.normalize();
+//            Vec2 norm1(p1[1], -p1[0]); norm1.normalize();
+//            Vec2 norm = norm0 + norm1; norm.normalize();
+//
+//
+//            assert(norm.length() < 1.1 and norm.length() > 0.9);
+//
+//            
+//            
+//            double l0 = p0.length();
+//            double l1 = p1.length();
+//            double angle = std::atan2(CGLA::cross(p0, p1), DSC2D::Util::dot(p0, p1));
+//            double curvature = angle / (l0/2.0 + l1/2.0);
+//            
+//            assert(curvature != NAN);
+//            
+//            s_dsc->add_node_internal_force(
+//                    hew0.vertex(), -norm*curvature*s_dsc->get_avg_edge_length()*g_param.alpha);
+//        }
+//    }
+    
+    // TODO: Should follow the algorithm in the paper
 }
 
 void dynamics_mul::displace_dsc_2(){
@@ -1658,29 +1662,27 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
 
     
     double total = 0.0;
-    dE_0_ = 0.0;
-    double max_move = 0.0;
-    double el = obj->get_avg_edge_length();
+ //   dE_0_ = 0.0;
+ //   double max_move = 0.0;
+
     for (auto ni = obj->vertices_begin(); ni != obj->vertices_end(); ni++) {
         Vec2 dis = (obj->get_node_internal_force(*ni)
                     + obj->get_node_external_force(*ni));
         
-        double d = obj->get_node_force(*ni, STAR_DIFFER)[0];
+        assert(dis != NAN);
         
-        double differ = 1.0; // std::atan(d/1) * 2 / PI_V1;
-        
-        double n_dt = 0.03;//s_dsc->time_step(*ni);
+        double n_dt = 1;//s_dsc->time_step(*ni);
 
         if ((obj->is_interface(*ni) or obj->is_crossing(*ni)))
         {
-            obj->set_destination(*ni, obj->get_pos(*ni) + dis*n_dt*differ);
-            total += dis.length();
+            obj->set_destination(*ni, obj->get_pos(*ni) + dis*n_dt);
+//            total += dis.length();
+//            
+//            if (max_move < dis.length()) {
+//                max_move = dis.length();
+//            }
             
-            if (max_move < dis.length()) {
-                max_move = dis.length();
-            }
-            
-            dE_0_ += -dis.length()*dis.length()*dt;
+        //    dE_0_ += -dis.length()*dis.length()*dt;
         }
     }
     
@@ -1798,35 +1800,52 @@ void dynamics_mul::compute_intensity_force(){
             auto p0 = s_dsc->get_pos(hew.opp().vertex());
             auto p1 = s_dsc->get_pos(hew.vertex());
             
-            int length = (int)(p1 - p0).length();
+            double length = (p1 - p0).length();
+            
+            if (length < 0.001) {
+                // Avoid retouch the edge
+                cout << " Singular edge length" << endl;
+                touched[*eit] = 1;
+                touched[hew.opp().halfedge()] = 1;
+                continue;
+            }
+            
             double f0 = 0.0, f1 = 0.0;
             Vec2 fg0(0.0), fg1(0.0);
-            for (int i = 0; i <= length; i++) {
-                auto p = p0 + (p1 - p0)*(double(i)/(double)length);
+            
+            // Integrate on the edge
+            int N = (int)length;
+            if (N < 3) {
+                N = 3;
+            }
+            double dl = (double)length / (double)N;
+            for (int i = 0; i < N; i++) {
+                auto p = p0 + (p1 - p0)*((i+0.5) / N);
                 double I = s_img->get_intensity_f(p[0], p[1]);
                 
-                // Normalize force
-                int normalizedF = 1;
-                double f ;
-                switch (normalizedF) {
-                    case 1:
-                        f = ( (c0-c1)*(2*I - c0 - c1)) / ((c0-c1)*(c0-c1));
-                        break;
-                    case 2:
-                        f = ( (c0-c1)*(2*I - c0 - c1)) / std::abs((c0 - c1));
-                        break;
-                    case 3:
-                        f = (c0-c1)*(2*I - c0 - c1);
-                        break;
-                    default:
-                        f = 0.0;
-                        break;
-                }
+                double f = (2*I - c0 - c1) / (c0-c1) * dl /length;
+                assert(f != NAN);
                 
                 // Barry Centric coordinate
                 f0 += f*(p-p1).length() / (double)length;
                 f1 += f*(p-p0).length() / (double)length;
             }
+            
+//            f0 = 0.0, f1 = 0.0;
+//            for (int i = 0; i <= length; i++) {
+//                
+//                auto p = p0 + (p1 - p0)*(double(i)/(double)length);
+//                double I = s_img->get_intensity_f(p[0], p[1]);
+//                
+//                // Normalize force
+//                double f = ( (c0-c1)*(2*I - c0 - c1)) / ((c0-c1)*(c0-c1));
+//                assert(f != NAN);
+//
+//                
+//                // Barry Centric coordinate
+//                f0 += f*(p-p1).length() / (double)length;
+//                f1 += f*(p-p0).length() / (double)length;
+//            }
             
             // Set force
             Vec2 L01 = p1 - p0;
@@ -1835,6 +1854,9 @@ void dynamics_mul::compute_intensity_force(){
             
             Vec2 f_x0 = N01*f0;// - fg0;
             Vec2 f_x1 = N01*f1;// - fg1;
+            
+            assert(f0 != NAN);
+            assert(f1 != NAN);
             
             s_dsc->add_node_external_force(hew.opp().vertex(), f_x0*g_param.beta);
             s_dsc->add_node_external_force(hew.vertex(), f_x1*g_param.beta);

@@ -21,29 +21,21 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     dsc_ = & dsc;
     
     // Face total variation
-    double thread = 0.01; // Potential for face splitting and relabeling
-    HMesh::FaceAttributeVector<double> intensity(dsc_->get_no_faces(), 0);
+    // Split high energy face
+    double flip_thres = 0.01;
+    
+    HMesh::FaceAttributeVector<double> variation(dsc_->get_no_faces(), 0);
     std::vector<Face_key> to_split;
     for (auto fkey : dsc_->faces())
     {
-        auto tris = dsc_->get_pos(fkey);
-        auto area = dsc_->area(fkey);
-        double ci = g_param.mean_intensity[dsc_->get_label(fkey)];
+        auto pts = dsc_->get_pos(fkey);
+        double area;
+        double mi = img.get_tri_intensity_f(pts, &area); mi /= area;
+        double e = img.get_tri_differ_f(pts, mi)/ (area + 4);
         
-        double sum = img.get_sum_on_tri_differ(tris, ci) / area;
-        
-        intensity[fkey] = sum;
-        if (sum > thread and area > 10)
+        variation[fkey] = e;
+        if (e < flip_thres and area > 1)
         {
-            to_split.push_back(fkey);
-        }
-    }
-    
-    // Split high energy face
-    double flip_thres = 0.02;
-    for (auto fkey : to_split)
-    {
-        if (intensity[fkey] > flip_thres) {
             // Consider flipping
             int min_label = -1;
             double min_differ = INFINITY;
@@ -53,7 +45,7 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
             
             for (int i = 0; i < c_array.size(); i++) {
                 double ci = c_array[i];
-                double c_sum = img.get_sum_on_tri_differ(tris, ci) / area;
+                double c_sum = img.get_tri_differ_f(tris, ci) / area;
                 
                 if (c_sum < min_differ) {
                     min_differ = c_sum;
@@ -61,14 +53,42 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
                 }
             }
             
-     //       assert(min_label != -1 and min_label != dsc_->get_label(fkey));
-            dsc_->set_label(fkey, min_label);
+            
+            dsc_->update_attributes(fkey, min_label);
         }else{
             dsc_->split(fkey);
         }
     }
     
-    dsc_->clean_attributes();
+//
+//    for (auto fkey : to_split)
+//    {
+//        if (variation[fkey] < flip_thres) {
+//            // Consider flipping
+//            int min_label = -1;
+//            double min_differ = INFINITY;
+//            auto c_array = g_param.mean_intensity;
+//            auto tris = dsc_->get_pos(fkey);
+//            auto area = dsc_->area(fkey);
+//            
+//            for (int i = 0; i < c_array.size(); i++) {
+//                double ci = c_array[i];
+//                double c_sum = img.get_tri_differ_f(tris, ci) / area;
+//                
+//                if (c_sum < min_differ) {
+//                    min_differ = c_sum;
+//                    min_label = i;
+//                }
+//            }
+//            
+//            
+//            dsc_->update_attributes(fkey, min_label);
+//        }else{
+//            dsc_->split(fkey);
+//        }
+//    }
+    
+  //  dsc_->clean_attributes();
 }
 
 struct edge_s_e
@@ -133,7 +153,7 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     
     if(1)
     {
-    double thres = 0.4;
+    double thres = 0.35;
     
     std::vector<Edge_key> edges;
     for(auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei)
@@ -174,7 +194,7 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
             ev += std::abs(f)*dl;
         }
         
-        ev = ev / (length + 10);
+        ev = ev / (length + 3);
         
         if (ev > thres) {
             dsc.split(ekey);

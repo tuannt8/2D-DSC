@@ -24,6 +24,8 @@
 #include <iostream>
 #include <fstream>
 
+#define TETRA_PAK
+
 
 namespace DSC2D
 {    
@@ -34,17 +36,25 @@ namespace DSC2D
         COS_MIN_ANGLE = cos(MIN_ANGLE);
         DEG_ANGLE = 0.2*MIN_ANGLE;
         
+#ifdef TETRA_PAK
         MAX_LENGTH = 2.;
         MIN_LENGTH = 0.5;// 0.01;// 0.05 // 0.5;
         DEG_LENGTH = 0.2*MIN_LENGTH;
         
         MAX_AREA = 5.;
-#ifdef TUAN_SEG
-        MIN_AREA = 2.;
-#else
         MIN_AREA =  0.2; //0.001;//0.01;// 0.2;
-#endif
+        
         DEG_AREA = 0.2*MIN_AREA;
+#else
+        MAX_LENGTH = 2.;
+        MIN_LENGTH = 0.5;// 0.01;// 0.05 // 0.5;
+        DEG_LENGTH = 0.2*MIN_LENGTH;
+        
+        MAX_AREA = 5.;
+        MIN_AREA =  0.2; //0.001;//0.01;// 0.2;
+        
+        DEG_AREA = 0.2*MIN_AREA;
+#endif
         
         INTERFACE_COLOR = DARK_RED;
         CROSSING_COLOR = RED;
@@ -1424,6 +1434,17 @@ namespace DSC2D
 
     void DeformableSimplicialComplex::split_edge(DeformableSimplicialComplex::edge_key ek) {
         split(ek);
+    }
+    
+    void DeformableSimplicialComplex::increase_resolution_range(){
+        MAX_LENGTH = 2.;
+        MIN_LENGTH = MIN_LENGTH / 2.0;
+        DEG_LENGTH = 0.2*MIN_LENGTH;
+        
+        MAX_AREA = 5.;
+        MIN_AREA =  MIN_AREA / 4;
+        
+        DEG_AREA = 0.2*MIN_AREA;
     }
 
     void DeformableSimplicialComplex::clean_attributes() {

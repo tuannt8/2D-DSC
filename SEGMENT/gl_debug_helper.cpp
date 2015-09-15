@@ -179,7 +179,19 @@ void gl_debug_helper::print_debug_info_nearest(dsc_obj &complex){
     }
     
     if (LOG_FACE) {
-        
+        double nearest = INFINITY;
+        Face_key nearID;
+        for (auto fkey : complex.faces()) {
+            auto pts = complex.get_pos(fkey);
+            auto center = (pts[0] + pts[1] + pts[2])/3;
+            double dis = (pt - center).length();
+            if (dis < nearest) {
+                nearest = dis;
+                nearID = fkey;
+            }
+        }
+        double area = complex.area(nearID);
+        cout << "Face: " << nearID << ", A = " << area << endl;
     }
 }
 

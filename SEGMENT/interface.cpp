@@ -164,6 +164,9 @@ void interface::keyboard(unsigned char key, int x, int y){
         case '\t':
             Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, "./LOG");
             break;
+        case 'r':
+            dsc->increase_resolution_range();
+            break;
         case 'f': // Flipping phase
         {
             adapt_mesh am;
@@ -321,7 +324,7 @@ void interface::draw()
     }
     
     if (options_disp::get_option("Edge and vertices ", true) and dsc) {
-        glColor3f(1, 0.4, 0.3);
+        glLineWidth(0.5);
         Painter::draw_edges(*dsc);
         glColor3f(1, 0.0, 0.0);
         Painter::draw_vertices(*dsc);
@@ -371,11 +374,12 @@ void interface::draw_tri_variant(){
         auto pts = dsc->get_pos(fkey);
         double area;
         double mi = image_->get_tri_intensity_f(pts, &area); mi /= area;
-        double e = image_->get_tri_differ_f(pts, mi)/area;
+        double e = image_->get_tri_differ_f(pts, mi)/ (area + 4);
         
         auto center = (pts[0] + pts[1] + pts[2])/3.0;
         
         std::ostringstream is;
+        is.precision(3);
         is << e;
         Painter::print_gl(center[0], center[1], is.str().c_str());
     }
@@ -476,20 +480,7 @@ void interface::draw_edge_energy(){
                 }
             
             
-    //        ev = 0;
-    //        
-    //        int length = (int)(p1 - p0).length();
-    //        for (int i = 0; i <= length; i++) {
-    //            auto p = p0 + (p1 - p0)*(double(i)/(double)length);
-    //            double I = image_->get_intensity_f(p[0], p[1]);
-    //            
-    //            // Normalize force
-    //            double f = (2*I - c0 - c1) / (c0-c1);
-    //            
-    //            ev += std::abs(f);
-    //        }
-            
-            ev = ev / ((double)length + 10);
+            ev = ev / ((double)length + 3);
             
             // draw
             auto tris = dsc->get_pos(ekey);

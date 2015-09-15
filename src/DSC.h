@@ -903,6 +903,7 @@ namespace DSC2D {
 
 #pragma mark - TESTING
     public:
+        void increase_resolution_range(); // For multi resolution
         void  split_edge(edge_key ek);
         void clean_attributes();
         
