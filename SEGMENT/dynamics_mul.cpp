@@ -1688,7 +1688,7 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
         
         assert(dis != NAN);
         
-        double n_dt = 0.1;//s_dsc->time_step(*ni);
+        double n_dt = 0.4;//s_dsc->time_step(*ni);
 
         if ((obj->is_interface(*ni) or obj->is_crossing(*ni)))
         {
