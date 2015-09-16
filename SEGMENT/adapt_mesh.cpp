@@ -22,7 +22,7 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     
     // Face total variation
     // Split high energy face
-    double flip_thres = 0.002;
+    double flip_thres = 0.006;
     
     HMesh::FaceAttributeVector<double> variation(dsc_->get_no_faces(), 0);
     std::vector<Face_key> to_split;
@@ -153,7 +153,7 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     
     if(1)
     {
-    double thres = 0.25;
+    double thres = 0.1;
     
     std::vector<Edge_key> edges;
     for(auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei)
