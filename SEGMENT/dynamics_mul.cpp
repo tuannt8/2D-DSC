@@ -1641,6 +1641,26 @@ void dynamics_mul::compute_curvature_force(){
 //        }
 //    }
     
+    for (auto vkey : s_dsc->vertices())
+    {
+        if (s_dsc->is_interface(vkey)
+            or s_dsc->is_crossing(vkey))
+        {
+            for(auto w = s_dsc->walker(vkey); !w.full_circle(); w = w.circulate_vertex_ccw())
+            {
+                if (s_dsc->is_interface(w.halfedge()))
+                {
+                    auto p12 = s_dsc->get_pos(w.vertex()) - s_dsc->get_pos(w.opp().vertex());
+                    
+                    assert(p12.length() > 0.001);
+                    p12.normalize();
+                    s_dsc->add_node_internal_force(vkey, p12*g_param.alpha);
+                    
+                }
+            }
+        }
+    }
+    
     // TODO: Should follow the algorithm in the paper
 }
 
@@ -1661,9 +1681,6 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
     }
 
     
-    double total = 0.0;
- //   dE_0_ = 0.0;
- //   double max_move = 0.0;
 
     for (auto ni = obj->vertices_begin(); ni != obj->vertices_end(); ni++) {
         Vec2 dis = (obj->get_node_internal_force(*ni)
@@ -1676,13 +1693,6 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
         if ((obj->is_interface(*ni) or obj->is_crossing(*ni)))
         {
             obj->set_destination(*ni, obj->get_pos(*ni) + dis*n_dt);
-//            total += dis.length();
-//            
-//            if (max_move < dis.length()) {
-//                max_move = dis.length();
-//            }
-            
-        //    dE_0_ += -dis.length()*dis.length()*dt;
         }
     }
     

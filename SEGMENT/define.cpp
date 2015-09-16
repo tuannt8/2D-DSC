@@ -17,12 +17,20 @@ int debug_num[10] = {-1};
  */
 
 /************************/
+/* CEMENT phantom
+ */
+dynamics_param g_param(0.1,1,0.1);
+
+std::string IMAGE_NAME = "Data/cement/sample.png";
+double DISCRETIZE_RES = 19;//11.0
+
+/************************/
 /* FUEL CELL phantom
  */
-dynamics_param g_param(0.1,1,0.01);
-
-std::string IMAGE_NAME = "Data/fuel_cell/small_gap.png";
-double DISCRETIZE_RES = 19;//11.0
+//dynamics_param g_param(0.1,1,0.01);
+//
+//std::string IMAGE_NAME = "Data/fuel_cell/small_gap.png";
+//double DISCRETIZE_RES = 19;//11.0
 
 /************************/
 /* GOMU:
