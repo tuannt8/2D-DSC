@@ -14,6 +14,8 @@
 #include "define.h"
 #include "image.h"
 
+#define SINGULAR_AREA 3. // In computation of triangle variation
+
 class adapt_mesh{
 public:
     adapt_mesh();

@@ -374,7 +374,7 @@ void interface::draw_tri_variant(){
         auto pts = dsc->get_pos(fkey);
         double area;
         double mi = image_->get_tri_intensity_f(pts, &area); mi /= area;
-        double e = image_->get_tri_differ_f(pts, mi)/ (area + 4);
+        double e = image_->get_tri_differ_f(pts, mi)/ (area + SINGULAR_AREA);
         
         auto center = (pts[0] + pts[1] + pts[2])/3.0;
         

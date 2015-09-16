@@ -17,12 +17,20 @@ int debug_num[10] = {-1};
  */
 
 /************************/
-/* Sound image
+/* GOMU:
  */
 dynamics_param g_param(0.1,1,0.01);
 
-std::string IMAGE_NAME = "Data/sound_gap.png";
-double DISCRETIZE_RES = 25;//11.0
+std::string IMAGE_NAME = "Data/Gomu/TallHamster_x_135.png";
+double DISCRETIZE_RES = 15;//11.0
+
+/************************/
+/* SOUND IMAGE
+ */
+//dynamics_param g_param(0.1,1,0.01);
+//
+//std::string IMAGE_NAME = "Data/sound_gap.png";
+//double DISCRETIZE_RES = 25;//11.0
 
 
 /************************/

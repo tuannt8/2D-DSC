@@ -350,7 +350,8 @@ namespace DSC2D
                 auto verts = get_verts(fkey);
                 myfile << index_map[(int)verts[0].get_index()] << " "
                         << index_map[(int)verts[1].get_index()] << " "
-                        << index_map[(int)verts[2].get_index()] << "\n";
+                        << index_map[(int)verts[2].get_index()] << " "
+                        << get_label(fkey) << "\n";
             }
             
             myfile.close();
