@@ -17,12 +17,20 @@ int debug_num[10] = {-1};
  */
 
 /************************/
+/* Flower
+ */
+//dynamics_param g_param(0.3,1,0.1);
+//
+//std::string IMAGE_NAME = "flowers.png";
+//double DISCRETIZE_RES = 25;//11.0
+
+/************************/
 /* Dental
  */
-dynamics_param g_param(0.3,1,0.1);
+dynamics_param g_param(0.01,1,0.1);
 
-std::string IMAGE_NAME = "Data/dental/sample_gap.png";
-double DISCRETIZE_RES = 25;//11.0
+std::string IMAGE_NAME = "Data/dental/sample.png";
+double DISCRETIZE_RES = 29;//11.0
 
 /************************/
 /* CEMENT phantom
@@ -35,7 +43,7 @@ double DISCRETIZE_RES = 25;//11.0
 /************************/
 /* FUEL CELL phantom
  */
-//dynamics_param g_param(0.1,1,0.01);
+//dynamics_param g_param(0.03,1,0.01);
 //
 //std::string IMAGE_NAME = "Data/fuel_cell/small_gap.png";
 //double DISCRETIZE_RES = 19;//11.0
@@ -63,7 +71,7 @@ double DISCRETIZE_RES = 25;//11.0
 //dynamics_param g_param(0.1,1,0.01);
 //
 //std::string IMAGE_NAME = "Data/TetraPak/sample.png";
-//double DISCRETIZE_RES = 40;//11.0
+//double DISCRETIZE_RES = 21;//11.0
 
 /************************/
 /* square.bmp

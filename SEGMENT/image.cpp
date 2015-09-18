@@ -22,7 +22,7 @@
 #endif
 
 
-#define NOISE 40
+#define NOISE 5
 #define BLUR 2.0
 
 void image::load_image(std::string const file_path){
@@ -30,10 +30,8 @@ void image::load_image(std::string const file_path){
     load(file_path.c_str());
     this->mirror('y');
 
-//    printf("Image %d change \n", this->spectrum());
-
 //   
-//    blur(BLUR);
+//    blur(BLUR); //isotropically
 //    noise(NOISE);
 
     set_gl_texture();
@@ -112,7 +110,7 @@ double image::get_intensity_f(double x, double y){
     if (x < 0 or x > width()
         or y < 0 or y > height())
     {
-        std::cout << "Out of image [" << x << ", " << y << "]\n";
+    //    std::cout << "Out of image [" << x << ", " << y << "]\n";
         return 0;
     }
     

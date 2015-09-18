@@ -1599,47 +1599,6 @@ void dynamics_mul::compute_curvature_force_implicit(){
 }
 
 void dynamics_mul::compute_curvature_force(){
-//    for (auto eid = s_dsc->halfedges_begin(); eid != s_dsc->halfedges_end(); eid++) {
-//
-//        if (s_dsc->is_interface(*eid)) {
-//            auto hew0 = s_dsc->walker(*eid);
-//            
-//            // Find next edge on the boundary
-//            auto hew1 = hew0.next().opp();
-//            while (1) {
-//                if (s_dsc->is_interface(hew1.halfedge())) {
-//                    hew1 = hew1.opp();
-//                    break;
-//                }
-//                
-//                hew1 = hew1.next().opp();
-//            }
-//            
-//            assert(hew0.halfedge() != hew1.halfedge());
-//            
-//            Vec2 p0 = s_dsc->get_pos(hew0.vertex()) - s_dsc->get_pos(hew0.opp().vertex());
-//            Vec2 p1 = s_dsc->get_pos(hew1.vertex()) - s_dsc->get_pos(hew1.opp().vertex());
-//            
-//            Vec2 norm0(p0[1], -p0[0]); norm0.normalize();
-//            Vec2 norm1(p1[1], -p1[0]); norm1.normalize();
-//            Vec2 norm = norm0 + norm1; norm.normalize();
-//
-//
-//            assert(norm.length() < 1.1 and norm.length() > 0.9);
-//
-//            
-//            
-//            double l0 = p0.length();
-//            double l1 = p1.length();
-//            double angle = std::atan2(CGLA::cross(p0, p1), DSC2D::Util::dot(p0, p1));
-//            double curvature = angle / (l0/2.0 + l1/2.0);
-//            
-//            assert(curvature != NAN);
-//            
-//            s_dsc->add_node_internal_force(
-//                    hew0.vertex(), -norm*curvature*s_dsc->get_avg_edge_length()*g_param.alpha);
-//        }
-//    }
     
     for (auto vkey : s_dsc->vertices())
     {
@@ -1652,10 +1611,14 @@ void dynamics_mul::compute_curvature_force(){
                 {
                     auto p12 = s_dsc->get_pos(w.vertex()) - s_dsc->get_pos(w.opp().vertex());
                     
-                    assert(p12.length() > 0.001);
-                    p12.normalize();
-                    s_dsc->add_node_internal_force(vkey, p12*g_param.alpha);
                     
+                    if(p12.length() > 0.001)
+                    {
+                        p12.normalize();
+                        s_dsc->add_node_internal_force(vkey, p12*g_param.alpha);
+                    }
+                    else
+                        cout << "Edge length 0 in bound";
                 }
             }
         }
@@ -1803,8 +1766,11 @@ void dynamics_mul::compute_intensity_force(){
         if( s_dsc->is_interface(*eit) and
            !touched[*eit])
         {
-            double c0 = mean_inten_[s_dsc->get_label(hew.face())];
-            double c1 = mean_inten_[s_dsc->get_label(hew.opp().face())];
+            int phase0 = s_dsc->get_label(hew.face());
+            int phase1 = s_dsc->get_label(hew.opp().face());
+            
+            double c0 = mean_inten_[phase0];
+            double c1 = mean_inten_[phase1];
             
             // Loop on the edge
             auto p0 = s_dsc->get_pos(hew.opp().vertex());
@@ -1833,7 +1799,20 @@ void dynamics_mul::compute_intensity_force(){
                 auto p = p0 + (p1 - p0)*((i+0.5) / N);
                 double I = s_img->get_intensity_f(p[0], p[1]);
                 
-                double f = (2*I - c0 - c1) / (c0-c1) * dl /length;
+                double f = 0.0;
+                // Same coefficient
+            //    double f = (2*I - c0 - c1) / (c0-c1) * dl /length;
+                
+                // Different coefficients; for dental segmentation
+                double beta2 = 1.3;
+                if (phase0 == 2) {
+                    f = -(beta2*(I-c0)*(I-c0) - (I-c1)*(I-c1)) * dl /length / ((c0-c1)*(c0-c1));
+                }else if (phase1 == 2){
+                    f = -((I-c0)*(I-c0) - beta2*(I-c1)*(I-c1)) * dl /length / ((c0-c1)*(c0-c1));
+                } else{
+                    f = (2*I - c0 - c1) / (c0-c1) * dl /length;
+                }
+                
                 assert(f != NAN);
                 
                 // Barry Centric coordinate

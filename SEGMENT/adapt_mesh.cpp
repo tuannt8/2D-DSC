@@ -8,6 +8,7 @@
 
 #include "adapt_mesh.h"
 
+
 adapt_mesh::adapt_mesh(){
     
 }
@@ -22,12 +23,18 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     
     // Face total variation
     // Split high energy face
-    double flip_thres = 0.01;
+    double flip_thres = FACE_SPLIT_THRES;
     
     HMesh::FaceAttributeVector<double> variation(dsc_->get_no_faces(), 0);
     std::vector<Face_key> to_split;
     for (auto fkey : dsc_->faces())
     {
+        // For dental image
+        // Do not flip phase 1
+        if (dsc.get_label(fkey) == 1) {
+            continue;
+        }
+
         auto pts = dsc_->get_pos(fkey);
         double area;
         double mi = img.get_tri_intensity_f(pts, &area); mi /= area;
@@ -36,6 +43,7 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
         variation[fkey] = e;
         if (e < flip_thres and area > 1)
         {
+            
             // Consider flipping
             int min_label = -1;
             double min_differ = INFINITY;
@@ -43,9 +51,14 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
             auto tris = dsc_->get_pos(fkey);
             auto area = dsc_->area(fkey);
             
+            
             for (int i = 0; i < c_array.size(); i++) {
                 double ci = c_array[i];
                 double c_sum = img.get_tri_differ_f(tris, ci) / area;
+                
+                // For dental image
+//                if(i == 2)
+//                    c_sum = c_sum*0.7;
                 
                 if (c_sum < min_differ) {
                     min_differ = c_sum;
@@ -153,7 +166,7 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     
     if(1)
     {
-    double thres = 0.6;
+    double thres = EDGE_SPLIT_THRES;
     
     std::vector<Edge_key> edges;
     for(auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei)
@@ -194,7 +207,7 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
             ev += std::abs(f)*dl;
         }
         
-        ev = ev / (length + 3);
+        ev = ev / (length + SINGULAR_EDGE);
         
         if (ev > thres) {
             dsc.split(ekey);
