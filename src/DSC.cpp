@@ -1447,6 +1447,27 @@ namespace DSC2D
         
         DEG_AREA = 0.2*MIN_AREA;
     }
+    
+    void DeformableSimplicialComplex::refine_without_change_interface(){
+        /**
+         Restore original parametters
+         */
+        MAX_LENGTH = 2.;
+        MIN_LENGTH = 0.5;// 0.01;// 0.05 // 0.5;
+        DEG_LENGTH = 0.2*MIN_LENGTH;
+        
+        MAX_AREA = 5.;
+        MIN_AREA =  0.2; //0.001;//0.01;// 0.2;
+        
+        DEG_AREA = 0.2*MIN_AREA;
+        
+        /**
+         Collapse all small triangle
+         */
+        thinning();
+        
+        smooth();
+    }
 
     void DeformableSimplicialComplex::clean_attributes() {
         HMesh::IDRemap cleanup_map;

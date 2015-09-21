@@ -1801,17 +1801,17 @@ void dynamics_mul::compute_intensity_force(){
                 
                 double f = 0.0;
                 // Same coefficient
-            //    double f = (2*I - c0 - c1) / (c0-c1) * dl /length;
+                f = (2*I - c0 - c1) / (c0-c1) * dl /length;
                 
-                // Different coefficients; for dental segmentation
-                double beta2 = 1.3;
-                if (phase0 == 2) {
-                    f = -(beta2*(I-c0)*(I-c0) - (I-c1)*(I-c1)) * dl /length / ((c0-c1)*(c0-c1));
-                }else if (phase1 == 2){
-                    f = -((I-c0)*(I-c0) - beta2*(I-c1)*(I-c1)) * dl /length / ((c0-c1)*(c0-c1));
-                } else{
-                    f = (2*I - c0 - c1) / (c0-c1) * dl /length;
-                }
+//                // Different coefficients; for dental segmentation
+//                double beta2 = 1.3;
+//                if (phase0 == 2) {
+//                    f = -(beta2*(I-c0)*(I-c0) - (I-c1)*(I-c1)) * dl /length / ((c0-c1)*(c0-c1));
+//                }else if (phase1 == 2){
+//                    f = -((I-c0)*(I-c0) - beta2*(I-c1)*(I-c1)) * dl /length / ((c0-c1)*(c0-c1));
+//                } else{
+//                    f = (2*I - c0 - c1) / (c0-c1) * dl /length;
+//                }
                 
                 assert(f != NAN);
                 

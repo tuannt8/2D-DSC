@@ -29,11 +29,6 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     std::vector<Face_key> to_split;
     for (auto fkey : dsc_->faces())
     {
-        // For dental image
-        // Do not flip phase 1
-        if (dsc.get_label(fkey) == 1) {
-            continue;
-        }
 
         auto pts = dsc_->get_pos(fkey);
         double area;
@@ -56,9 +51,6 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
                 double ci = c_array[i];
                 double c_sum = img.get_tri_differ_f(tris, ci) / area;
                 
-                // For dental image
-//                if(i == 2)
-//                    c_sum = c_sum*0.7;
                 
                 if (c_sum < min_differ) {
                     min_differ = c_sum;

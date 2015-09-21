@@ -31,8 +31,8 @@ void image::load_image(std::string const file_path){
     this->mirror('y');
 
 //   
-//    blur(BLUR); //isotropically
-//    noise(NOISE);
+    blur(BLUR); //isotropically
+    noise(NOISE);
 
     set_gl_texture();
     compute_gradient();

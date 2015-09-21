@@ -27,13 +27,13 @@ int debug_num[10] = {-1};
 /************************/
 /* Dental
  */
-dynamics_param g_param(0.01,1,0.1);
-
-std::string IMAGE_NAME = "Data/dental/sample.png";
-double DISCRETIZE_RES = 29;//11.0
+//dynamics_param g_param(0.01,1,0.1);
+//
+//std::string IMAGE_NAME = "Data/dental/sample.png";
+//double DISCRETIZE_RES = 29;//11.0
 
 /************************/
-/* CEMENT phantom
+/* CEMENT
  */
 //dynamics_param g_param(0.1,1,0.1);
 //
@@ -43,10 +43,10 @@ double DISCRETIZE_RES = 29;//11.0
 /************************/
 /* FUEL CELL phantom
  */
-//dynamics_param g_param(0.03,1,0.01);
-//
-//std::string IMAGE_NAME = "Data/fuel_cell/small_gap.png";
-//double DISCRETIZE_RES = 19;//11.0
+dynamics_param g_param(0.03,1,0.01);
+
+std::string IMAGE_NAME = "Data/fuel_cell/small_gap.png";
+double DISCRETIZE_RES = 19;//11.0
 
 /************************/
 /* GOMU:

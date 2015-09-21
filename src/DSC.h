@@ -904,8 +904,13 @@ namespace DSC2D {
 #pragma mark - TESTING
     public:
         void increase_resolution_range(); // For multi resolution
+        void refine_without_change_interface();
+        
+        
         void  split_edge(edge_key ek);
         void clean_attributes();
+        
+
         
         DeformableSimplicialComplex * clone();
     };

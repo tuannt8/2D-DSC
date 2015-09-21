@@ -149,9 +149,10 @@ void interface::keyboard(unsigned char key, int x, int y){
             gl_debug_helper::print_debug_info_nearest(*dsc);
             gl_debug_helper::print_image_info(*image_);
             break;
-        case 'i':
-            std::cout << "Input debug number: ";
-            std::cin >> debug_num[0];
+        case 'r':
+        {
+            dsc->refine_without_change_interface();
+        }
             break;
         case ' ':
         {
@@ -164,7 +165,7 @@ void interface::keyboard(unsigned char key, int x, int y){
         case '\t':
             Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, "./LOG");
             break;
-        case 'r':
+        case 'i':
             dsc->increase_resolution_range();
             break;
         case 'f': // Flipping phase

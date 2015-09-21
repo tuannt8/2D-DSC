@@ -14,9 +14,9 @@
 #include "define.h"
 #include "image.h"
 
-#define FACE_SPLIT_THRES 0.01   // Variation threshold
-#define EDGE_SPLIT_THRES 0.6   // Energy threshold
-#define SINGULAR_AREA 20.        // In computation of triangle variation
+#define FACE_SPLIT_THRES 0.002   // Variation threshold
+#define EDGE_SPLIT_THRES 0.3   // Energy threshold
+#define SINGULAR_AREA 4.        // In computation of triangle variation
 #define SINGULAR_EDGE 3.0
 
 class adapt_mesh{
