@@ -43,18 +43,18 @@ int debug_num[10] = {-1};
 /************************/
 /* FUEL CELL phantom
  */
-dynamics_param g_param(0.03,1,0.01);
-
-std::string IMAGE_NAME = "Data/fuel_cell/small_gap.png";
-double DISCRETIZE_RES = 19;//11.0
+//dynamics_param g_param(0.1,1,0.01);
+//
+//std::string IMAGE_NAME = "Data/fuel_cell/small_gap.png";
+//double DISCRETIZE_RES = 19;//11.0
 
 /************************/
 /* GOMU:
  */
-//dynamics_param g_param(0.1,1,0.01);
+//dynamics_param g_param(0.01,1,0.01);
 //
 //std::string IMAGE_NAME = "Data/Gomu/TallHamster_x_135.png";
-//double DISCRETIZE_RES = 15;//11.0
+//double DISCRETIZE_RES = 10;//11.0
 
 /************************/
 /* SOUND IMAGE
@@ -92,13 +92,13 @@ double DISCRETIZE_RES = 19;//11.0
 /************************/
 /* test.bmp
  */
-//dynamics_param g_param(0.1, // alpha
-//                       1.0, // beta
-//                       1. // dt
-//                       );
-//
-//std::string IMAGE_NAME = "test.png";
-//double DISCRETIZE_RES = 8.0;//11.0
+dynamics_param g_param(0.01, // alpha
+                       1.0, // beta
+                       1. // dt
+                       );
+
+std::string IMAGE_NAME = "test.png";
+double DISCRETIZE_RES = 8.0;//11.0
 
 /************************/
 /* test.bmp

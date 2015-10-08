@@ -75,6 +75,7 @@ namespace DSC2D
                                                                   vec2(0.0f));
         external_node_forces = HMesh::VertexAttributeVector<vec2>(get_no_vertices(),
                                                                   vec2(0.0f));
+        bStable = HMesh::VertexAttributeVector<int>(get_no_vertices(), 1);
         forces = HMesh::VertexAttributeVector<std::vector<vec2>>(get_no_vertices(),
                                                     std::vector<vec2>(NB_FORCES, Vec2(0.0)));
         dts = HMesh::VertexAttributeVector<double>(get_no_vertices(), 0.0);
@@ -97,6 +98,7 @@ namespace DSC2D
         destination.cleanup(cleanup_map.vmap);
         internal_node_forces.cleanup(cleanup_map.vmap);
         external_node_forces.cleanup(cleanup_map.vmap);
+        bStable.cleanup(cleanup_map.vmap);
         dts.cleanup(cleanup_map.vmap);
         
   //     node_att_i.cleanup(cleanup_map.vmap);
@@ -539,15 +541,19 @@ namespace DSC2D
         
         for(auto vi = vertices_begin(); vi != vertices_end(); ++vi)
         {
-            init_attributes(*vi);
+            init_attributes(*vi, true);
         }
     }
     
-    void DeformableSimplicialComplex::init_attributes(node_key vid)
+    void DeformableSimplicialComplex::init_attributes(node_key vid, bool keep)
     {
         destination[vid] = get_pos(vid);
         internal_node_forces[vid] = vec2(0.0);
         external_node_forces[vid] = vec2(0.0);
+        
+
+        bStable = 1;
+
         
 
 //        if (is_interface(vid)) {
@@ -715,6 +721,9 @@ namespace DSC2D
     
     bool DeformableSimplicialComplex::split(face_key fid)
     {
+//        bool success = split(sorted_face_edges(fid).back());
+//        return success;
+        
         int fa = get_label(fid);
         node_key vid = mesh->split_face_by_vertex(fid);
         
@@ -1308,6 +1317,13 @@ namespace DSC2D
                 }
             }
         }
+        
+        // Tuan-hard code fix bug
+        for (auto fkey:faces()){
+            if (area(fkey) < 1e-6) {
+                collapse(fkey, false);
+            }
+        }
     }
     
     
@@ -1443,7 +1459,7 @@ namespace DSC2D
         DEG_LENGTH = 0.2*MIN_LENGTH;
         
         MAX_AREA = 5.;
-        MIN_AREA =  MIN_AREA / 4;
+        MIN_AREA =  MIN_AREA / 4; 
         
         DEG_AREA = 0.2*MIN_AREA;
     }
@@ -1467,6 +1483,8 @@ namespace DSC2D
         thinning();
         
         smooth();
+        
+        max_min_angle();
     }
 
     void DeformableSimplicialComplex::clean_attributes() {

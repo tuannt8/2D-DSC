@@ -110,6 +110,8 @@ namespace DSC2D {
         
         HMesh::VertexAttributeVector<vec2> internal_node_forces;
         HMesh::VertexAttributeVector<vec2> external_node_forces;
+        HMesh::VertexAttributeVector<int> bStable;
+        
         
         HMesh::VertexAttributeVector<std::vector<vec2>> forces;
         
@@ -188,7 +190,7 @@ namespace DSC2D {
         /**
          Initialise the attribute vectors for the vertex with ID vid. Should be called after a new vertex has been created.
          */
-        virtual void init_attributes(node_key vid);
+        virtual void init_attributes(node_key vid, bool keep = false);
         
         /**
          Initialise the attribute vectors for the edge with ID eid. Should be called after a new edge has been created.
@@ -408,6 +410,7 @@ namespace DSC2D {
         void set_pos(node_key vid, vec2 p);
         
     public:
+        
         /**
          Internal force
          */
@@ -717,11 +720,13 @@ namespace DSC2D {
          */
         void max_min_angle();
         
+    public:
         /**
          Performs Laplacian smoothing on all safe editable vertices.
          */
         void smooth(real t = 1.);
-        
+    
+    private:
         /**
          Remove needles, triangles with one very short edge, by splitting the face (inserting a vertex at the barycenter of the face).
          */
@@ -903,8 +908,10 @@ namespace DSC2D {
 
 #pragma mark - TESTING
     public:
-        void increase_resolution_range(); // For multi resolution
+        void increase_resolution_range(); // reduce smallest edge by 2. For multi resolution
         void refine_without_change_interface();
+        
+        double get_min_length_ratio(){return MIN_LENGTH;}
         
         
         void  split_edge(edge_key ek);

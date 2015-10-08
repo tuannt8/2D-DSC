@@ -18,6 +18,7 @@
 #include "define.h"
 #include "util.h"
 #include "polygon_f.h"
+#include "adapt_mesh.h"
 
 using namespace std;
 
@@ -77,6 +78,45 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
 //        }
 //    }
 }
+
+void dynamics_mul::update_dsc_with_adaptive_mesh()
+{
+    int nb_displace = 1;
+    adapt_mesh am;
+    
+    // Displace vertices' positions
+    for (int iu = 0; iu < nb_displace; iu++)
+    {
+        displace_dsc();
+        
+        am.thinning_interface(*s_dsc, *s_img);
+        
+        compute_mean_intensity(mean_inten_);
+        g_param.mean_intensity = mean_inten_;
+        compute_intensity_force();
+        compute_curvature_force();
+    }
+    
+    
+    // adapt mesh
+    
+    update_vertex_stable();
+    am.split_face(*s_dsc, *s_img);
+    
+    compute_mean_intensity(mean_inten_);
+    g_param.mean_intensity = mean_inten_;
+    compute_intensity_force();
+    compute_curvature_force();
+    
+    update_vertex_stable();
+    am.split_edge(*s_dsc, *s_img);
+    
+    compute_mean_intensity(mean_inten_);
+    g_param.mean_intensity = mean_inten_;
+    compute_intensity_force();
+    compute_curvature_force();
+
+}
 void dynamics_mul::compute_difference()
 {
     for (auto nkey : s_dsc->vertices())
@@ -123,11 +163,42 @@ void dynamics_mul::compute_difference()
 }
 
 void dynamics_mul::update_dsc(dsc_obj &dsc, image &img){
-    // update_dsc_implicit(dsc, img);
-     update_dsc_explicit(dsc, img);
-    // update_dsc_explicit_whole_domain(dsc, img);
-    // update_dsc_area(dsc, img);
-    // update_dsc_build_and_solve(dsc, img);
+
+    s_dsc = &dsc;
+    s_img = &img;
+    // update_dsc_explicit(dsc, img);
+
+    update_dsc_with_adaptive_mesh();
+}
+
+void dynamics_mul::update_vertex_stable()
+{
+    auto obj = s_dsc;
+    
+    
+    for (auto ni = obj->vertices_begin(); ni != obj->vertices_end(); ni++)
+    {
+        obj->bStable[*ni] = 1;
+        
+        if ((obj->is_interface(*ni) or obj->is_crossing(*ni)))
+        {
+            Vec2 dis = (obj->get_node_internal_force(*ni)
+                        + obj->get_node_external_force(*ni));
+            assert(dis.length() != NAN);
+            
+            double n_dt = dt;
+            
+            if (dis.length()*n_dt < STABLE_MOVE) // stable
+            {
+                std::cout << "Stable : " << ni->get_index() << std::endl;
+                obj->bStable[*ni] = 1;
+            }
+            else
+            {
+                obj->bStable[*ni] = 0;
+            }
+        }
+    }
 }
 
 void dynamics_mul::update_dsc_build_and_solve(dsc_obj &dsc, image &img){
@@ -1388,6 +1459,11 @@ double dynamics_mul::gradient_length(dsc_obj *obj){
     return dEl;
 }
 double dynamics_mul::get_curvature(dsc_obj *obj, HMesh::Walker hew0){
+    if (s_dsc->is_crossing(hew0.vertex()))
+    {
+        return INFINITY; // Crossing point. No curvature.
+    }
+    
     // Find next edge on the boundary
     auto hew1 = hew0.next().opp();
     while (1) {
@@ -1645,21 +1721,43 @@ void dynamics_mul::displace_dsc(dsc_obj *obj){
 
     
 
-    for (auto ni = obj->vertices_begin(); ni != obj->vertices_end(); ni++) {
-        Vec2 dis = (obj->get_node_internal_force(*ni)
-                    + obj->get_node_external_force(*ni));
+    for (auto ni = obj->vertices_begin(); ni != obj->vertices_end(); ni++)
+    {
+        obj->bStable[*ni] = 1;
         
-        assert(dis != NAN);
-        
-        double n_dt = 0.4;//s_dsc->time_step(*ni);
-
         if ((obj->is_interface(*ni) or obj->is_crossing(*ni)))
         {
+            Vec2 dis = (obj->get_node_internal_force(*ni)
+                        + obj->get_node_external_force(*ni));
+            assert(dis.length() != NAN);
+            
+            double n_dt = dt;//s_dsc->time_step(*ni);
+
             obj->set_destination(*ni, obj->get_pos(*ni) + dis*n_dt);
+            
+//            if (dis.length()*n_dt < STABLE_MOVE) // stable
+//            {
+//                double a = dis.length()*n_dt;
+//                std::cout << "Stable : " << ni->get_index() << std::endl;
+//                obj->bStable[*ni] = 1;
+//            }
+//            else
+//            {
+//                obj->bStable[*ni] = 0;
+//            }
         }
     }
     
     obj->deform();
+}
+
+void dynamics_mul::compute_mean_intensity(dsc_obj &dsc, image &img)
+{
+    s_img = &img;
+    s_dsc = &dsc;
+    
+    compute_mean_intensity(mean_inten_);
+    g_param.mean_intensity = mean_inten_;
 }
 
 void dynamics_mul::compute_mean_intensity(std::map<int, double> & mean_inten_o){

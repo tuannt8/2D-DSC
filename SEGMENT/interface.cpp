@@ -171,7 +171,8 @@ void interface::keyboard(unsigned char key, int x, int y){
         case 'f': // Flipping phase
         {
             adapt_mesh am;
-            am.split_face(*dsc, *image_);
+//            am.split_face(*dsc, *image_);
+            am.split_face_and_relabel(*dsc, *image_);
         }
             break;
         case 's': // Split edge
@@ -673,14 +674,14 @@ void interface::init_dsc(){
     
     DISCRETIZATION = (double) height / (double)DISCRETIZE_RES;
     
-    width -= 2*DISCRETIZATION;
-    height -= 2*DISCRETIZATION;
+//    width -= 2*DISCRETIZATION;
+//    height -= 2*DISCRETIZATION;
     
     std::vector<real> points;
     std::vector<int> faces;
     Trializer::trialize(width, height, DISCRETIZATION, points, faces);
     
-    DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, 0 /* DISCRETIZATION */);
+    DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, 0 /*,  DISCRETIZATION */);
     
     dsc = std::unique_ptr<DeformableSimplicialComplex>(
                             new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));

@@ -14,19 +14,54 @@
 #include "define.h"
 #include "image.h"
 
-#define FACE_SPLIT_THRES 0.002   // Variation threshold
-#define EDGE_SPLIT_THRES 0.3   // Energy threshold
-#define SINGULAR_AREA 4.        // In computation of triangle variation
-#define SINGULAR_EDGE 3.0
+/**
+ FUEL CELL
+ */
+//#define FACE_SPLIT_THRES 0.01   // Variation threshold
+//#define EDGE_SPLIT_THRES 0.01   // Energy threshold
+//#define SINGULAR_AREA 4.        // In computation of triangle variation
+//#define SINGULAR_EDGE 3.0
+
+/**
+ HAMSTER - GOMU
+ */
+//#define FACE_SPLIT_THRES 0.002   // Variation threshold
+//#define EDGE_SPLIT_THRES 0.38   // Energy threshold
+//#define SINGULAR_AREA 4.        // In computation of triangle variation
+//#define SINGULAR_EDGE 3.0
+
+/**
+ SOUND IMAGE
+ */
+//#define FACE_SPLIT_THRES 0.01   // Variation threshold
+//#define EDGE_SPLIT_THRES 0.2   // Energy threshold
+//#define SINGULAR_AREA 4.        // In computation of triangle variation
+//#define SINGULAR_EDGE 10.0
+
+/**
+ DENTAL
+ */
+#define FACE_SPLIT_THRES 0.01   // Variation threshold
+#define EDGE_SPLIT_THRES 0.4   // Energy threshold
+#define SINGULAR_AREA 3.        // In computation of triangle variation
+#define SINGULAR_EDGE 5.0
 
 class adapt_mesh{
 public:
     adapt_mesh();
     ~adapt_mesh();
     
+    // Split edge manually
     void split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img);
     
+    // Split face mannually
     void split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img);
+    
+    // remove vertices on interface
+    void thinning_interface(DSC2D::DeformableSimplicialComplex &dsc, image &img);
+    
+    // First step: Split face and relabeling. Not working.
+    void split_face_and_relabel(DSC2D::DeformableSimplicialComplex &dsc, image &img);
 private:
     DSC2D::DeformableSimplicialComplex *dsc_;
     void split_single_edge(Edge_key ekey);

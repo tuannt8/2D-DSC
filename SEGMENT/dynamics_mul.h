@@ -38,6 +38,8 @@ enum {
     PHASE_PROBABILITY, // Probability of phase
 };
 
+#define STABLE_MOVE 1e-2
+
 class dynamics_mul {
 
     
@@ -46,7 +48,8 @@ public:
     ~dynamics_mul();
     
     void  update_dsc(dsc_obj &dsc, image &img);
-            
+    
+    void update_vertex_stable();
 private:
     // temporary variable
     dsc_obj * s_dsc;
@@ -60,7 +63,7 @@ private:
     // Adaptive dt
     double E0_ = 0.0, E1_ = 0.0, dE_0_ = 0., dE2 = 0.;
     std::vector<Vec2> E_grad0_;
-    double dt = 0.1;
+    double dt = 0.4;
 private:
     /*
      Compute on the whole domain
@@ -73,6 +76,10 @@ private:
     std::vector<int> get_vert_idx(std::vector<HMesh::VertexID> vids);
     void build_and_solve();
     
+    /*
+     Update with adaptive mesh
+     */
+    void update_dsc_with_adaptive_mesh();
 private:
     void update_dsc_explicit_whole_domain(dsc_obj &dsc, image &img);
     void update_dsc_area(dsc_obj &dsc, image &img);
@@ -89,6 +96,9 @@ private:
     void compute_curvature_force();
     
     void compute_difference();
+    
+public:
+    void compute_mean_intensity(dsc_obj &dsc, image &img);
     
 public:
     void displace_dsc_2();
@@ -109,7 +119,7 @@ public:
     // Interface length in node link
     double curve_length(Node_key nid, Vec2 new_pos);
     
-private:
+private: public:
     double get_total_energy(dsc_obj *obj, std::map<int, double>  intesity_map);
     
     double energy_gradient_by_moving_distance(dsc_obj *obj, std::map<int, double>  intesity_map);
