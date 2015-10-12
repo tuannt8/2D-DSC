@@ -713,9 +713,6 @@ namespace DSC2D
         
         update_locally(vid);
         
-        // Linear interpolation
-        dts[vid] = (dts[v1] + dts[v2])/2;
-        
         return true;
     }
     
@@ -723,20 +720,29 @@ namespace DSC2D
     {
 //        bool success = split(sorted_face_edges(fid).back());
 //        return success;
-        
-        int fa = get_label(fid);
-        node_key vid = mesh->split_face_by_vertex(fid);
-        
-        init_attributes(vid);
-        
-        for(auto hew = walker(vid); !hew.full_circle(); hew = hew.circulate_vertex_cw())
+        // check quality
+        auto hew = walker(fid);
+        if (max_angle(fid, hew) > 150*M_PI / 180.)
         {
-            init_attributes(hew.halfedge());
-            init_attributes(hew.face(), fa);
+            return split(sorted_face_edges(fid).back());
         }
         
-        update_locally(vid);
-        return true;
+        else
+        {
+            int fa = get_label(fid);
+            node_key vid = mesh->split_face_by_vertex(fid);
+            
+            init_attributes(vid);
+            
+            for(auto hew = walker(vid); !hew.full_circle(); hew = hew.circulate_vertex_cw())
+            {
+                init_attributes(hew.halfedge());
+                init_attributes(hew.face(), fa);
+            }
+            
+            update_locally(vid);
+            return true;
+        }
     }
     
     real DeformableSimplicialComplex::min_quality(const std::vector<edge_key>& eids, const vec2& pos_old, const vec2& pos_new)
@@ -890,6 +896,8 @@ namespace DSC2D
     
     bool DeformableSimplicialComplex::collapse(HMesh::Walker hew, real weight)
     {
+        std::cout << "Collapse: " << hew.halfedge().get_index() << endl;
+        
         node_key vid = hew.vertex();
         vec2 p = (1.-weight) * get_pos(hew.vertex()) + weight * get_pos(hew.opp().vertex());
         vec2 d = (1.-weight) * get_destination(hew.vertex()) + weight * get_destination(hew.opp().vertex());
@@ -950,6 +958,49 @@ namespace DSC2D
         return Util::min(Util::min(Util::length(p[0] - p[1]), Util::length(p[1] - p[2])), Util::length(p[0] - p[2]));
     }
     
+    real DeformableSimplicialComplex::max_angle(face_key fid, HMesh::Walker &hmax)
+    {
+        double min_cos = INFINITY;
+        
+        for (auto hew = walker(fid); !hew.full_circle(); hew = hew.circulate_face_ccw())
+        {
+            auto p = get_pos(hew.next().vertex());
+            auto p1 = get_pos(hew.vertex());
+            auto p2 = get_pos(hew.opp().vertex());
+            
+            double cos_a = Util::cos_angle(p1, p, p2);
+            if (cos_a < min_cos)
+            {
+                min_cos = cos_a;
+                hmax = hew;
+            }
+        }
+        
+        return acos(min_cos);
+    }
+    
+    HMesh::Walker DeformableSimplicialComplex::max_angle_point(face_key fid)
+    {
+        HMesh::Walker h_max = walker(fid);
+        double min_cos = INFINITY;
+        
+        for (auto hew = walker(fid); !hew.full_circle(); hew = hew.circulate_face_ccw())
+        {
+            auto p = get_pos(hew.vertex());
+            auto p1 = get_pos(hew.next().vertex());
+            auto p2 = get_pos(hew.next().next().vertex());
+            
+            double cos_a = Util::cos_angle(p1, p, p2);
+            if (cos_a < min_cos)
+            {
+                min_cos = cos_a;
+                h_max = hew;
+            }
+        }
+        
+        return h_max;
+    }
+    
     real DeformableSimplicialComplex::min_angle(face_key fid)
     {
         std::vector<vec2> p = get_pos(fid);
@@ -1005,10 +1056,76 @@ namespace DSC2D
         {
             if(mesh->in_use(*fi))
             {
+                /* Tuan
+                 In case of obtuse triangle, collapse edge is not enough.
+                 We need merge the triangles
+                 See: https://goo.gl/oMxXcX The degenerated triangle should be handle by adding point
+                    to the long edge
+                 */
+                
+                HMesh::Walker hew = walker(*fi);
+                if(max_angle(*fi, hew) > M_PI * 165. / 180.)
+                {
+                    if (!unsafe_editable(hew.halfedge())) {
+                        continue;
+                    }
+                    
+                    // add point to edge
+                    face_key f1 = hew.face();
+                    node_key v1 = hew.next().vertex();
+                    face_key f2 = hew.opp().face();
+                    node_key v2 = hew.opp().next().vertex();
+                    
+                    std::cout << "Degenerated tri. Opp vertex: " << v1.get_index() << endl;
+                    
+                    
+                    // Split
+                    node_key vid = mesh->split_edge(hew.halfedge());
+                    face_key newf1 = mesh->split_face_by_edge(f1, vid, v1);
+                    face_key newf2 = mesh->split_face_by_edge(f2, vid, v2);
+                    
+                    // Update attributes
+                    auto eid = hew.halfedge();
+                    init_attributes(vid);
+                    for(auto hew = walker(vid); !hew.full_circle(); hew = hew.circulate_vertex_cw())
+                    {
+                        if(hew.halfedge() != eid && hew.opp().halfedge() != eid)
+                        {
+                            init_attributes(hew.halfedge());
+                        }
+                    }
+                    init_attributes(newf1, get_label(f1));
+                    init_attributes(newf2, get_label(f2));
+                    
+                    update_locally(vid);
+                    
+                    // merge vid and v1
+                    set_pos(vid, get_pos(v1));
+                    auto hw = walker(v1);
+                    for (; !hw.full_circle(); hw = hw.circulate_vertex_ccw())
+                    {
+                        if (hw.vertex() == vid)
+                        {
+                            break;
+                        }
+                    }
+                    mesh->collapse_edge(hw.halfedge());
+                    
+                }
+                
+                if((min_angle(*fi) < DEG_ANGLE || area(*fi) < DEG_AREA*AVG_AREA) && !collapse(*fi, true))
+                {
+                    double mm = max_angle(*fi, hew);
+                    std::cout << "Degenerated normal. face: " << fi->get_index() << "Max a = " << mm << endl;
+                    collapse(*fi, false);
+                }
+                
+                /** Old code
                 if((min_angle(*fi) < DEG_ANGLE || area(*fi) < DEG_AREA*AVG_AREA) && !collapse(*fi, true))
                 {
                     collapse(*fi, false);
                 }
+                 */
             }
         }
     }

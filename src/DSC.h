@@ -793,6 +793,17 @@ namespace DSC2D {
         real min_angle(face_key fid);
         
         /**
+         Returns the max angle of the face with ID fid.
+         */
+        real max_angle(face_key fid, HMesh::Walker &hmax);
+
+        /**
+         Returns the vertex of max angle.
+         The half edge point to that vertex
+         */
+        HMesh::Walker max_angle_point(face_key fid);
+        
+        /**
          Returns the minimum edge length of the edges of the face with ID fid.
          */
         real min_edge_length(face_key fid);

@@ -81,7 +81,7 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
 
 void dynamics_mul::update_dsc_with_adaptive_mesh()
 {
-    int nb_displace = 1;
+    int nb_displace = 1;//20;
     adapt_mesh am;
     
     // Displace vertices' positions
@@ -190,7 +190,7 @@ void dynamics_mul::update_vertex_stable()
             
             if (dis.length()*n_dt < STABLE_MOVE) // stable
             {
-                std::cout << "Stable : " << ni->get_index() << std::endl;
+            //    std::cout << "Stable : " << ni->get_index() << std::endl;
                 obj->bStable[*ni] = 1;
             }
             else

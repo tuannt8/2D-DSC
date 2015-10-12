@@ -674,13 +674,15 @@ void interface::init_dsc(){
     
     DISCRETIZATION = (double) height / (double)DISCRETIZE_RES;
     
-//    width -= 2*DISCRETIZATION;
-//    height -= 2*DISCRETIZATION;
+    width -= 2*DISCRETIZATION;
+    height -= 2*DISCRETIZATION;
     
     std::vector<real> points;
     std::vector<int> faces;
     Trializer::trialize(width, height, DISCRETIZATION, points, faces);
     
+    width += 2*DISCRETIZATION;
+    height += 2*DISCRETIZATION;
     DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, 0 /*,  DISCRETIZATION */);
     
     dsc = std::unique_ptr<DeformableSimplicialComplex>(
