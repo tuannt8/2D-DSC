@@ -93,6 +93,12 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
             if(min_label != dsc_->get_label(fkey))
                 dsc_->update_attributes(fkey, min_label);
         }else{
+            auto area = dsc_->area(fkey);
+            if (area < SMALLEST_SIZE*SMALLEST_SIZE)
+            {
+                continue;
+            }
+            
             // Only split stable triangle
             // Triangle with 3 stable edge
             int bStable = 0;
@@ -202,7 +208,7 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
         if (dsc.bStable[hew.vertex()] == 1
             and dsc.bStable[hew.opp().vertex()] == 1)
         {
-            if (ev > thres) // High energy. Split
+            if (ev > thres and length > SMALLEST_SIZE) // High energy. Split
             {
                 dsc.split(ekey);
                 cout << "Split " << ekey.get_index() << endl;

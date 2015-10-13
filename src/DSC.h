@@ -922,6 +922,11 @@ namespace DSC2D {
         void increase_resolution_range(); // reduce smallest edge by 2. For multi resolution
         void refine_without_change_interface();
         
+        /**
+         Set coefficients. Smallest feature size in pixel
+         */
+        void set_smallest_feature_size(double length);
+        
         double get_min_length_ratio(){return MIN_LENGTH;}
         
         

@@ -1581,6 +1581,19 @@ namespace DSC2D
         DEG_AREA = 0.2*MIN_AREA;
     }
     
+    void DeformableSimplicialComplex::set_smallest_feature_size(double length)
+    {
+        // Length
+        MAX_LENGTH = 2.;
+        MIN_LENGTH = length / AVG_LENGTH / 2.0;
+        DEG_LENGTH = 0.2*MIN_LENGTH;
+        
+        // Area
+        MAX_AREA = 5.;
+        MIN_AREA =  MIN_LENGTH*MIN_LENGTH;
+        DEG_AREA = 0.2*MIN_AREA;
+    }
+    
     void DeformableSimplicialComplex::refine_without_change_interface(){
         /**
          Restore original parametters

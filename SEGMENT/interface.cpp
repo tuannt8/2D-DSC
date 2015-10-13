@@ -688,6 +688,7 @@ void interface::init_dsc(){
     dsc = std::unique_ptr<DeformableSimplicialComplex>(
                             new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
     
+    dsc->set_smallest_feature_size(SMALLEST_SIZE);
 #ifdef TUAN_MULTI_RES
     dsc->img = &*image_;
 #endif

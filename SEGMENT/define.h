@@ -68,6 +68,6 @@ extern dynamics_param g_param;
 
 // Discretization
 extern double DISCRETIZE_RES;
-
+extern double SMALLEST_SIZE;
 
 #endif // File protection

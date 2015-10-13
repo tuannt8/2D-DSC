@@ -81,7 +81,7 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
 
 void dynamics_mul::update_dsc_with_adaptive_mesh()
 {
-    int nb_displace = 1;//20;
+    int nb_displace = 20;
     adapt_mesh am;
     
     // Displace vertices' positions

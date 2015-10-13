@@ -43,8 +43,8 @@
  */
 #define FACE_SPLIT_THRES 0.01   // Variation threshold
 #define EDGE_SPLIT_THRES 0.4   // Energy threshold
-#define SINGULAR_AREA 100        // In computation of triangle variation
-#define SINGULAR_EDGE 5.0
+#define SINGULAR_AREA 0.        // In computation of triangle variation
+#define SINGULAR_EDGE 0.0
 
 class adapt_mesh{
 public:
