@@ -389,53 +389,6 @@ void interface::draw_tri_variant(){
 
 void interface::draw_edge_energy(){
     
-    // By face energy
-    if (0)
-    {
-        // Face total variation
-        HMesh::FaceAttributeVector<double> intensity(dsc->get_no_faces(), 0);
-        for (auto fkey : dsc->faces()){
-            auto tris = dsc->get_pos(fkey);
-            // auto sum = img.get_sum_on_tri_variation(tris, 2);
-            
-            auto area = dsc->area(fkey);
-            double ci = g_param.mean_intensity[dsc->get_label(fkey)];
-            double sum = image_->get_tri_differ(tris, ci).total_differ / area;
-            
-            intensity[fkey] = sum;
-        }
-        
-        std::vector<Edge_key> edges;
-        for(auto hei = dsc->halfedges_begin(); hei != dsc->halfedges_end(); ++hei)
-        {
-            if (dsc->is_interface(*hei)) {
-                auto hew = dsc->walker(*hei);
-                if(dsc->is_movable(*hei)
-                   and dsc->get_label(hew.face()) < dsc->get_label(hew.opp().face()))
-                {
-                    edges.push_back(*hei);
-                }
-            }
-        }
-        
-        glColor3f(0, 0, 0);
-        // Edge total variation
-        for (auto ekey : edges){
-            auto hew = dsc->walker(ekey);
-            
-            double ev = intensity[hew.face()] + intensity[hew.opp().face()];
-            ev = ev / std::pow(g_param.mean_intensity[dsc->get_label(hew.face())]
-                               - g_param.mean_intensity[dsc->get_label(hew.opp().face())], 2);
-            //  ev = ev / dsc.length(ekey);
-            
-            auto tris = dsc->get_pos(ekey);
-            auto center = (tris[0] + tris[1])/2.0;
-            std::ostringstream is;
-            is << ev;
-            Painter::print_gl(center[0], center[1], is.str().c_str());
-        }
-    }
-    
     // By total force energy
     if (1) {
         

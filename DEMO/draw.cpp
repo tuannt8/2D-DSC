@@ -166,10 +166,17 @@ void Painter::draw_vertices(const DeformableSimplicialComplex& dsc)
     glPointSize(std::max(std::floor(POINT_SIZE*dsc.get_avg_edge_length()), 1.));
 	glBegin(GL_POINTS);
     vec3 p;
+    HMesh::VertexAttributeVector<int> b_stable = dsc.bStable;
 	for(auto vi = dsc.vertices_begin(); vi != dsc.vertices_end(); ++vi)
     {
         p = vec3(dsc.get_pos(*vi)[0], dsc.get_pos(*vi)[1], 0.);
         glColor3d(static_cast<double>(colors[*vi][0]), static_cast<double>(colors[*vi][1]), static_cast<double>(colors[*vi][2]));
+        
+        if (b_stable[*vi])
+        {
+            glColor3f(0, 1, 0);
+        }
+        
         glVertex3d(static_cast<double>(p[0]), static_cast<double>(p[1]), static_cast<double>(p[2]));
     }
 	glEnd();

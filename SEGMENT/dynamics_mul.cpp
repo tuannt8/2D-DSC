@@ -188,7 +188,15 @@ void dynamics_mul::update_vertex_stable()
             
             double n_dt = dt;
             
-            if (dis.length()*n_dt < STABLE_MOVE) // stable
+            auto norm = obj->get_normal(*ni);
+            
+            double move = DSC2D::Util::dot(dis, norm)*n_dt;
+            if (obj->is_crossing(*ni))
+            {
+                move = dis.length() * n_dt;
+            }
+            
+            if (move < STABLE_MOVE) // stable
             {
             //    std::cout << "Stable : " << ni->get_index() << std::endl;
                 obj->bStable[*ni] = 1;

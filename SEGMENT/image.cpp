@@ -31,7 +31,7 @@ void image::load_image(std::string const file_path){
     this->mirror('y');
 
 //   
-    blur(BLUR); //isotropically
+//    blur(BLUR); //isotropically
     noise(NOISE);
 
     set_gl_texture();

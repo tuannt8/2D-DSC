@@ -99,7 +99,7 @@ dynamics_param g_param(0.01, // alpha
 
 std::string IMAGE_NAME = "test.png";
 double DISCRETIZE_RES = 8.0;//11.0
-double SMALLEST_SIZE = 20;
+double SMALLEST_SIZE = 30;
 
 /************************/
 /* test.bmp

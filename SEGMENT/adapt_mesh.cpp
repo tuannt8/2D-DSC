@@ -48,19 +48,19 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     std::vector<Face_key> to_split;
     for (auto fkey : dsc_->faces())
     {
-        bool is_boundary = false;
-        for (auto hew = dsc_->walker(fkey); !hew.full_circle(); hew = hew.circulate_face_ccw())
-        {
-            if (dsc_->is_outside(hew.vertex()))
-            {
-                is_boundary = true;
-                continue;
-            }
-        }
-        if (is_boundary)
-        {
-            continue;
-        }
+//        bool is_boundary = false;
+//        for (auto hew = dsc_->walker(fkey); !hew.full_circle(); hew = hew.circulate_face_ccw())
+//        {
+//            if (dsc_->is_outside(hew.vertex()))
+//            {
+//                is_boundary = true;
+//                continue;
+//            }
+//        }
+//        if (is_boundary)
+//        {
+//            continue;
+//        }
 
         auto pts = dsc_->get_pos(fkey);
         double area;
@@ -205,13 +205,15 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
         
         ev = ev / (length + SINGULAR_EDGE);
         
+        thres = 2*(c0-c1) * (c0-c1);
+        
         if (dsc.bStable[hew.vertex()] == 1
             and dsc.bStable[hew.opp().vertex()] == 1)
         {
             if (ev > thres and length > SMALLEST_SIZE) // High energy. Split
             {
                 dsc.split(ekey);
-                cout << "Split " << ekey.get_index() << endl;
+                cout << "Split " << ekey.get_index() << "; thres = " << thres << endl;
             }
             else // Low energy, consider collapse
             {

@@ -63,7 +63,7 @@ private:
     // Adaptive dt
     double E0_ = 0.0, E1_ = 0.0, dE_0_ = 0., dE2 = 0.;
     std::vector<Vec2> E_grad0_;
-    double dt = 2;
+    double dt = 1;
 private:
     /*
      Compute on the whole domain
