@@ -41,23 +41,24 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     assert(mincij > 1e-5);
 
     double flip_thres = SPLIT_FACE_COEFFICIENT*(1-SPLIT_FACE_COEFFICIENT)*mincij*mincij;
-    std::cout << "Flip thres = " << flip_thres << "; mincij = " << mincij << std::endl;
+    std::cout << "Split thres = " << flip_thres << "; mincij = " << mincij << std::endl;
     
     
     HMesh::FaceAttributeVector<double> variation(dsc_->get_no_faces(), 0);
     std::vector<Face_key> to_split;
     for (auto fkey : dsc_->faces())
     {
+        
         auto pts = dsc_->get_pos(fkey);
-        /*
-         Shrink the triangle
-         */
-        auto center = (pts[0] + pts[1] + pts[2]) / 3.0;
-        double aa = 1 - 0.1;
-        pts[0] = center + (pts[0] - center)*aa;
-        pts[1] = center + (pts[1] - center)*aa;
-        pts[2] = center + (pts[2] - center)*aa;
-        /**/
+//        /*
+//         Shrink the triangle
+//         */
+//        auto center = (pts[0] + pts[1] + pts[2]) / 3.0;
+//        double aa = 1 - 0.1;
+//        pts[0] = center + (pts[0] - center)*aa;
+//        pts[1] = center + (pts[1] - center)*aa;
+//        pts[2] = center + (pts[2] - center)*aa;
+//        /**/
         
         double area;
         double mi = img.get_tri_intensity_f(pts, &area); mi /= area;
@@ -99,7 +100,7 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
             {
                 continue;
             }
-            
+
             // Only split stable triangle
             // Triangle with 3 stable edge
             int bStable = 0;
@@ -107,18 +108,20 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
             {
                 bStable += dsc_->bStable[w.vertex()];
             }
-            
-            // For testing relabeling in the beginning
-            // bStable = 22;
-            
+          //  cout << "Stable = " << bStable << endl;
             if (bStable > 1)
             {
                 
                 dsc_->split(fkey);
-                std::cout << "Split: " << fkey.get_index() << std::endl;
+           //     std::cout << "Adapt: Split face: " << fkey.get_index() << std::endl;
+            }
+            else
+            {
+               // cout << "Adapt: not stable " << fkey.get_index() << std::endl;
             }
         }
     }
+
     
   //  dsc_->clean_attributes();
 }
@@ -144,6 +147,28 @@ struct edge_s_e
     double length;
 };
 
+void adapt_mesh::remove_needles(DSC2D::DeformableSimplicialComplex &dsc)
+{
+    dsc_ = &dsc;
+    
+    for (auto fit = dsc.faces_begin(); fit != dsc.faces_end(); fit++)
+    {
+        if (!dsc.mesh->in_use(*fit))
+        {
+            continue;
+        }
+        
+        HMesh::Walker het = dsc.walker(*fit);
+        if (
+            dsc.min_angle(*fit) < 5*M_PI/180.// dsc.DEG_ANGLE
+  //          and dsc.max_angle(*fit, het) < M_PI_2
+            )
+        {
+            dsc.remove_degenerate_needle(*fit);
+        }
+    }
+}
+
 void adapt_mesh::thinning(DSC2D::DeformableSimplicialComplex &dsc, image &img)
 {
     dsc_ = & dsc;
@@ -167,17 +192,6 @@ void adapt_mesh::thinning(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     
     double flip_thres = SPLIT_FACE_COEFFICIENT*(1-SPLIT_FACE_COEFFICIENT)*mincij*mincij;
     std::cout << "Flip thres = " << flip_thres << "; mincij = " << mincij << std::endl;
-    
-//    HMesh::FaceAttributeVector<double> variation(dsc_->get_no_faces(), 0);
-//    for (auto fkey : dsc_->faces())
-//    {
-//        auto pts = dsc_->get_pos(fkey);
-//        double area;
-//        double mi = img.get_tri_intensity_f(pts, &area); mi /= area;
-//        double e = img.get_tri_differ_f(pts, mi)/ (area + SINGULAR_AREA);
-//        
-//        variation[fkey] = e;
-//    }
     
 //    std::vector<Node_key> to_collapse;
     for (auto nkey : dsc_->vertices())
@@ -215,6 +229,7 @@ void adapt_mesh::thinning(DSC2D::DeformableSimplicialComplex &dsc, image &img)
         if (low_var)
         {
             dsc_->collapse(smallest.halfedge(), true);
+            //dsc.collapse(smallest, 0.0);
         }
     }
     
@@ -225,7 +240,6 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
 {
     dsc_ = &dsc;
     
-    double thres = EDGE_SPLIT_THRES;
     
     std::vector<Edge_key> edges;
     for(auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei)
@@ -281,15 +295,16 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
         
         ev = ev / (length + SINGULAR_EDGE);
         
-        thres = 2*(c0-c1) * (c0-c1);
+        double thres = SPLIT_EDGE_COEFFICIENT*(c0-c1) * (c0-c1);
         
         if (dsc.bStable[hew.vertex()] == 1
             and dsc.bStable[hew.opp().vertex()] == 1)
         {
             if (ev > thres and length > SMALLEST_SIZE) // High energy. Split
             {
-                dsc.split(ekey);
-                cout << "Split " << ekey.get_index() << "; thres = " << thres << endl;
+                dsc.split_adpat_mesh(ekey);
+                cout << "Adapt: Split edge " << ekey.get_index() << "; thres = " << thres <<
+                    " energy = " << ev << endl;
             }
             else // Low energy, consider collapse
             {
@@ -297,14 +312,9 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
                 // And doesnot reduce mesh quality
                 // conflict with face split
                 
-//                if (!collapse_edge(hew))
-//                {
-//                    collapse_edge(hew.opp());
-//                }
-                
                 if(dsc.collapse(ekey, true))
                 {
-                    cout << "Adapt mesh: Collapse " << ekey.get_index() << endl;
+                    cout << "Adapt mesh: Collapse edge " << ekey.get_index() << endl;
                 }
             }
         }

@@ -694,6 +694,12 @@ namespace DSC2D {
          */
         bool collapse(HMesh::Walker hew, real weight);
         
+        /**
+         Splits the edge eid by inserting a vertex at the center of the edge and splitting the two neighbouring faces of the edge. Returns whether it suceeds or not.
+         For mesh adaptation. We need stability of the vertex.
+         */
+        bool split_adpat_mesh(edge_key eid);
+        
         
         //************** QUALITY CONTROL ***************
 #pragma mark - Quality control
@@ -780,7 +786,7 @@ namespace DSC2D {
         
         //************** UTIL ***************
 #pragma mark - Utilities
-    private:
+    private: public:
         
         /**
          Checks that the mesh is valid, i.e. that each face has three vertices and that the area of a face is positive (the face is not degenerate).
@@ -922,6 +928,7 @@ namespace DSC2D {
         void increase_resolution_range(); // reduce smallest edge by 2. For multi resolution
         void refine_without_change_interface();
         
+        void remove_degenerate_needle(face_key fkey);
         /**
          Set coefficients. Smallest feature size in pixel
          */

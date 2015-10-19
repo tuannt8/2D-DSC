@@ -92,14 +92,12 @@ int debug_num[10] = {-1};
 /************************/
 /* test.bmp
  */
-dynamics_param g_param(0.01, // alpha
-                       1.0, // beta
+dynamics_param g_param(ALPHA, // alpha
+                       BETA, // beta
                        1. // dt
                        );
 
-std::string IMAGE_NAME = "test.png";
-double DISCRETIZE_RES = 8.0;//11.0
-double SMALLEST_SIZE = 30;
+std::string IMAGE_NAME = IMAGE_PATH;
 
 /************************/
 /* test.bmp

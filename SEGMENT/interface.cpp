@@ -327,7 +327,7 @@ void interface::draw()
     }
     
     if (options_disp::get_option("Edge and vertices ", true) and dsc) {
-        glLineWidth(0.5);
+        glLineWidth(1.0);
         Painter::draw_edges(*dsc);
         glColor3f(1, 0.0, 0.0);
         Painter::draw_vertices(*dsc);
@@ -379,6 +379,17 @@ void interface::draw()
 void interface::draw_tri_variant(){
     for (auto fkey : dsc->faces()){
         auto pts = dsc->get_pos(fkey);
+        /*
+         Shrink the triangle
+         */
+        {
+        auto center = (pts[0] + pts[1] + pts[2]) / 3.0;
+        double aa = 1 - 0.1;
+        pts[0] = center + (pts[0] - center)*aa;
+        pts[1] = center + (pts[1] - center)*aa;
+        pts[2] = center + (pts[2] - center)*aa;
+        }
+        /**/
         double area;
         double mi = image_->get_tri_intensity_f(pts, &area); mi /= area;
         double e = image_->get_tri_differ_f(pts, mi)/ (area + SINGULAR_AREA);

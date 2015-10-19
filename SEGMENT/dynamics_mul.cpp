@@ -81,46 +81,70 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
 
 void dynamics_mul::update_dsc_with_adaptive_mesh()
 {
-    int nb_displace = 1.;
-    adapt_mesh am;
+    int nb_displace = 10;
+
     
     // Displace vertices' positions
-    for (int iu = 0; iu < nb_displace; iu++)
-    {
+
         displace_dsc();
         
         compute_mean_intensity(mean_inten_);
         g_param.mean_intensity = mean_inten_;
         compute_intensity_force();
         compute_curvature_force();
-    }
+
+    static int count = 0;
+    static int count_thin = 0;
+    count ++;
+    count_thin++;
     
     
     // adapt mesh
+    adapt_mesh am;
     
-    update_vertex_stable();
-    am.split_edge(*s_dsc, *s_img);
+//    if (count_thin > 2*nb_displace+1)
+//    {
+//        count_thin = 0;
+//        update_vertex_stable();
+//        am.thinning(*s_dsc, *s_img);
+//        
+//        compute_mean_intensity(mean_inten_);
+//        g_param.mean_intensity = mean_inten_;
+//        compute_intensity_force();
+//        compute_curvature_force();
+//    }
+
     
-    compute_mean_intensity(mean_inten_);
-    g_param.mean_intensity = mean_inten_;
-    compute_intensity_force();
-    compute_curvature_force();
-    
-    update_vertex_stable();
-    am.split_face(*s_dsc, *s_img);
-    
-    compute_mean_intensity(mean_inten_);
-    g_param.mean_intensity = mean_inten_;
-    compute_intensity_force();
-    compute_curvature_force();
-    
-    update_vertex_stable();
-    am.thinning(*s_dsc, *s_img);
-    
-    compute_mean_intensity(mean_inten_);
-    g_param.mean_intensity = mean_inten_;
-    compute_intensity_force();
-    compute_curvature_force();
+    if (count > nb_displace)
+    {
+        count = 0;
+        
+        update_vertex_stable();
+        am.split_edge(*s_dsc, *s_img);
+        
+        compute_mean_intensity(mean_inten_);
+        g_param.mean_intensity = mean_inten_;
+        compute_intensity_force();
+        compute_curvature_force();
+        
+        update_vertex_stable();
+        am.split_face(*s_dsc, *s_img);
+        
+        compute_mean_intensity(mean_inten_);
+        g_param.mean_intensity = mean_inten_;
+        compute_intensity_force();
+        compute_curvature_force();
+        
+        update_vertex_stable();
+        am.thinning(*s_dsc, *s_img);
+        
+        compute_mean_intensity(mean_inten_);
+        g_param.mean_intensity = mean_inten_;
+        compute_intensity_force();
+        compute_curvature_force();
+
+        am.remove_needles(*s_dsc);
+    }
 }
 void dynamics_mul::compute_difference()
 {
@@ -180,10 +204,9 @@ void dynamics_mul::update_vertex_stable()
 {
     auto obj = s_dsc;
     
-    
     for (auto ni = obj->vertices_begin(); ni != obj->vertices_end(); ni++)
     {
-        obj->bStable[*ni] = 1;
+        obj->bStable[*ni] = 1; // default stable
         
         if ((obj->is_interface(*ni) or obj->is_crossing(*ni)))
         {
@@ -203,7 +226,7 @@ void dynamics_mul::update_vertex_stable()
             
             if (move < STABLE_MOVE) // stable
             {
-            //    std::cout << "Stable : " << ni->get_index() << std::endl;
+               // std::cout << "Stable : " << ni->get_index() << std::endl;
                 obj->bStable[*ni] = 1;
             }
             else
@@ -212,6 +235,7 @@ void dynamics_mul::update_vertex_stable()
             }
         }
     }
+    
 }
 
 void dynamics_mul::update_dsc_build_and_solve(dsc_obj &dsc, image &img){

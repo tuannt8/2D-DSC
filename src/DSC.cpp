@@ -552,15 +552,7 @@ namespace DSC2D
         external_node_forces[vid] = vec2(0.0);
         
 
-        bStable = 1;
-
-        
-
-//        if (is_interface(vid)) {
-//            std::cout << "Reinit node " << (int)vid.get_index() << "\n";
-//        }
-//        dts[vid] = default_dt;
-        
+        bStable[vid] = 1;
         
         forces[vid] = std::vector<vec2>(NB_FORCES, Vec2(0.0));
     }
@@ -680,6 +672,42 @@ namespace DSC2D
         }
     }
     
+    bool DeformableSimplicialComplex::split_adpat_mesh(edge_key eid)
+    {
+        
+        if (!unsafe_editable(eid)) {
+            return false;
+        }
+        
+        auto hew = walker(eid);
+        face_key f1 = hew.face();
+        node_key v1 = hew.next().vertex();
+        face_key f2 = hew.opp().face();
+        node_key v2 = hew.opp().next().vertex();
+        
+        // Split
+        node_key vid = mesh->split_edge(eid);
+        face_key newf1 = mesh->split_face_by_edge(f1, vid, v1);
+        face_key newf2 = mesh->split_face_by_edge(f2, vid, v2);
+        
+        // Update attributes
+        init_attributes(vid);
+        for(auto hew = walker(vid); !hew.full_circle(); hew = hew.circulate_vertex_cw())
+        {
+            if(hew.halfedge() != eid && hew.opp().halfedge() != eid)
+            {
+                init_attributes(hew.halfedge());
+            }
+        }
+        init_attributes(newf1, get_label(f1));
+        init_attributes(newf2, get_label(f2));
+        
+        update_locally(vid);
+        
+        bStable[vid] = 0;
+        
+        return true;
+    }
     
     bool DeformableSimplicialComplex::split(edge_key eid)
     {
@@ -721,18 +749,24 @@ namespace DSC2D
 //        bool success = split(sorted_face_edges(fid).back());
 //        return success;
         // check quality
+        
+        /*
+         TUAN: if the triangle is obtuse, split long edge
+         */
         auto hew = walker(fid);
         if (max_angle(fid, hew) > 120*M_PI / 180.)
         {
             return split(sorted_face_edges(fid).back());
         }
-        
         else
+        //--
         {
+            
             int fa = get_label(fid);
             node_key vid = mesh->split_face_by_vertex(fid);
             
             init_attributes(vid);
+            
             
             for(auto hew = walker(vid); !hew.full_circle(); hew = hew.circulate_vertex_cw())
             {
@@ -741,6 +775,7 @@ namespace DSC2D
             }
             
             update_locally(vid);
+            
             return true;
         }
     }
@@ -881,7 +916,7 @@ namespace DSC2D
     
     bool DeformableSimplicialComplex::collapse(HMesh::Walker hew, real weight)
     {
-        std::cout << "Collapse: " << hew.halfedge().get_index() << endl;
+//        std::cout << "Collapse: " << hew.halfedge().get_index() << endl;
         
         node_key vid = hew.vertex();
         vec2 p = (1.-weight) * get_pos(hew.vertex()) + weight * get_pos(hew.opp().vertex());
@@ -1095,12 +1130,13 @@ namespace DSC2D
                         }
                     }
                     mesh->collapse_edge(hw.halfedge());
+                    update_locally(hw.vertex());
                 }
                 
                 if((min_angle(*fi) < DEG_ANGLE || area(*fi) < DEG_AREA*AVG_AREA) && !collapse(*fi, true))
                 {
                     double mm = max_angle(*fi, hew);
-                    std::cout << "Degenerated normal. face: " << fi->get_index() << "Max a = " << mm << endl;
+                    std::cout << "Degenerated normal. face: " << fi->get_index() << " Max a = " << mm << endl;
                     collapse(*fi, false);
                 }
                 
@@ -1547,6 +1583,147 @@ namespace DSC2D
         split(ek);
     }
     
+    void DeformableSimplicialComplex::remove_degenerate_needle(Face_key fkey)
+    {
+        cout << "Remove needle: " << fkey.get_index() << endl;
+        
+        auto edges = sorted_face_edges(fkey);
+        int l = get_label(fkey);
+        
+        if(is_interface(edges[2]) || is_interface(edges[1]))
+        {
+            return;
+        }
+        
+        {
+            auto hew1 = walker(edges[2]);
+            auto hew2 = walker(edges[1]);
+            face_key f_out1 = hew1.opp().face();
+            face_key f_out2 = hew2.opp().face();
+            node_key n_out1 = hew1.opp().next().vertex();
+            node_key n_out2 = hew2.opp().next().vertex();
+            
+            // Split the two edges
+            node_key n1 = mesh->split_edge(hew1.halfedge());
+            node_key n2 = mesh->split_edge(hew2.halfedge());
+            // Split the faces
+            face_key new_f1 = mesh->split_face_by_edge(f_out1, n_out1, n1);
+            face_key new_f2 = mesh->split_face_by_edge(f_out2, n_out2, n2);
+            face_key new_f_in = mesh->split_face_by_edge(fkey, n1, n2);
+            
+            auto hem = walker(n1);
+            for (; !hem.full_circle(); hem = hem.circulate_vertex_ccw())
+            {
+                if (hem.vertex() == n2)
+                {
+                    break;
+                }
+            }
+            
+            // collapse edge
+            mesh->collapse_edge(hem.halfedge(), true);
+            
+            // Update attribute
+            init_attributes(n2);
+            for(auto hew = walker(n2); !hew.full_circle(); hew = hew.circulate_vertex_cw())
+            {
+                //if(hew.halfedge() != n2 && hew.opp().halfedge() != n2)
+                {
+                    init_attributes(hew.halfedge());
+                }
+            }
+            init_attributes(new_f1, get_label(f_out1));
+            init_attributes(new_f2, get_label(f_out2));
+            init_attributes(new_f_in, l);
+            
+            update_locally(n2);
+        }
+        return;
+        
+        node_key vn1, vn2;
+        {// Split edge 0
+            auto eid = edges[2];
+            auto hew = walker(eid);
+            face_key f1 = hew.face();
+            node_key v1 = hew.next().vertex();
+            face_key f2 = hew.opp().face();
+            node_key v2 = hew.opp().next().vertex();
+            
+            node_key vid = mesh->split_edge(eid);
+            face_key newf1 = mesh->split_face_by_edge(f1, vid, v1);
+            face_key newf2 = mesh->split_face_by_edge(f2, vid, v2);
+            
+            // Update attributes
+            init_attributes(vid);
+            for(auto hew = walker(vid); !hew.full_circle(); hew = hew.circulate_vertex_cw())
+            {
+                if(hew.halfedge() != eid && hew.opp().halfedge() != eid)
+                {
+                    init_attributes(hew.halfedge());
+                }
+            }
+            init_attributes(newf1, get_label(f1));
+            init_attributes(newf2, get_label(f2));
+            
+            update_locally(vid);
+            
+            vn1 = vid;
+        }
+        
+        {// Split edge 0
+            auto eid = edges[1];
+            auto hew = walker(eid);
+            face_key f1 = hew.face();
+            node_key v1 = hew.next().vertex();
+            face_key f2 = hew.opp().face();
+            node_key v2 = hew.opp().next().vertex();
+            
+            node_key vid = mesh->split_edge(eid);
+            face_key newf1 = mesh->split_face_by_edge(f1, vid, v1);
+            face_key newf2 = mesh->split_face_by_edge(f2, vid, v2);
+            
+            // Update attributes
+            init_attributes(vid);
+            for(auto hew = walker(vid); !hew.full_circle(); hew = hew.circulate_vertex_cw())
+            {
+                if(hew.halfedge() != eid && hew.opp().halfedge() != eid)
+                {
+                    init_attributes(hew.halfedge());
+                }
+            }
+            init_attributes(newf1, get_label(f1));
+            init_attributes(newf2, get_label(f2));
+            
+            update_locally(vid);
+            
+            vn2 = vid;
+        }
+        
+        // merge v2 and v1
+        auto pt = (get_pos(vn1) + get_pos(vn2)) / 2.0;
+        auto hew = walker(vn1);
+        for (; !hew.full_circle(); hew = hew.circulate_vertex_ccw())
+        {
+            if (hew.vertex() == vn2)
+            {
+                break;
+            }
+        }
+        
+        update_attributes(hew.halfedge(), OUTSIDE, OUTSIDE);
+        update_attributes(hew.prev().halfedge(), OUTSIDE, OUTSIDE);
+        update_attributes(hew.opp().next().halfedge(), OUTSIDE, OUTSIDE);
+        update_attributes(hew.next().halfedge(), OUTSIDE, OUTSIDE);
+        update_attributes(hew.opp().prev().halfedge(), OUTSIDE, OUTSIDE);
+        update_attributes(hew.opp().vertex(), OUTSIDE);
+        
+        mesh->collapse_edge(hew.halfedge());
+        
+        update_locally(vn2);
+        set_pos(vn2, pt);
+        set_destination(vn2, pt);
+    }
+    
     void DeformableSimplicialComplex::increase_resolution_range(){
         MAX_LENGTH = 2.;
         MIN_LENGTH = MIN_LENGTH / 2.0;
@@ -1562,7 +1739,7 @@ namespace DSC2D
     {
         // Length
         MAX_LENGTH = 2.;
-        MIN_LENGTH = length / AVG_LENGTH / 2.0;
+        MIN_LENGTH = length / AVG_LENGTH /2.0;
         DEG_LENGTH = 0.2*MIN_LENGTH;
         
         // Area

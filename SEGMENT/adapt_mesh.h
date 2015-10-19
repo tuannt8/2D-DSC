@@ -41,12 +41,9 @@
 /**
  DENTAL
  */
-#define FACE_SPLIT_THRES 0.01   // Variation threshold
-#define EDGE_SPLIT_THRES 0.4   // Energy threshold
-#define SINGULAR_AREA 30.        // In computation of triangle variation
-#define SINGULAR_EDGE 10.0
+#define SINGULAR_AREA 0.        // In computation of triangle variation
+#define SINGULAR_EDGE (SMALLEST_SIZE / 2.0)
 
-#define SPLIT_FACE_COEFFICIENT  0.2
 
 class adapt_mesh{
 public:
@@ -61,6 +58,8 @@ public:
     
     // remove steiner vertices
     void thinning(DSC2D::DeformableSimplicialComplex &dsc, image &img);
+    
+    void remove_needles(DSC2D::DeformableSimplicialComplex &dsc);
     
     // First step: Split face and relabeling. Not working.
     void split_face_and_relabel(DSC2D::DeformableSimplicialComplex &dsc, image &img);

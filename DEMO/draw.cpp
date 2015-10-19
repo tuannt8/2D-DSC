@@ -303,7 +303,7 @@ void Painter::draw_lines(const DeformableSimplicialComplex& dsc, const HMesh::Ve
 void Painter::draw_edges(const DeformableSimplicialComplex& dsc)
 {
     HMesh::HalfEdgeAttributeVector<vec3> colors = dsc.get_edge_colors();
-    glLineWidth(std::max(std::floor(LINE_WIDTH*dsc.get_avg_edge_length()), 1.));
+//    glLineWidth(std::max(std::floor(LINE_WIDTH*dsc.get_avg_edge_length()), 1.));
     vec3 p1, p2;
 	glBegin(GL_LINES);
 	for(auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei)
