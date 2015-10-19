@@ -43,7 +43,7 @@
  */
 #define FACE_SPLIT_THRES 0.01   // Variation threshold
 #define EDGE_SPLIT_THRES 0.4   // Energy threshold
-#define SINGULAR_AREA 0.        // In computation of triangle variation
+#define SINGULAR_AREA 30.        // In computation of triangle variation
 #define SINGULAR_EDGE 10.0
 
 class adapt_mesh{
@@ -66,6 +66,7 @@ private:
     DSC2D::DeformableSimplicialComplex *dsc_;
     void split_single_edge(Edge_key ekey);
     void add_point_if_need(HMesh::Walker hew);
+    bool collapse_edge(HMesh::Walker hew);
 };
 
 #endif /* defined(__DSC_seg_integral__adapt_mesh__) */

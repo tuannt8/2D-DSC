@@ -40,7 +40,8 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     }
     assert(mincij > 1e-5);
 
-    double flip_thres = 0.08*0.92*mincij*mincij;
+    double coe = 0.1;
+    double flip_thres = coe*(1-coe)*mincij*mincij;
     std::cout << "Flip thres = " << flip_thres << "; mincij = " << mincij << std::endl;
     
     
@@ -48,21 +49,17 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     std::vector<Face_key> to_split;
     for (auto fkey : dsc_->faces())
     {
-//        bool is_boundary = false;
-//        for (auto hew = dsc_->walker(fkey); !hew.full_circle(); hew = hew.circulate_face_ccw())
-//        {
-//            if (dsc_->is_outside(hew.vertex()))
-//            {
-//                is_boundary = true;
-//                continue;
-//            }
-//        }
-//        if (is_boundary)
-//        {
-//            continue;
-//        }
-
         auto pts = dsc_->get_pos(fkey);
+        /*
+         Shrink the triangle
+         */
+        auto center = (pts[0] + pts[1] + pts[2]) / 3.0;
+        double aa = 1 - 0.1;
+        pts[0] = center + (pts[0] - center)*aa;
+        pts[1] = center + (pts[1] - center)*aa;
+        pts[2] = center + (pts[2] - center)*aa;
+        /**/
+        
         double area;
         double mi = img.get_tri_intensity_f(pts, &area); mi /= area;
         double e = img.get_tri_differ_f(pts, mi)/ (area + SINGULAR_AREA);
@@ -112,6 +109,7 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
             
             if (bStable > 1)
             {
+                
                 dsc_->split(fkey);
                 std::cout << "Split: " << fkey.get_index() << std::endl;
             }
@@ -144,11 +142,86 @@ struct edge_s_e
 
 void adapt_mesh::thinning_interface(DSC2D::DeformableSimplicialComplex &dsc, image &img)
 {
-
+    dsc_ = & dsc;
+    
+    /**
+     Auto get threshold
+     */
+    auto c_array = g_param.mean_intensity;
+    double mincij = INFINITY;
+    for (int i = 0; i < c_array.size(); i++)
+    {
+        for (int j = 0; j < c_array.size(); j++)
+        {
+            if (i != j and mincij > std::abs(c_array[i] - c_array[j]))
+            {
+                mincij = std::abs(c_array[i] - c_array[j]);
+            }
+        }
+    }
+    assert(mincij > 1e-5);
+    
+    double flip_thres = 0.08*0.92*mincij*mincij;
+    std::cout << "Flip thres = " << flip_thres << "; mincij = " << mincij << std::endl;
+    
+    HMesh::FaceAttributeVector<double> variation(dsc_->get_no_faces(), 0);
+    for (auto fkey : dsc_->faces())
+    {
+        auto pts = dsc_->get_pos(fkey);
+        double area;
+        double mi = img.get_tri_intensity_f(pts, &area); mi /= area;
+        double e = img.get_tri_differ_f(pts, mi)/ (area + SINGULAR_AREA);
+        
+        variation[fkey] = e;
+    }
+    
+    std::vector<Node_key> to_collapse;
+    for (auto nkey : dsc_->vertices())
+    {
+        if (dsc_->is_interface(nkey))
+        {
+            continue;
+        }
+        
+        bool low_var = true;
+        for (auto hew = dsc_->walker(nkey); !hew.full_circle(); hew = hew.circulate_vertex_ccw())
+        {
+            if (variation[hew.face()] > flip_thres)
+            {
+                low_var = false;
+            }
+        }
+        if (low_var)
+        {
+            to_collapse.push_back(nkey);
+        }
+    }
+    
+    for (auto nkey : to_collapse)
+    {
+        // collapse the shortest edge
+        double shortest = INFINITY;
+        Edge_key se;
+        for (auto hew = dsc_->walker(nkey); !hew.full_circle(); hew = hew.circulate_vertex_ccw())
+        {
+            double l = dsc_->length(hew.halfedge());
+            if (l < shortest)
+            {
+                shortest = l;
+                se = hew.halfedge();
+            }
+        }
+        
+        dsc_->collapse(se, false);
+        cout << "Thining collapse: " << nkey.get_index() << endl;
+        break;
+    }
 }
 
 void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
 {
+    dsc_ = &dsc;
+    
     double thres = EDGE_SPLIT_THRES;
     
     std::vector<Edge_key> edges;
@@ -217,16 +290,40 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
             }
             else // Low energy, consider collapse
             {
-                bool success = dsc.collapse(ekey, true);
+                // Only collapse edge on the interface
+                // And doesnot reduce mesh quality
+                // conflict with face split
                 
-                
-//                if (success)
+//                if (!collapse_edge(hew))
 //                {
-//                    cout << "Collapse " << hew.halfedge().get_index() << endl;
+//                    collapse_edge(hew.opp());
 //                }
+                
+                if(dsc.collapse(ekey, true))
+                {
+                    cout << "Adapt mesh: Collapse " << ekey.get_index() << endl;
+                }
             }
         }
     }
+}
+
+bool adapt_mesh::collapse_edge(HMesh::Walker hew)
+{
+    if (dsc_->is_crossing(hew.opp().vertex()) )
+    {
+        return false;
+    }
+    
+    Vec2 p0 = dsc_->get_pos(hew.opp().vertex());
+    Vec2 p1 = dsc_->get_pos(hew.vertex());
+    Vec2 p2 = dsc_->get_pos(dsc_->previous_interface(hew).opp().vertex());
+    if (DSC2D::Util::cos_angle(p2, p0, p1) < dsc_->COS_MIN_ANGLE)
+    {
+        return dsc_->collapse(hew, 0.0);
+    }
+    
+    return false;
 }
 
 void adapt_mesh::split_single_edge(Edge_key ekey)

@@ -63,6 +63,7 @@ public:
 
     double get_sum_gradient_tri(Vec2_array tris, double * area = nullptr);
     
+    void debug_integral(Vec2_array tris);
     
     // Get value on the whole triangle
     template <typename T>

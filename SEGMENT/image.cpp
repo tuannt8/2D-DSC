@@ -31,7 +31,7 @@ void image::load_image(std::string const file_path){
     this->mirror('y');
 
 //   
-//    blur(BLUR); //isotropically
+    blur(BLUR); //isotropically
     noise(NOISE);
 
     set_gl_texture();
@@ -46,7 +46,7 @@ void image::draw_image(int window_width){
 
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, tex_ID);
-        
+
         glColor3f(1, 1, 1);
         glBegin(GL_QUADS);
 
@@ -61,7 +61,7 @@ void image::draw_image(int window_width){
 
         glTexCoord2f(0.0, 1.0);
         glVertex2f(0.0, h);
-        
+
         glEnd();
 
         glDisable(GL_TEXTURE_2D);
@@ -74,7 +74,6 @@ void image::draw_image(int window_width){
     glVertex2f(w, h);
     glVertex2f(0.0, h);
     glEnd();
-
 }
 
 void image::draw_grad(int window_width){
@@ -517,9 +516,12 @@ void image::set_gl_texture() {
     
     for (int j = 0; j < height(); ++j) {
     for (int i = 0; i < width(); ++i) {
-            *(ptr++) = (*this)(i,j, 0);
-            *(ptr++) = (*this)(i,j, 0);
-            *(ptr++) = (*this)(i,j, 0);
+        
+            BYTE color = (BYTE) (get_intensity_f(i,j) * 255);
+        
+            *(ptr++) = color;
+            *(ptr++) = color;
+            *(ptr++) = color;
         }
     }
 
@@ -533,6 +535,10 @@ void image::set_gl_texture() {
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+}
+
+void image::debug_integral(Vec2_array tris){
+
 }
 
 double image::get_tri_differ_f(Vec2_array tris, double ci) {

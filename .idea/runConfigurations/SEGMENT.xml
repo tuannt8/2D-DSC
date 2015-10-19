@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="SEGMENT" type="AppleRunConfiguration" factoryName="Application" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="DSC_seg_integral" TARGET_NAME="SEGMENT" CONFIG_NAME="Release" SCHEME_NAME="SEGMENT" RUN_TARGET_PROJECT_NAME="DSC_seg_integral" RUN_TARGET_NAME="SEGMENT" MAKE_ACTIVE="TRUE" WAIT_FOR="FALSE">
+  <configuration default="false" name="SEGMENT" type="AppleRunConfiguration" factoryName="Application" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="DSC_seg_integral" TARGET_NAME="SEGMENT" CONFIG_NAME="Debug" SCHEME_NAME="SEGMENT" RUN_TARGET_PROJECT_NAME="DSC_seg_integral" RUN_TARGET_NAME="SEGMENT" MAKE_ACTIVE="TRUE" WAIT_FOR="FALSE">
     <envs />
     <EXTENSION ID="org.jetbrains.appcode.reveal.RevealRunConfigurationExtension">
       <REVEAL_SETTINGS autoInject="false" autoInstall="true" askToEnableAutoInstall="true" />

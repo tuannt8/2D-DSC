@@ -722,7 +722,7 @@ namespace DSC2D
 //        return success;
         // check quality
         auto hew = walker(fid);
-        if (max_angle(fid, hew) > 150*M_PI / 180.)
+        if (max_angle(fid, hew) > 120*M_PI / 180.)
         {
             return split(sorted_face_edges(fid).back());
         }
@@ -763,29 +763,19 @@ namespace DSC2D
     
     bool DeformableSimplicialComplex::is_collapsable(HMesh::Walker hew, bool safe)
     {
-#ifdef TUAN_MULTI_RES
-//        if(is_interface(hew.halfedge()))
-//        {
-//            // Get the energy
-//            // Optimize later by building predefined triangle energy
-//            auto tris1 = get_pos(hew.face());
-//            auto tris2 = get_pos(hew.opp().face());
-//            
-//            double e = img->get_sum_on_tri_variation(tris1, pixel_spread) +
-//            img->get_sum_on_tri_variation(tris2, pixel_spread);
-//            e = e / length(hew.halfedge());
-//            
-//            if (e > collapse_ene_thres) {
-//                return false;
-//            }
-//        }
-#endif
-        
         if(safe)
         {
             if(safe_editable(hew.opp().vertex()))
             {
                 return true;
+            }
+            /*TUAN add: Do not move crossing vertex, even one of the iinterface is straight*/
+            else
+            {
+                if (is_crossing(hew.opp().vertex()))
+                {
+                    return false;
+                }
             }
         }
         else {
@@ -1110,7 +1100,6 @@ namespace DSC2D
                         }
                     }
                     mesh->collapse_edge(hw.halfedge());
-                    
                 }
                 
                 if((min_angle(*fi) < DEG_ANGLE || area(*fi) < DEG_AREA*AVG_AREA) && !collapse(*fi, true))
@@ -1432,13 +1421,6 @@ namespace DSC2D
                     }
 #endif
                 }
-            }
-        }
-        
-        // Tuan-hard code fix bug
-        for (auto fkey:faces()){
-            if (area(fkey) < 1e-6) {
-                collapse(fkey, false);
             }
         }
     }

@@ -78,7 +78,7 @@ namespace DSC2D {
             pri(_pri), h(_h), time(_time) {}
         };
         
-    protected:
+    protected:public: // testing
         
         real AVG_LENGTH;
         real AVG_AREA;

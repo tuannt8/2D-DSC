@@ -305,6 +305,7 @@ void interface::draw()
     
     reshape(WIN_SIZE_X, WIN_SIZE_Y);
     
+    
     if (options_disp::get_option("Image", true)) {
         image_->draw_image(WIN_SIZE_X);
     }
@@ -362,6 +363,10 @@ void interface::draw()
         Painter::draw_external_force(*dsc);
     }
     
+    // Debug
+//    auto fid = dsc->faces_begin();
+//    auto pts = dsc->get_pos(*fid);
+//    image_->debug_integral(pts);
     
     
     gl_debug_helper::draw();
