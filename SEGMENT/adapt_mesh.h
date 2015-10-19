@@ -46,6 +46,8 @@
 #define SINGULAR_AREA 30.        // In computation of triangle variation
 #define SINGULAR_EDGE 10.0
 
+#define SPLIT_FACE_COEFFICIENT  0.2
+
 class adapt_mesh{
 public:
     adapt_mesh();
@@ -57,8 +59,8 @@ public:
     // Split face mannually
     void split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img);
     
-    // remove vertices on interface
-    void thinning_interface(DSC2D::DeformableSimplicialComplex &dsc, image &img);
+    // remove steiner vertices
+    void thinning(DSC2D::DeformableSimplicialComplex &dsc, image &img);
     
     // First step: Split face and relabeling. Not working.
     void split_face_and_relabel(DSC2D::DeformableSimplicialComplex &dsc, image &img);

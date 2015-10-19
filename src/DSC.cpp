@@ -809,11 +809,6 @@ namespace DSC2D
     
     bool DeformableSimplicialComplex::collapse(const edge_key& eid, bool safe)
     {
-#ifdef TUAN_MULTI_RES
-//        if(is_interface(eid))
-//            return false;
-#endif
-        
         if (!precond_collapse_edge(*mesh, eid) || !unsafe_editable(eid))
         {
             return false;
