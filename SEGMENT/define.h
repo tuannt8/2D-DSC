@@ -35,7 +35,10 @@
 //// Mumford
 //#define ALPHA 0.1  // internal force
 //#define BETA    1.0 // external force
-
+//
+//#define DT_ 5.0
+//#define ADD_NOISE
+//#define STABLE_MOVE 1e-2
 
 ///*
 // * Sound
@@ -51,21 +54,131 @@
 //// Mumford
 //#define ALPHA 0.1  // internal force
 //#define BETA    1.0 // external force
+//#define DT_ 1.0
+//#define STABLE_MOVE 1e-2
+
+///*
+// * Fuel cell
+// */
+//// Coefficient
+//#define IMAGE_PATH "Data/fuel_cell/small_gap.png"
+//// Mesh control
+//#define DISCRETIZE_RES 20.0
+//#define SMALLEST_SIZE   3.0
+//// Adaptive mesh
+//#define SPLIT_FACE_COEFFICIENT  0.08 // split thres = coe*(1-coe)*(ci-cj)^2
+//#define SPLIT_EDGE_COEFFICIENT 1    // Split thres = coe*(ci-cj)^2
+//// Mumford
+//#define ALPHA 0.1  // internal force
+//#define BETA    1.0 // external force
+//#define DT_ 0.5
+//#define ADD_NOISE
+//#define STABLE_MOVE 1e-2
+
+///*
+// * Hamster -- easy
+// */
+//// Coefficient
+//#define IMAGE_PATH "Data/Gomu/TallHamster_x_135.png"
+//// Mesh control
+//#define DISCRETIZE_RES 10.0
+//#define SMALLEST_SIZE   5.0
+//// Adaptive mesh
+//#define SPLIT_FACE_COEFFICIENT  0.08 // split thres = coe*(1-coe)*(ci-cj)^2
+//#define SPLIT_EDGE_COEFFICIENT 10    // Split thres = coe*(ci-cj)^2
+//// Mumford
+//#define ALPHA 0.1  // internal force
+//#define BETA    1.0 // external force
+//#define DT_ 0.5
+//#define STABLE_MOVE 1e-2
+
+///*
+// * Star
+// */
+//// Coefficient
+//#define IMAGE_PATH "Star.png"
+//// Mesh control
+//#define DISCRETIZE_RES 10.0
+//#define SMALLEST_SIZE   5.0
+//// Adaptive mesh
+//#define SPLIT_FACE_COEFFICIENT  0.2 // split thres = coe*(1-coe)*(ci-cj)^2
+//#define SPLIT_EDGE_COEFFICIENT 2    // Split thres = coe*(ci-cj)^2
+//// Mumford
+//#define ALPHA 0.1  // internal force
+//#define BETA    1.0 // external force
+//#define DT_ 3
+//#define STABLE_MOVE 1e-2
+//#define ADD_NOISE
+
+///*
+// * Multi phase
+// */
+//// Coefficient
+//#define IMAGE_PATH "multi_700x700.png"
+//// Mesh control
+//#define DISCRETIZE_RES 10.0
+//#define SMALLEST_SIZE   5.0
+//// Adaptive mesh
+//#define SPLIT_FACE_COEFFICIENT  0.2 // split thres = coe*(1-coe)*(ci-cj)^2
+//#define SPLIT_EDGE_COEFFICIENT 2    // Split thres = coe*(ci-cj)^2
+//// Mumford
+//#define ALPHA 0.1  // internal force
+//#define BETA    1.0 // external force
+//#define DT_ 3
+//#define STABLE_MOVE 1e-2
+//#define ADD_NOISE
+
+///*
+// * adapt mesh
+// */
+//// Coefficient
+//#define IMAGE_PATH "adaptive.png"
+//// Mesh control
+//#define DISCRETIZE_RES 10.0
+//#define SMALLEST_SIZE   3.0
+//// Adaptive mesh
+//#define SPLIT_FACE_COEFFICIENT  0.2 // split thres = coe*(1-coe)*(ci-cj)^2
+//#define SPLIT_EDGE_COEFFICIENT 0.3    // Split thres = coe*(ci-cj)^2
+//// Mumford
+//#define ALPHA 0.1  // internal force
+//#define BETA    1.0 // external force
+//#define DT_ 3
+//#define STABLE_MOVE 1e-2
+//#define ADD_NOISE
+
+///*
+// * Cement
+// */
+//// Coefficient
+//#define IMAGE_PATH "Data/cement/sample.png"
+//// Mesh control
+//#define DISCRETIZE_RES 20.0
+//#define SMALLEST_SIZE   4.0
+//// Adaptive mesh
+//#define SPLIT_FACE_COEFFICIENT  0.08 // split thres = coe*(1-coe)*(ci-cj)^2
+//#define SPLIT_EDGE_COEFFICIENT 10    // Split thres = coe*(ci-cj)^2
+//// Mumford
+//#define ALPHA 0.2  // internal force
+//#define BETA    1.0 // external force
+//#define DT_ 0.5
+//#define STABLE_MOVE 1e-2
 
 /*
- * Fuel cell
+ * Dental
  */
 // Coefficient
-#define IMAGE_PATH "Data/fuel_cell/small_gap.png"
+#define IMAGE_PATH "Data/dental/sample_gap.png"
 // Mesh control
 #define DISCRETIZE_RES 20.0
-#define SMALLEST_SIZE   2.0
+#define SMALLEST_SIZE   8.0
 // Adaptive mesh
-#define SPLIT_FACE_COEFFICIENT  0.08 // split thres = coe*(1-coe)*(ci-cj)^2
-#define SPLIT_EDGE_COEFFICIENT 1    // Split thres = coe*(ci-cj)^2
+#define SPLIT_FACE_COEFFICIENT  0.5 // split thres = coe*(1-coe)*(ci-cj)^2
+#define SPLIT_EDGE_COEFFICIENT 5   // Split thres = coe*(ci-cj)^2
 // Mumford
-#define ALPHA 0.1  // internal force
+#define ALPHA 0.2  // internal force
 #define BETA    1.0 // external force
+#define DT_ 0.5
+#define STABLE_MOVE 1e-2
 
 using std::vector;
 using std::cout;

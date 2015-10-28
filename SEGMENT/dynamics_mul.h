@@ -38,7 +38,7 @@ enum {
     PHASE_PROBABILITY, // Probability of phase
 };
 
-#define STABLE_MOVE 1e-2
+// #define STABLE_MOVE 1e-2
 
 class dynamics_mul {
 
@@ -50,6 +50,8 @@ public:
     void  update_dsc(dsc_obj &dsc, image &img);
     
     void update_vertex_stable();
+    
+    void write_energy();
 private:
     // temporary variable
     dsc_obj * s_dsc;
@@ -59,11 +61,13 @@ private:
     std::map<int, double> mean_inten_;
     std::map<int, double> alpha_map_;
 
+    // Measure energy change
+    FILE *f;
     
     // Adaptive dt
     double E0_ = 0.0, E1_ = 0.0, dE_0_ = 0., dE2 = 0.;
     std::vector<Vec2> E_grad0_;
-    double dt = 0.5;
+    double dt = DT_;
 private:
     /*
      Compute on the whole domain
@@ -120,6 +124,8 @@ public:
     double curve_length(Node_key nid, Vec2 new_pos);
     
 private: public:
+    double get_total_energy(); // Oct. 20
+    
     double get_total_energy(dsc_obj *obj, std::map<int, double>  intesity_map);
     
     double energy_gradient_by_moving_distance(dsc_obj *obj, std::map<int, double>  intesity_map);

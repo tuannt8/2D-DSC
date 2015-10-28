@@ -685,6 +685,12 @@ namespace DSC2D
         face_key f2 = hew.opp().face();
         node_key v2 = hew.opp().next().vertex();
         
+        if (!mesh->in_use(f1) or !mesh->in_use(f2)
+            or !mesh->in_use(v1) or !mesh->in_use(v2))
+        {
+            return false;
+        }
+        
         // Split
         node_key vid = mesh->split_edge(eid);
         face_key newf1 = mesh->split_face_by_edge(f1, vid, v1);
@@ -702,8 +708,14 @@ namespace DSC2D
         init_attributes(newf1, get_label(f1));
         init_attributes(newf2, get_label(f2));
         
+        for (auto hew = walker(vid); !hew.full_circle(); hew= hew.circulate_vertex_ccw())
+        {
+            assert(mesh->in_use(hew.face()));
+        }
+        
         update_locally(vid);
         
+        // add stablity check
         bStable[vid] = 0;
         
         return true;
@@ -1603,6 +1615,12 @@ namespace DSC2D
             node_key n_out1 = hew1.opp().next().vertex();
             node_key n_out2 = hew2.opp().next().vertex();
             
+            if (!mesh->in_use(f_out1) or !mesh->in_use(f_out2)
+                or !mesh->in_use(n_out1) or !mesh->in_use(n_out2))
+            {
+                return;
+            }
+            
             // Split the two edges
             node_key n1 = mesh->split_edge(hew1.halfedge());
             node_key n2 = mesh->split_edge(hew2.halfedge());
@@ -1611,6 +1629,7 @@ namespace DSC2D
             face_key new_f2 = mesh->split_face_by_edge(f_out2, n_out2, n2);
             face_key new_f_in = mesh->split_face_by_edge(fkey, n1, n2);
             
+            // collapse edge n1-n2
             auto hem = walker(n1);
             for (; !hem.full_circle(); hem = hem.circulate_vertex_ccw())
             {
@@ -1619,8 +1638,6 @@ namespace DSC2D
                     break;
                 }
             }
-            
-            // collapse edge
             mesh->collapse_edge(hem.halfedge(), true);
             
             // Update attribute
@@ -1740,12 +1757,12 @@ namespace DSC2D
         // Length
         MAX_LENGTH = 2.;
         MIN_LENGTH = length / AVG_LENGTH /2.0;
-        DEG_LENGTH = 0.2*MIN_LENGTH;
+        DEG_LENGTH = MIN_LENGTH;// 0.2*MIN_LENGTH;
         
         // Area
         MAX_AREA = 5.;
-        MIN_AREA =  MIN_LENGTH*MIN_LENGTH;
-        DEG_AREA = 0.2*MIN_AREA;
+        MIN_AREA = MIN_LENGTH*MIN_LENGTH;
+        DEG_AREA = MIN_AREA; //0.2*MIN_AREA;
     }
     
     void DeformableSimplicialComplex::refine_without_change_interface(){

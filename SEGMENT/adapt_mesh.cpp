@@ -40,7 +40,7 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     }
     assert(mincij > 1e-5);
 
-    double flip_thres = SPLIT_FACE_COEFFICIENT*(1-SPLIT_FACE_COEFFICIENT)*mincij*mincij;
+    double flip_thres = SPLIT_FACE_COEFFICIENT*mincij*mincij;
     std::cout << "Split thres = " << flip_thres << "; mincij = " << mincij << std::endl;
     
     
@@ -54,7 +54,7 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
 //         Shrink the triangle
 //         */
 //        auto center = (pts[0] + pts[1] + pts[2]) / 3.0;
-//        double aa = 1 - 0.1;
+//        double aa = 1 - 0.2;
 //        pts[0] = center + (pts[0] - center)*aa;
 //        pts[1] = center + (pts[1] - center)*aa;
 //        pts[2] = center + (pts[2] - center)*aa;
@@ -65,15 +65,20 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
         double e = img.get_tri_differ_f(pts, mi)/ (area + SINGULAR_AREA);
         
         variation[fkey] = e;
-        if (e < flip_thres and area > 1)
+        if (e < flip_thres)
         {
-            
+      //      auto area = dsc_->area(fkey);
+//            if (area < SMALLEST_SIZE*SMALLEST_SIZE / 2.0)
+//            {
+//                cout << "Too small trinagle, not relabeled" << endl;
+//                continue;
+//            }
             // Consider flipping
             int min_label = -1;
             double min_differ = INFINITY;
 
             auto tris = dsc_->get_pos(fkey);
-            auto area = dsc_->area(fkey);
+       //     auto area = dsc_->area(fkey);
             
             
             for (int i = 0; i < c_array.size(); i++) {
@@ -95,8 +100,8 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
                 
             }
         }else{
-            auto area = dsc_->area(fkey);
-            if (area < SMALLEST_SIZE*SMALLEST_SIZE)
+        //    auto area = dsc_->area(fkey);
+            if (area < SMALLEST_SIZE*SMALLEST_SIZE / 2.0)
             {
                 continue;
             }
@@ -160,8 +165,8 @@ void adapt_mesh::remove_needles(DSC2D::DeformableSimplicialComplex &dsc)
         
         HMesh::Walker het = dsc.walker(*fit);
         if (
-            dsc.min_angle(*fit) < 5*M_PI/180.// dsc.DEG_ANGLE
-  //          and dsc.max_angle(*fit, het) < M_PI_2
+            dsc.min_angle(*fit) < 10*M_PI/180.// dsc.DEG_ANGLE
+            and dsc.max_angle(*fit, het) < 120*M_PI/180.
             )
         {
             dsc.remove_degenerate_needle(*fit);

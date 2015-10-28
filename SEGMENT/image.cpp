@@ -30,10 +30,11 @@ void image::load_image(std::string const file_path){
     load(file_path.c_str());
     this->mirror('y');
 
-//   
+#ifdef ADD_NOISE
     blur(BLUR); //isotropically
     noise(NOISE);
-
+#endif
+    
     set_gl_texture();
     compute_gradient();
 }

@@ -191,6 +191,11 @@ void interface::keyboard(unsigned char key, int x, int y){
             load_dsc();
         }
             break;
+        case 'w': // Split edge
+        {
+            dyn_->write_energy();
+        }
+            break;
         case 'u':
             std::cout << g_param.alpha << " - New alpha: ";
             std::cin >> g_param.alpha;
@@ -330,7 +335,8 @@ void interface::draw()
         glLineWidth(1.0);
         Painter::draw_edges(*dsc);
         glColor3f(1, 0.0, 0.0);
-        Painter::draw_vertices(*dsc);
+        glPointSize(1.0);
+    //    Painter::draw_vertices(*dsc);
     }
     
     

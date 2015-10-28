@@ -72,19 +72,26 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
 //    static int nb_spli = 0;
 //    if (nb_spli < 10) {
 //        std::cout << s_dsc->get_no_faces() <<" " << t << "\n";
-//        
+//        ưư
 //        for (auto fkey : s_dsc->faces()) {
 //            s_dsc->split(fkey);
 //        }
 //    }
 }
 
+void dynamics_mul::write_energy()
+{
+    fclose(f);
+    
+    cout << "DSC: " << s_dsc->get_no_faces() << " faces; " << s_dsc->get_no_vertices() << " vertices " << endl;
+}
+
 void dynamics_mul::update_dsc_with_adaptive_mesh()
 {
+    auto init_time = std::chrono::system_clock::now();
+    
     int nb_displace = 10;
 
-    
-    // Displace vertices' positions
 
         displace_dsc();
         
@@ -92,28 +99,13 @@ void dynamics_mul::update_dsc_with_adaptive_mesh()
         g_param.mean_intensity = mean_inten_;
         compute_intensity_force();
         compute_curvature_force();
-
+    
     static int count = 0;
     static int count_thin = 0;
     count ++;
-    count_thin++;
-    
     
     // adapt mesh
     adapt_mesh am;
-    
-//    if (count_thin > 2*nb_displace+1)
-//    {
-//        count_thin = 0;
-//        update_vertex_stable();
-//        am.thinning(*s_dsc, *s_img);
-//        
-//        compute_mean_intensity(mean_inten_);
-//        g_param.mean_intensity = mean_inten_;
-//        compute_intensity_force();
-//        compute_curvature_force();
-//    }
-
     
     if (count > nb_displace)
     {
@@ -145,6 +137,24 @@ void dynamics_mul::update_dsc_with_adaptive_mesh()
 
         am.remove_needles(*s_dsc);
     }
+    
+    // Displace vertices' positions
+    static bool inited = false;
+    if(!inited)
+    {
+        f = fopen("./LOG/MSE.txt", "w");
+        inited = true;
+    }
+    
+    static double time = 0;
+    std::chrono::duration<double> t = std::chrono::system_clock::now() - init_time;
+    time += t.count();
+    
+    double E = get_total_energy();
+    fprintf(f, "%f  %f\n", E, time);
+    
+    
+
 }
 void dynamics_mul::compute_difference()
 {
@@ -1640,6 +1650,31 @@ double dynamics_mul::get_total_energy(dsc_obj *obj, std::map<int, double>  inten
     }
     
     return E;
+}
+
+double dynamics_mul::get_total_energy()
+{
+    // intensity difference
+    double E = 0;
+    for (auto fkey : s_dsc->faces())
+    {
+        auto pts = s_dsc->get_pos(fkey);
+        double ci = mean_inten_[s_dsc->get_label(fkey)];
+        E += s_img->get_tri_differ_f(pts, ci);
+    }
+    
+    // Length
+    double L = 0;
+    for (auto ekey : s_dsc->halfedges())
+    {
+        auto hew = s_dsc->walker(ekey);
+        if (hew.vertex().get_index() > hew.opp().vertex().get_index())
+        {
+            L += s_dsc->length(ekey);
+        }
+    }
+    
+    return g_param.alpha * L + g_param.beta * E;
 }
 
 void dynamics_mul::debug_optimum_dt(){
