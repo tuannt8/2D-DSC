@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Check parametter
+if [ "$#" -lt 4 ]; then
+	echo width hight left down output_name
+	exit
+fi
+
+NUM=1
+NAME=out
+if [[ "$#" -eq 5 ]]; then
+	NAME=$5
+fi
+for i in $( ls ); do
+	if [[ $i = *scr* ]]; then 
+		NEW_NAME=$NAME"_"$NUM.png
+		echo crop $i to $NEW_NAME
+		convert -crop $1x$2+$3+$4 $i $NEW_NAME
+		NUM=$(( NUM + 1 ))
+	fi
+done

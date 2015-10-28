@@ -159,6 +159,11 @@ void Painter::draw_arrows(const DeformableSimplicialComplex& dsc, const HMesh::V
     vec3 arrow, a_hat, p;
     for(auto vi = dsc.vertices_begin(); vi != dsc.vertices_end(); ++vi)
     {
+        if (vi->get_index() >= arrows.size())
+        {
+            continue;
+        }
+        
         arrow = vec3(arrows[*vi][0], arrows[*vi][1], 0.f);
         if(arrow.length() > EPSILON)
         {

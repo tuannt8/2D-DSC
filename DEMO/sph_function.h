@@ -13,6 +13,9 @@
 #include "sph.h"
 #include "armadillo"
 
+#define INVALID_IDX -1
+#define GRAVITY_ABS 3
+
 class sph_function{
 public:
     sph *sph_mgr;
@@ -30,7 +33,23 @@ private:
     HMesh::VertexAttributeVector<int> vert_idx;
     HMesh::FaceAttributeVector<int> face_idx;
     
-    const int INVALID_IDX = -1;
+private:
+    // Constant volume
+    double m_V0;
+    
+    // Boundary
+    DSC2D::vec2 center_bound;
+    double r_bound;
+    
+    
+    //debug
+public:
+    HMesh::VertexAttributeVector<DSC2D::vec2> ver_dis;
+    static DSC2D::vec2 Gravity;
+private:
+    double get_curent_volume();
+    bool is_outside(DSC2D::vec2 pt, DSC2D::vec2 &projectionPoint);
+    bool is_on_boundary(DSC2D::vec2 pt, DSC2D::vec2 &projectionPoint);
 private:
     void re_index_dsc();
     void build_matrix();

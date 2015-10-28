@@ -9,42 +9,209 @@
 #include "sph_function.h"
 #include "draw.h"
 #include "console_debug.h"
+#include "../Eigen/Sparse"
 
+using namespace HMesh;
+using namespace Eigen;
+
+#define sign_(a) (a>0? 1:-1)
+
+
+DSC2D::vec2 sph_function::Gravity(0,-GRAVITY_ABS);
 
 void sph_function::deform(DSC2D::DeformableSimplicialComplex& dsc){
+    dsc_ptr = &dsc;
     
     /*
-     * Displace SPH
+     Displace DSC
      */
-    displace_sph();
+    // Gravity
+    HMesh::VertexAttributeVector<DSC2D::vec2> vels(dsc_ptr->get_no_vertices(), DSC2D::vec2(0.0));
+    for(auto vi = dsc.vertices_begin(); vi != dsc.vertices_end(); ++vi)
+    {
+        if (dsc.is_interface(*vi) or dsc.is_crossing(*vi))
+        {
+            vels[*vi] += Gravity;
+        }
+    }
+    // curvature
+    for (auto hekey : dsc_ptr->halfedges())
+    {
+        if (dsc_ptr->is_interface(hekey))
+        {
+            auto hew = dsc_ptr->walker(hekey);
+            auto l = dsc_ptr->get_pos(hew.opp().vertex()) - dsc_ptr->get_pos(hew.vertex());
+            l.normalize();
+            vels[hew.vertex()] += l*1.1;
+        }
+    }
     
-    /*
-     * Deform DSC
-     */
-    displace_dsc();
     
-    /*
-     * Index DSC
-     */
-    re_index_dsc();
+    for(auto vi = dsc.vertices_begin(); vi != dsc.vertices_end(); ++vi)
+    {
+        if(dsc.is_movable(*vi))
+        {
+            if (dsc.is_interface(*vi) or dsc.is_crossing(*vi))
+            {
+                auto ff = vels[*vi];
+                dsc.set_destination(*vi, dsc.get_pos(*vi) + vels[*vi]);
+            }
+        }
+    }
     
-    /*
-     * Compute matrix A in: A dP_col = dV_col
-     */
-    build_matrix();
-    
-    /*
-     * Compute expected volume dV_col
-     */
-    compt_volume_change();
-    
-    /**
-     * Solve for displacement dP_col
-     */
-//    solve_displacement();
-    solve_displacement_tikhnov();
+    dsc.deform();
 
-    get_info();
+    
+    /*
+     Volume lost compensation
+     */
+    double volumeLost = get_curent_volume() - m_V0;
+    
+    // Index the interface veritces
+    HMesh::VertexAttributeVector<int> vIdxs(dsc_ptr->get_no_vertices(), INVALID_IDX);
+    int num = 0;
+    for (auto vkey : dsc_ptr->vertices())
+    {
+        if (dsc_ptr->is_interface(vkey) or dsc_ptr->is_crossing(vkey))
+        {
+            vIdxs[vkey] = num++;
+        }
+    }
+    
+    // Build the equation
+    using EigMat = SparseMatrix<double>;
+    using EigVec = VectorXd;
+    
+    EigMat M(1 + num, 2*num);
+    for (auto ekey : dsc_ptr->halfedges())
+    {
+        if (dsc_ptr->is_interface(ekey))
+        {
+            auto hew = dsc_ptr->walker(ekey);
+            if (dsc_ptr->get_label(hew.face()) != 1)
+            {
+                hew = hew.opp();
+            }
+            
+            auto pt_tip = dsc_ptr->get_pos(hew.vertex());
+            auto pt_root = dsc_ptr->get_pos(hew.opp().vertex());
+            auto line = pt_tip - pt_root;
+            DSC2D::vec2 norm = DSC2D::Util::normalize(DSC2D::vec2(line[1], -line[0]));
+            double length = line.length();
+            
+            // Matrix M
+            int idx1 = vIdxs[hew.vertex()];
+            int idx2 = vIdxs[hew.opp().vertex()];
+            M.coeffRef(0, 2*idx1) += norm[0]*length / 2.0;
+            M.coeffRef(0, 2*idx1+1) += norm[1]*length / 2.0;
+            
+            M.coeffRef(0, 2*idx2) += norm[0]*length / 2.0;
+            M.coeffRef(0, 2*idx2+1) += norm[1]*length / 2.0;
+        }
+    }
+    
+    EigVec B(1 + num);
+    for (int i = 0; i < 1+num; i++)
+    {
+        B[i] = 0;
+    }
+    B[0] = -volumeLost;
+    
+    // Boundary
+    int bound_count = 1;
+    for (auto vkey : dsc_ptr->vertices())
+    {
+        if (dsc_ptr->is_interface(vkey) or dsc_ptr->is_crossing(vkey))
+        {
+            DSC2D::vec2 norm;
+            if (!is_on_boundary(dsc_ptr->get_pos(vkey), norm))
+            {
+                auto n = dsc_ptr->get_normal(vkey);
+                norm = DSC2D::vec2(n[1], -n[0]);
+            }
+            
+            int idx = vIdxs[vkey];
+            M.coeffRef(bound_count, 2*idx) = norm[0];
+            M.coeffRef(bound_count, 2*idx+1) = norm[1];
+            bound_count++;
+        }
+    }
+    
+    // Solve
+    EigMat M_t = M.transpose();
+    EigMat MtM = M_t*M;
+    EigVec MtB = M_t*B;
+    
+    ConjugateGradient<EigMat> cg(MtM);
+    EigVec X = cg.solve(MtB);
+    
+    // Apply displcement
+    ver_dis.resize(dsc_ptr->get_no_vertices());
+    for (auto vkey : dsc_ptr->vertices())
+    {
+        int idx = vIdxs[vkey];
+        if (idx != INVALID_IDX)
+        {
+            DSC2D::vec2 dis(X[2*idx], X[2*idx+1]);
+            dsc_ptr->set_destination(vkey, dsc_ptr->get_pos(vkey) + dis);
+            ver_dis[vkey] = dis;
+        }
+    }
+    
+    dsc_ptr->deform();
+    
+    /*
+     Project back to boundary
+     */
+    for (auto vkey : dsc_ptr->vertices())
+    {
+        if (dsc_ptr->is_interface(vkey) or dsc_ptr->is_crossing(vkey))
+        {
+            DSC2D::vec2 p_v;
+            if (is_outside(dsc_ptr->get_pos(vkey), p_v))
+            {
+                dsc_ptr->set_destination(vkey, p_v);
+            }
+        }
+    }
+    dsc.deform();
+}
+
+bool sph_function::is_on_boundary(DSC2D::vec2 pt, DSC2D::vec2 &norm)
+{
+    double l = (pt - center_bound).length();
+    if (l > r_bound - 1e-2)
+    {
+        norm = DSC2D::Util::normalize(pt-center_bound);
+        return true;
+    }
+    
+    return false;
+}
+
+bool sph_function::is_outside(DSC2D::vec2 pt, DSC2D::vec2 &projectionPoint)
+{
+    double l = (pt - center_bound).length();
+    if (l > r_bound)
+    {
+        projectionPoint = center_bound + DSC2D::Util::normalize(pt-center_bound)*r_bound;
+        return true;
+    }
+    
+    return false;
+}
+
+double sph_function::get_curent_volume(){
+    double V = 0;
+    for (auto fkey: dsc_ptr->faces())
+    {
+        if (dsc_ptr->get_label(fkey) == 1)
+        {
+            V += dsc_ptr->area(fkey);
+        }
+    }
+    
+    return V;
 }
 
 void sph_function::fit_dsc_to_sph(){
@@ -289,52 +456,21 @@ void sph_function::solve_displacement(){
 }
 
 void sph_function::draw(){
-    // Face intensity
-    if (console_debug::get_opt("DSC Face color by SPH", true)) {
-        HMesh::FaceAttributeVector<DSC2D::vec3>
-            colors(dsc_ptr->get_no_faces(), DSC2D::vec3(0.0));
-        
-        double scale = 10000;
-//        double rr = rho_0 * scale;
-        
-//        printf("\n ============================= \n");
-        for (auto fkey : dsc_ptr->faces()){
-//            if (dsc_ptr->get_label(fkey) != 0)
-            {
-                auto v_pos = dsc_ptr->get_pos(fkey);
-                double mass = sph_mgr->get_mass_tri(v_pos);
-                double rho = mass /dsc_ptr->area(fkey)*scale;
-                colors[fkey] = DSC2D::vec3(rho, rho, rho);
-//                printf(" %f ", rho/scale);
-            }
-//            else{
-//                colors[fkey] = DSC2D::vec3(rr, rr, rr);
-//            }
+    // Boundary
+    int N = 150;
+    glBegin(GL_LINE_LOOP);
+    glColor3f(1, 0, 0);
+    double step = 2*M_PI / (double)N;
+    for (int i = 0; i < N; i++)
+    {
+        double aa = step*i;
+        DSC2D::vec2 pt = center_bound + DSC2D::vec2(sin(aa)*r_bound, cos(aa)*r_bound);
+        glVertex2d(pt[0], pt[1]);
+    }
+    
+    glEnd();
 
-        }
-        Painter::draw_faces(*dsc_ptr, colors);
-    }
     
-    // Vetex displacement
-    if (console_debug::get_opt("Vert displacement", true)) {
-        if (vert_displace.size() == dsc_ptr->get_no_vertices()) {
-            Painter::draw_arrows(*dsc_ptr, vert_displace);
-        }
-    }
-    
-    // Volume change
-    if (console_debug::get_opt("Volume change", true)) {
-        if (dP_col.n_elem > 0) {
-            HMesh::FaceAttributeVector<std::string> vc(dsc_ptr->get_no_faces(), "");
-            for (auto fkey:dsc_ptr->faces()) {
-                if (face_idx[fkey] != INVALID_IDX) {
-                    double dV = dV_col[face_idx[fkey]];
-                    vc[fkey] = dV>0? "+" : "-";
-                }
-            }
-            Painter::draw_faces_text(*dsc_ptr, vc);
-        }
-    }
 }
 
 void sph_function::re_index_dsc(){
@@ -363,18 +499,13 @@ void sph_function::re_index_dsc(){
 }
 
 void sph_function::init(){
-    double mass = 0.0;
-    V0 = 0.0;
-    for (auto fkey:dsc_ptr->faces()){
-        if (dsc_ptr->get_label(fkey) != 0) {
-            
-            V0 += dsc_ptr->area(fkey);
-            auto v_pos = dsc_ptr->get_pos(fkey);
-            mass += sph_mgr->get_mass_tri(v_pos);
-        }
-    }
+    m_V0 = get_curent_volume();
+
+    // Boundary
+    auto pts = dsc_ptr->get_design_domain()->get_corners();
     
-    rho_0 = mass / V0;
+    center_bound = (pts[0] + pts[2]) / 2;
+    r_bound = (pts[1] - pts[0]).length() * 0.5 * 0.8;
 }
 
 void sph_function::build_matrix(){

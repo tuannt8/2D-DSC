@@ -162,7 +162,7 @@ void sph::init(DSC2D::DeformableSimplicialComplex &complex){
     auto corners = complex.get_design_domain()->get_corners();
     auto center = complex.get_center();
     vec2 diag = corners[2] - corners[0];
-    diag = diag/3.5;
+    diag = diag/4.0;
     
     ld_ = center - diag;
     ru_ = center + diag;
@@ -184,6 +184,10 @@ void sph::init(DSC2D::DeformableSimplicialComplex &complex){
                 * 2.0 / 1.0;
     
     DSC2D::vec2 gap(10,10);
-    DSC2D::ObjectGenerator::create_square(complex, ld_ - gap, ru_- ld_ + gap, 1);
     
+    DSC2D::ObjectGenerator::create_square(complex, ld_ - gap, ru_- ld_ + gap, 1);
+    for(auto fkey: complex.faces())
+    {
+        
+    }
 }

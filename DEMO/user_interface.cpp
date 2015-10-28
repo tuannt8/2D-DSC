@@ -275,11 +275,13 @@ void UI::keyboard(unsigned char key, int x, int y) {
                 update_title();
             }
             break;
-        case ',':
-            if(!dsc)
-            {
-                DISCRETIZATION = std::max(DISCRETIZATION - 0.5, 1.);
-                update_title();
+        case 'c':
+            if(std::abs(DSC2D::Util::dot(sph_function::Gravity, DSC2D::vec2(1,0))) > 0.9)
+           {
+               sph_function::Gravity = DSC2D::vec2(0,-GRAVITY_ABS);
+           }
+            else{
+                 sph_function::Gravity = DSC2D::vec2(-GRAVITY_ABS, 0);
             }
             break;
         case '<':
@@ -337,19 +339,19 @@ void UI::draw()
     Painter::begin();
     if (dsc)
     {
-    
-        sph_vel.draw();
         
         if (console_debug::get_opt("DSC edge", true)) {
             glColor3f(0.7, 0.2, 0.4);
             Painter::draw_edges(*dsc);
         }
         
-        sph_mgr.draw();
-        
         if(console_debug::get_opt("Face index", false)){
             Painter::draw_faces_idx(*dsc);
         }
+        
+        sph_vel.draw();
+        
+     //   Painter::draw_arrows(*dsc, sph_vel.ver_dis);
     }
     Painter::end();
 }
@@ -462,7 +464,7 @@ void UI::update_sph(){
 
 void UI::sph_init(){
     
-    DISCRETIZATION = 50;
+    DISCRETIZATION = 20;
     
     stop();
     
