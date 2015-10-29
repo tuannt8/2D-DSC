@@ -19,7 +19,6 @@
 #include "velocity_function.h"
 #include "DSC.h"
 #include "log.h"
-#include "sph.h"
 
 #ifdef WIN32
 #include <GL/glew.h>
@@ -57,7 +56,6 @@ class UI
     static UI* instance;
     
 public:
-    sph sph_mgr;
     int winID;
     
     void update_sph();

@@ -168,7 +168,7 @@ void UI::display()
     
     if(CONTINUOUS)
     {
-        CONTINUOUS = false;
+       // CONTINUOUS = false;
         
         update_sph();
        
@@ -232,15 +232,6 @@ void UI::keyboard(unsigned char key, int x, int y) {
             break;
         case 'd': // D ---> regular distribute
             sph_vel.deform(*dsc);
-            break;
-        case 'f': // F ---> Fit DSC
-            sph_vel.fit_dsc_to_sph();
-            break;
-        case 'm':
-            sph_mgr.gravity_down();
-            break;
-        case 't':
-            sph_vel.get_info();
             break;
         case '\t':
             if(dsc)
@@ -458,8 +449,6 @@ void UI::expand_blobs()
 
 void UI::update_sph(){
      sph_vel.deform(*dsc);
-    //  sph_mgr.gravity_down();
-    
 }
 
 void UI::sph_init(){
@@ -483,9 +472,7 @@ void UI::sph_init(){
     reshape(width + 2*DISCRETIZATION, height + 2*DISCRETIZATION);
     
     // sph
-    sph_mgr.init(*dsc);
-    
-    sph_vel.sph_mgr = &sph_mgr;
+
     sph_vel.dsc_ptr = &*dsc;
     sph_vel.init();
     
