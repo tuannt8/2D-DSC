@@ -339,6 +339,9 @@ void interface::draw()
     //    Painter::draw_vertices(*dsc);
     }
     
+    if(options_disp::get_option("Phase index", false)){
+        Painter::draw_face_label(*dsc);
+    }
     
     if(options_disp::get_option("Triangle variation", false)){
         draw_tri_variant();

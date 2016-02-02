@@ -217,6 +217,19 @@ void Painter::draw_faces_index(const DSC2D::DeformableSimplicialComplex& complex
     }
 }
 
+void Painter::draw_face_label(const DSC2D::DeformableSimplicialComplex& complex)
+{
+    char idx_text[20];
+    glColor3f(0, 0, 0);
+    for (auto fkey : complex.faces()){
+        auto tris = complex.get_pos(fkey);
+        auto center = (tris[0] + tris[1] + tris[2]) / 3;
+        
+        sprintf(idx_text, " %d", complex.get_label(fkey));
+        print_gl(center[0], center[1], idx_text);
+    }
+}
+
 void Painter::draw_interface(const DeformableSimplicialComplex& dsc, vec3 color)
 {
     glPointSize(std::max(std::floor(POINT_SIZE*dsc.get_avg_edge_length()), 1.));
@@ -308,7 +321,12 @@ void Painter::draw_edges(const DeformableSimplicialComplex& dsc)
 	glBegin(GL_LINES);
 	for(auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei)
     {
-        glColor3d(static_cast<double>(colors[*hei][0]), static_cast<double>(colors[*hei][1]), static_cast<double>(colors[*hei][2]));
+  //      glColor3d(static_cast<double>(colors[*hei][0]), static_cast<double>(colors[*hei][1]), static_cast<double>(colors[*hei][2]));
+        if (dsc.is_interface(*hei))
+        {
+            glColor3f(1, 0, 0);
+        }else
+            glColor3f(0, 0, 1);
         
         auto hew = dsc.walker(*hei);
         p1 = vec3(dsc.get_pos(hew.vertex())[0], dsc.get_pos(hew.vertex())[1], 0.);

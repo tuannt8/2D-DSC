@@ -22,8 +22,8 @@
 #endif
 
 
-#define NOISE 15
-#define BLUR 2.0
+#define NOISE 10
+#define BLUR 1.0
 
 void image::load_image(std::string const file_path){
     

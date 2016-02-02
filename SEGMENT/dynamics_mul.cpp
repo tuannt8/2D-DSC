@@ -81,8 +81,18 @@ void dynamics_mul::update_dsc_explicit(dsc_obj &dsc, image &img){
 
 void dynamics_mul::write_energy()
 {
-    fclose(f);
+    f = fopen("./LOG/MSE.txt", "w");
     
+    if(f)
+    {
+        for (auto d : data_log)
+        {
+            fprintf(f, "%f %f %f \n", d[0], d[1], d[2]);
+        }
+        fclose(f);
+    }
+    
+    if(s_dsc)
     cout << "DSC: " << s_dsc->get_no_faces() << " faces; " << s_dsc->get_no_vertices() << " vertices " << endl;
 }
 
@@ -138,23 +148,23 @@ void dynamics_mul::update_dsc_with_adaptive_mesh()
         am.remove_needles(*s_dsc);
     }
     
-    // Displace vertices' positions
-    static bool inited = false;
-    if(!inited)
-    {
-        f = fopen("./LOG/MSE.txt", "w");
-        inited = true;
-    }
+//    // Displace vertices' positions
+//    static bool inited = false;
+//    if(!inited)
+//    {
+//        f = fopen("./LOG/MSE.txt", "w");
+//        inited = true;
+//    }
     
     static double time = 0;
     std::chrono::duration<double> t = std::chrono::system_clock::now() - init_time;
     time += t.count();
     
-    double E = get_total_energy();
-    fprintf(f, "%f  %f\n", E, time);
     
-    
-
+    double E, l;
+    get_energy(E, l);
+    data_log.push_back(Vec3(E, l, time));
+//    fprintf(f, "%f %f  %f\n", E, l, time);
 }
 void dynamics_mul::compute_difference()
 {
@@ -1652,6 +1662,33 @@ double dynamics_mul::get_total_energy(dsc_obj *obj, std::map<int, double>  inten
     return E;
 }
 
+void dynamics_mul::get_energy(double &e_, double &l_)
+{
+    // intensity difference
+    double E = 0;
+    for (auto fkey : s_dsc->faces())
+    {
+        auto pts = s_dsc->get_pos(fkey);
+        double ci = mean_inten_[s_dsc->get_label(fkey)];
+        E += s_img->get_tri_differ_f(pts, ci);
+    }
+    
+    // Length
+    double L = 0;
+    for (auto ekey : s_dsc->halfedges())
+    {
+        auto hew = s_dsc->walker(ekey);
+        if (hew.vertex().get_index() > hew.opp().vertex().get_index()
+            && s_dsc->is_interface(hew.halfedge()))
+        {
+            L += s_dsc->length(ekey);
+        }
+    }
+    
+    e_ = E;
+    l_ = L;
+}
+
 double dynamics_mul::get_total_energy()
 {
     // intensity difference
@@ -1668,7 +1705,8 @@ double dynamics_mul::get_total_energy()
     for (auto ekey : s_dsc->halfedges())
     {
         auto hew = s_dsc->walker(ekey);
-        if (hew.vertex().get_index() > hew.opp().vertex().get_index())
+        if (hew.vertex().get_index() > hew.opp().vertex().get_index()
+            && s_dsc->is_interface(hew.halfedge()))
         {
             L += s_dsc->length(ekey);
         }
@@ -1973,15 +2011,8 @@ void dynamics_mul::compute_intensity_force(){
                 // Same coefficient
                 f = (2*I - c0 - c1) / (c0-c1) * dl /length;
                 
-//                // Different coefficients; for dental segmentation
-//                double beta2 = 1.3;
-//                if (phase0 == 2) {
-//                    f = -(beta2*(I-c0)*(I-c0) - (I-c1)*(I-c1)) * dl /length / ((c0-c1)*(c0-c1));
-//                }else if (phase1 == 2){
-//                    f = -((I-c0)*(I-c0) - beta2*(I-c1)*(I-c1)) * dl /length / ((c0-c1)*(c0-c1));
-//                } else{
-//                    f = (2*I - c0 - c1) / (c0-c1) * dl /length;
-//                }
+                // No normalization
+                //f = (2*I - c0 - c1) * (c0-c1) * dl /length;
                 
                 assert(f != NAN);
                 

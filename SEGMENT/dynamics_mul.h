@@ -63,6 +63,7 @@ private:
 
     // Measure energy change
     FILE *f;
+    std::vector<Vec3> data_log;
     
     // Adaptive dt
     double E0_ = 0.0, E1_ = 0.0, dE_0_ = 0., dE2 = 0.;
@@ -125,6 +126,7 @@ public:
     
 private: public:
     double get_total_energy(); // Oct. 20
+    void get_energy(double &e_, double &l_); // 25.01.16
     
     double get_total_energy(dsc_obj *obj, std::map<int, double>  intesity_map);
     

@@ -103,7 +103,10 @@ public:
      */
     static void draw_faces(const DSC2D::DeformableSimplicialComplex& complex, const HMesh::FaceAttributeVector<DSC2D::vec3> &colors);
     
-    
+    /**
+     Draw the phase index (Phase label)
+     */
+    static void draw_face_label(const DSC2D::DeformableSimplicialComplex& complex);
     
     /**
      Draws the faces using the 'jet' color scheme.
