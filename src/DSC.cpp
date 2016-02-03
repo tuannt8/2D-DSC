@@ -16,6 +16,7 @@
 
 #include "DSC.h"
 #include "draw.h"
+#include <thread>
 
 namespace DSC2D
 {    
@@ -141,6 +142,7 @@ namespace DSC2D
     
     void DeformableSimplicialComplex::fix_complex()
     {
+
         smooth();
         
         max_min_angle();
@@ -149,6 +151,7 @@ namespace DSC2D
         remove_degenerate_faces();
         
         smooth();
+
     }
     
     void DeformableSimplicialComplex::resize_complex()
@@ -207,6 +210,7 @@ namespace DSC2D
     
     void DeformableSimplicialComplex::deform()
     {
+        
         bool work = true;
         int count = 0;
         while(work && count < 10)
@@ -224,13 +228,18 @@ namespace DSC2D
             count++;
         }
         
+
+        
         resize_complex();
+        
+
         
         HMesh::IDRemap cleanup_map;
         cleanup_attributes(cleanup_map);
         
         init_attributes();
         update_attributes();
+
     }
     
     bool DeformableSimplicialComplex::is_movable(node_key vid) const
@@ -811,15 +820,21 @@ namespace DSC2D
         }
     }
     
-    void DeformableSimplicialComplex::remove_degenerate_edges()
+    void DeformableSimplicialComplex::remove_degenerate_edges(int *count)
     {
+        if (count) {
+            *count = 0;
+        }
         for(auto ei = halfedges_begin(); ei != halfedges_end(); ei++)
         {
-            if(mesh->in_use(*ei))
+  //          if(mesh->in_use(*ei))
             {
                 if(length(*ei) < DEG_LENGTH*AVG_LENGTH && !collapse(*ei, true))
                 {
                     collapse(*ei, false);
+                    if (count) {
+                        *count ++;
+                    }
                 }
             }
         }
@@ -1263,4 +1278,106 @@ namespace DSC2D
         priority_queue_optimization(energy_fun);
     }
     
+#pragma mark - TEST PARALLEL
+    /******************************************************************************************/
+    /* TEST PARALLEL */
+    /******************************************************************************************/
+    /**
+     Parallel laplacian smooth
+     */
+    using namespace std;
+    void thread_dsc(int index, DeformableSimplicialComplex *dsc)
+    {
+//        duration_t sl(4);
+//        std::this_thread::sleep_for(sl);
+//        return;
+        
+        
+        //Compute new coordinate
+        // There should be some flag tell the thread to wait
+        {
+            // First phase - index and 2*index
+            dsc->smooth(2*index);
+
+            // Sync here to make sure all done
+            std::unique_lock<std::mutex> lck(dsc->mtx);
+            dsc->count_finish ++;
+
+            dsc->cv.notify_all();
+            while (dsc->count_finish  < 2) {
+                dsc->cv.wait(lck);
+            }
+            
+            // Second phase- index+1 and 2*index+1
+            dsc->smooth(2*index+1);
+        }
+    }
+    
+    
+    void DeformableSimplicialComplex::parallel_smooth(){
+        // Divide to 4 region
+        //
+        
+        count_finish = 0;
+        ready = false;
+        
+        positions.resize(get_no_vertices());
+        std::fill(positions.begin(), positions.end(), vec2(0.));
+        
+
+    }
+    
+    void DeformableSimplicialComplex::normal_smooth(){
+        int i = 0;
+        for(auto vi = vertices_begin(); vi != vertices_end(); ++vi,++i)
+        {
+            if(safe_editable(*vi))
+            {
+                positions[i] =  (get_barycenter(*vi, false) - get_pos(*vi)) + get_pos(*vi);
+            }
+        }
+    }
+    
+    void DeformableSimplicialComplex::smooth(int region){
+        
+        double left = INFINITY, right = -INFINITY;
+        std::vector<vec2> corners = get_design_domain()->get_corners();
+        for (auto p : corners) {
+            left = std::min(left, p[0]);
+            right = std::max(right, p[1]);
+        }
+        double rwidth = (right - left)/(NUM_THREAD);
+        left = left + region*rwidth;
+        right = left + rwidth;
+    
+        int i = 0;
+        for(auto vi = vertices_begin(); vi != vertices_end(); ++vi,++i)
+        {
+            auto p = get_pos(*vi);
+
+            if(p[0] >= left && p[0] < right && safe_editable(*vi))
+            {
+                positions[i] =  (get_barycenter(*vi, false) - get_pos(*vi)) + get_pos(*vi);
+            }
+        }
+        
+        // Swap pointer is faster. No, we also need to check if it is safe editable
+        // But it may be not the bottle neck
+//        i = 0;
+//        for(auto vi = vertices_begin(); vi != vertices_end(); ++vi,++i)
+//        {
+//            if(safe_editable(*vi))
+//            {
+//                set_pos(*vi, positions[i]);
+//            }
+//        }
+    }
+
+    void DeformableSimplicialComplex::swap_pos(std::vector<vec3> *new_pos) {
+        
+        auto & vertices = mesh->positions_attribute_vector();
+        vertices.items.swap(*new_pos);
+    }
 }
+
+

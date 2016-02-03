@@ -101,7 +101,7 @@ void flip_worker(parallel::dsc_class *dsc, int tid)
             {
                 l.lock();
                 bool bflip = HMesh::precond_collapse_edge(*dsc->mesh, hew.halfedge())
-                                    && dsc->safe_editable(hew.halfedge());
+                                    &&  dsc->safe_editable(hew.halfedge());
                 l.unlock();
                 
                 if (bflip)

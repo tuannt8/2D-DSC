@@ -29,8 +29,28 @@
 #endif
 
 
+
+#ifdef PROFILE
+#define TIME_NOW (std::chrono::system_clock::now())
+typedef std::chrono::duration<double> duration_t;
+enum{
+    smooth_t = 0,
+    angle_t,
+    rm_edge_t,
+    rm_face_t,
+    resize_t,
+    attribute_t,
+    count_t, //in while loop
+    total_iter_t, // nb of iterations
+    total_t // nb of enum
+};
+
+#define P_COUNT 20
+#endif
+
 namespace DSC2D {
     
+
     
     /**
      The base class representing a simplicial complex.
@@ -83,7 +103,7 @@ namespace DSC2D {
         vec3 DEFAULT_COLOR;
         vec3 OUTSIDE_FACE_COLOR;
         vec3 DEFAULT_FACE_COLOR;
-        
+
     private:
     public:
         HMesh::Manifold *mesh;
@@ -190,6 +210,7 @@ namespace DSC2D {
         
         
         //************** GETTERS ***************
+#pragma mark - GETTERS
     public:
         
         /**
@@ -312,7 +333,7 @@ namespace DSC2D {
         
         
         //************** SETTERS ***************
-    protected:
+    public:
         
         /**
          Sets the position of the vertex with ID vid to p. Should only be used internally by the simplicial complex class.
@@ -489,9 +510,11 @@ namespace DSC2D {
          Returns whether the edge with ID eid is movable, i.e. interface and unsafe editable.
          */
         virtual bool is_movable(edge_key eid) const;
+
         
     protected:
     public:
+
         /**
          Returns whether the vertex with ID vid is editable, but not safe to interface changes i.e. if you edit the vertex you may change the interface.
          */
@@ -519,7 +542,7 @@ namespace DSC2D {
          */
         void deform();
         
-    private:
+    public:
         
         /**
          Moves a the vertex with ID vid to its new position. Returns whether the vertex was succesfully moved to its new position.
@@ -569,8 +592,8 @@ namespace DSC2D {
         void add_to_queue(HMesh::HalfEdgeAttributeVector<int>& touched, std::priority_queue<PQElem>& Q, edge_key h, const HMesh::EnergyFun& efun);
         
         void priority_queue_optimization(const HMesh::EnergyFun& efun);
-        
-    private:
+
+    public:
         /**
          Maximize minimum angles using greedy approach by flipping edges.
          */
@@ -594,7 +617,7 @@ namespace DSC2D {
         /**
          Remove degenerate edges.
          */
-        void remove_degenerate_edges();
+        void remove_degenerate_edges(int* count = nullptr);
         
         /**
          Remove degenerate faces.
@@ -602,7 +625,7 @@ namespace DSC2D {
         void remove_degenerate_faces();
         
         //************** DETAIL CONTROL ***************
-        
+#pragma mark - DETAIL CONTROL
     public:
         /**
          Resize the elements of the simplicial complex by thinning, thickening and splitting of the interface.
@@ -752,6 +775,36 @@ namespace DSC2D {
          */
         real intersection_with_link(const node_key& vid, vec2 destination) const;
         
+#pragma mark - TEST PARALLEL
+    public:
+        /******************************************************************************************/
+        /* TEST PARALLEL */
+        /******************************************************************************************/
+        /**
+         Parallel laplacian smooth
+         */
+        int count_finish;
+        
+        void parallel_smooth();
+        
+        void smooth(int region);
+        void normal_smooth();
+        void start_thread(int index);
+        void thread_finish(int index);
+        
+        bool is_all_finish();
+        void update_finish_flag();
+    
+        // Threa management
+        std::mutex mtx;             // mutex for critical section
+        std::condition_variable cv; // condition variable for critical section
+        bool ready;
+        int NUM_THREAD = 8;
+        
+        std::vector<vec2> positions;
+
+        // Additional function
+        void swap_pos(std::vector<vec3> * new_pos);
     };
     
 }

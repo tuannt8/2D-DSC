@@ -72,9 +72,9 @@ UI* UI::instance = NULL;
 UI::UI(int &argc, char** argv)
 {
     instance = this;
-	WIN_SIZE_X = 500;
+    WIN_SIZE_X = 500;
     WIN_SIZE_Y = 500;
-
+    
     glutInit(&argc, argv);
     glutInitWindowSize(WIN_SIZE_X,WIN_SIZE_Y);
 #ifdef WIN32
@@ -85,14 +85,14 @@ UI::UI(int &argc, char** argv)
     glutCreateWindow("");
     
     glEnable(GL_MULTISAMPLE);
-	
-	glEnable(GL_LINE_SMOOTH);
+    
+    glEnable(GL_LINE_SMOOTH);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     glEnable(GL_POINT_SMOOTH);
     glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-	glEnable(GL_BLEND);
+    glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+    
     glutDisplayFunc(display_);
     glutKeyboardFunc(keyboard_);
     glutVisibilityFunc(visible_);
@@ -130,7 +130,7 @@ UI::UI(int &argc, char** argv)
     update_title();
     check_gl_error();
     
-    // Initialization
+    
     init_mesh_for_parallel();
 }
 
@@ -344,27 +344,6 @@ void UI::start()
 
 using namespace DSC2D;
 
-void UI::init_mesh_for_parallel()
-{
-    int width = 450;
-    int height = 450;
-    
-    std::vector<real> points;
-    std::vector<int> faces;
-    Trializer::trialize(width, height, DISCRETIZATION, points, faces);
-    
-    DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, DISCRETIZATION);
-    
-    dsc = std::unique_ptr<DeformableSimplicialComplex>(new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
-    vel_fun = std::unique_ptr<VelocityFunc<>>(new RotateFunc(VELOCITY, ACCURACY));
-    
-//    ObjectGenerator::create_square(*dsc, vec2(150., 150.), vec2(200., 200.), 1);
-    
-    reshape(width + 2*DISCRETIZATION, height + 2*DISCRETIZATION);
-    
-    m_para.random_flip(*dsc, 0.2);
-}
-
 void UI::rotate_square()
 {
     stop();
@@ -384,6 +363,27 @@ void UI::rotate_square()
     
     reshape(width + 2*DISCRETIZATION, height + 2*DISCRETIZATION);
     start();
+}
+
+void UI::init_mesh_for_parallel()
+{
+    int width = 450;
+    int height = 450;
+    
+    std::vector<real> points;
+    std::vector<int> faces;
+    Trializer::trialize(width, height, DISCRETIZATION, points, faces);
+    
+    DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, DISCRETIZATION);
+    
+    dsc = std::unique_ptr<DeformableSimplicialComplex>(new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
+    vel_fun = std::unique_ptr<VelocityFunc<>>(new RotateFunc(VELOCITY, ACCURACY));
+    
+    //    ObjectGenerator::create_square(*dsc, vec2(150., 150.), vec2(200., 200.), 1);
+    
+    reshape(width + 2*DISCRETIZATION, height + 2*DISCRETIZATION);
+    
+    m_para.random_flip(*dsc, 0.2);
 }
 
 void UI::smooth_filled()
@@ -430,4 +430,3 @@ void UI::expand_blobs()
     reshape(width + 2*DISCRETIZATION, height + 2*DISCRETIZATION);
     start();
 }
-

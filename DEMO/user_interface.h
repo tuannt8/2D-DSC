@@ -19,6 +19,7 @@
 #include "velocity_function.h"
 #include "DSC.h"
 #include "log.h"
+#include "define.h"
 
 #ifdef WIN32
 #include <GL/glew.h>
@@ -150,4 +151,12 @@ private:
      Should be called when a motion is stopped.
      */
     void stop();
+    
+public:
+    // Testing
+    void random_short_edge(dsc_obj &complex);
+    
+#ifdef PROFILE
+    void log_profile();
+#endif
 };
