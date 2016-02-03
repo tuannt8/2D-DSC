@@ -30,6 +30,8 @@
 #include <GLUT/glut.h>
 #endif
 
+#include "parallel.hpp"
+
 /**
  A default user interface which utilize OpenGL, GLEW and GLUT. At least some of the motion functions should be overridden.
  */
@@ -51,6 +53,10 @@ class UI
     double ACCURACY;
     static UI* instance;
     
+    
+    // Parallel
+    parallel m_para;
+    void init_mesh_for_parallel();
 public:
     
     UI(int &argc, char** argv);

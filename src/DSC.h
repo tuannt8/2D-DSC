@@ -60,6 +60,7 @@ namespace DSC2D {
         };
         
     protected:
+    public:
         
         real AVG_LENGTH;
         real AVG_AREA;
@@ -84,6 +85,7 @@ namespace DSC2D {
         vec3 DEFAULT_FACE_COLOR;
         
     private:
+    public:
         HMesh::Manifold *mesh;
         DesignDomain *design_domain;
         
@@ -489,7 +491,7 @@ namespace DSC2D {
         virtual bool is_movable(edge_key eid) const;
         
     protected:
-        
+    public:
         /**
          Returns whether the vertex with ID vid is editable, but not safe to interface changes i.e. if you edit the vertex you may change the interface.
          */
