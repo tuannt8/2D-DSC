@@ -15,6 +15,7 @@
 //  See licence.txt for a copy of the GNU General Public License.
 
 #include "user_interface.h"
+#include <unistd.h>
 
 #include "rotate_function.h"
 #include "average_function.h"
@@ -23,6 +24,8 @@
 #include "trializer.h"
 #include "object_generator.h"
 #include "draw.h"
+#include "thread_helper.h"
+#include "profile.h"
 
 void _check_gl_error(const char *file, int line)
 {
@@ -72,8 +75,8 @@ UI* UI::instance = NULL;
 UI::UI(int &argc, char** argv)
 {
     instance = this;
-	WIN_SIZE_X = 500;
-    WIN_SIZE_Y = 500;
+	WIN_SIZE_X = 800;
+    WIN_SIZE_Y = 800;
 
     glutInit(&argc, argv);
     glutInitWindowSize(WIN_SIZE_X,WIN_SIZE_Y);
@@ -111,26 +114,68 @@ UI::UI(int &argc, char** argv)
     {
         QUIT_ON_COMPLETION = true;
         CONTINUOUS = true;
-        RECORD = true;
+        RECORD = false;
         
         Util::ArgExtracter ext(argc, argv);
         ext.extract("nu", VELOCITY);
         ext.extract("delta", DISCRETIZATION);
         ext.extract("alpha", ACCURACY);
+        
+        
     }
-    else {
+    else
+    {
         VELOCITY = 10.;
-        DISCRETIZATION = 25.;
-        ACCURACY = 5.;
+        DISCRETIZATION = 21;
+        VELOCITY = DISCRETIZATION/2.;
+        ACCURACY = DISCRETIZATION/5.;
         
         CONTINUOUS = false;
-        RECORD = true;
+        RECORD = false;
         QUIT_ON_COMPLETION = false;
+        
+        rotate_square();
+
+        // Make test cases
+        random_short_edge(*dsc); // good for smooth
+        
+//        {
+//            profile pf("Parallel");
+//            thread_helper th;
+//            th.edge_collapse(*dsc, 0, WIN_SIZE_X);
+//        }
+        {
+
+          //  dsc->remove_degenerate_edges(&count);
+        //    std::cout << "Collapse " << count << " edges" << std::endl;
+        }
+
     }
     update_title();
     check_gl_error();
 }
 
+void UI::random_short_edge(dsc_obj &complex){
+    double percentage = 0.1;
+    int count = 0;
+    for (auto ei = complex.halfedges_begin(); ei != complex.halfedges_end(); ++ei) {
+        
+        double r = (double)std::rand() / (double)RAND_MAX;
+        bool b_should_shorten = (r) < percentage;
+        
+        if (b_should_shorten && !HMesh::boundary(*complex.mesh, complex.walker(*ei).vertex())
+            && !HMesh::boundary(*complex.mesh, complex.walker(*ei).opp().vertex()))
+        {
+            auto p1 = complex.get_pos(complex.walker(*ei).vertex());
+            auto p2 = complex.get_pos(complex.walker(*ei).opp().vertex());
+            double a = 0.1;
+            auto p = (p1*a + p2*(1-a));
+            complex.set_pos(complex.walker(*ei).vertex(), p);
+            count ++;
+        }
+    }
+    std::cout << "Shorten " << count << " edges / " << complex.get_no_halfedges() << std::endl;
+}
 void UI::update_title()
 {
     std::ostringstream oss;
@@ -151,9 +196,13 @@ void UI::display()
         return;
     }
     
+
     draw();
     update_title();
     
+    int count = 10;
+    static int iter = 0;
+
     if(vel_fun && CONTINUOUS)
     {
         vel_fun->take_time_step(*dsc);
@@ -164,6 +213,17 @@ void UI::display()
             if (QUIT_ON_COMPLETION) {
                 exit(0);
             }
+        }
+        iter++;
+        std::cout << iter << " / " << count << std::endl;
+        if (iter == count) {
+            CONTINUOUS = false;
+#ifdef PROFILE
+            log_profile();
+            std::cout << "TAKING SCREEN SHOT" << std::endl;
+            Painter::save_painting(WIN_SIZE_X, WIN_SIZE_Y, "../../../LOG");
+            
+#endif
         }
     }
     check_gl_error();
@@ -177,16 +237,54 @@ void UI::reshape(int width, int height)
         glLoadIdentity();
         gluOrtho2D(0, WIN_SIZE_X, 0, WIN_SIZE_Y);
     }
-    
-    glViewport(0, 0, WIN_SIZE_X, WIN_SIZE_Y);
+
+    glViewport(5, 5, WIN_SIZE_X, WIN_SIZE_Y);
     glutReshapeWindow(WIN_SIZE_X, WIN_SIZE_Y);
 }
 
 void UI::animate()
 {
-    glutPostRedisplay();
+//    glutPostRedisplay();
 }
-
+#ifdef PROFILE
+void UI::log_profile(){
+    std::vector<double> time = dsc->time_profile;
+    
+    for(int i = 0; i < total_t; i++){
+        std::cout << time[i] << " ";
+    }
+    
+    int count = 0;
+    for(auto hei = dsc->halfedges_begin(); hei != dsc->halfedges_end(); ++hei)
+    {
+        auto hew = dsc->walker(*hei);
+        if (dsc->is_movable(hew.halfedge())
+            and (dsc->is_movable(hew.vertex()) || dsc->is_movable(hew.opp().vertex())))
+        {
+            count++;
+        }
+    }
+    std::cout << dsc->get_no_vertices() << " " << dsc->get_no_faces() << " " << count;
+    
+    const char *name_profile[] = {"Smooth"
+        , "max_min_angle"
+        , "remove edge"
+        , "remove face"
+        , "resize dsc"
+        , "reset atribute"
+        , "total count in while"
+        , "total iterations"
+    };
+    
+    std::cout << "# ";
+    for(int i = 0; i < total_t; i++){
+        std::cout << name_profile[i] << " -- ";
+    }
+    
+    std::cout << "#vertices -- #faces -- #node on interface" << std::endl;
+    
+}
+#endif
 void UI::keyboard(unsigned char key, int x, int y) {
     switch(key) {
         case '\033':
@@ -212,6 +310,9 @@ void UI::keyboard(unsigned char key, int x, int y) {
             }
             else {
                 std::cout << "MOTION PAUSED" << std::endl;
+#ifdef PROFILE
+                log_profile();
+#endif
             }
             CONTINUOUS = !CONTINUOUS;
             break;
@@ -239,7 +340,7 @@ void UI::keyboard(unsigned char key, int x, int y) {
             if(dsc)
             {
                 std::cout << "TAKING SCREEN SHOT" << std::endl;
-                Painter::save_painting(WIN_SIZE_X, WIN_SIZE_Y, "LOG");
+                Painter::save_painting(WIN_SIZE_X, WIN_SIZE_Y, "../../../LOG");
             }
             break;
         case '+':
@@ -283,16 +384,47 @@ void UI::keyboard(unsigned char key, int x, int y) {
                 ACCURACY = std::max(ACCURACY - 1., 1.);
                 update_title();
             }
+        case 'e':
+            {
+                {
+                    profile pf("Parallel");
+                    thread_helper th;
+                    th.smooth(*dsc, 0, WIN_SIZE_X);
+                }
+                
+                {
+                    profile pf("serial");
+                    dsc->smooth();
+                }
+                
+                break;
+            }
+        case 'f':
+            {
+                {
+                    profile pf("Parallel");
+                    thread_helper th;
+                    th.edge_collapse(*dsc, 0, WIN_SIZE_X);
+                }
+//                {
+//                    profile pf("Serial");
+//                    int count = 0;
+//                    dsc->remove_degenerate_edges();
+//                    std::cout << count << " edges collaped" << std::endl;
+//                }
+            }
             break;
     }
+    
+    glutPostRedisplay();
 }
 
 void UI::visible(int v)
 {
-    if(v==GLUT_VISIBLE)
-        glutIdleFunc(animate_);
-    else
-        glutIdleFunc(0);
+//    if(v==GLUT_VISIBLE)
+//        glutIdleFunc(animate_);
+//    else
+//        glutIdleFunc(0);
 }
 
 void UI::draw()
@@ -341,8 +473,8 @@ using namespace DSC2D;
 void UI::rotate_square()
 {
     stop();
-    int width = 450;
-    int height = 450;
+    int width = WIN_SIZE_X - 50;
+    int height = WIN_SIZE_Y - 50;
     
     std::vector<real> points;
     std::vector<int> faces;
@@ -353,7 +485,7 @@ void UI::rotate_square()
     dsc = std::unique_ptr<DeformableSimplicialComplex>(new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
     vel_fun = std::unique_ptr<VelocityFunc<>>(new RotateFunc(VELOCITY, ACCURACY));
     
-    ObjectGenerator::create_square(*dsc, vec2(150., 150.), vec2(200., 200.), 1);
+//    ObjectGenerator::create_square(*dsc, vec2(150., 150.), vec2(200., 200.), 1);
     
     reshape(width + 2*DISCRETIZATION, height + 2*DISCRETIZATION);
     start();
