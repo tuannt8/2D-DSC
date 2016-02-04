@@ -120,7 +120,7 @@ UI::UI(int &argc, char** argv)
     }
     else {
         VELOCITY = 10.;
-        DISCRETIZATION = 25.;
+        DISCRETIZATION = 100.;
         ACCURACY = 5.;
         
         CONTINUOUS = false;
@@ -194,6 +194,12 @@ void UI::keyboard(unsigned char key, int x, int y) {
     switch(key) {
         case 'i':
             m_para.parallel_flip_edge(*dsc);
+            break;
+        case 'o':
+            m_para.serial_flip(&*dsc);
+            break;
+        case 'p':
+            m_para.random_flip(*dsc);
             break;
         case '\033':
             stop();
@@ -306,7 +312,7 @@ void UI::draw()
     Painter::begin();
     if (dsc)
     {
-        Painter::draw_complex(*dsc);
+  //      Painter::draw_complex(*dsc);
         if(RECORD && CONTINUOUS)
         {
             Painter::save_painting(WIN_SIZE_X, WIN_SIZE_Y, basic_log->get_path(), vel_fun->get_time_step());
@@ -367,8 +373,11 @@ void UI::rotate_square()
 
 void UI::init_mesh_for_parallel()
 {
-    int width = 450;
-    int height = 450;
+    DISCRETIZATION = 1;
+    
+    int width = WIN_SIZE_X - DISCRETIZATION*2;
+    int height = WIN_SIZE_Y - DISCRETIZATION*2;
+
     
     std::vector<real> points;
     std::vector<int> faces;
@@ -383,7 +392,7 @@ void UI::init_mesh_for_parallel()
     
     reshape(width + 2*DISCRETIZATION, height + 2*DISCRETIZATION);
     
-    m_para.random_flip(*dsc, 0.2);
+    m_para.random_flip(*dsc);
 }
 
 void UI::smooth_filled()

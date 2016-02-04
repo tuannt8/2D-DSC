@@ -1230,7 +1230,7 @@ namespace DSC2D
         if((energy<0) && (t < 10000)){
             Q.push(PQElem(energy, h, t));
         }
-        
+       // printf("Edge: %zu : %f\n", w.halfedge().get_index(), energy);
     }
     
     void DeformableSimplicialComplex::add_one_ring_to_queue(HMesh::HalfEdgeAttributeVector<int>& touched, std::priority_queue<PQElem>& Q, node_key v, const HMesh::EnergyFun& efun)
