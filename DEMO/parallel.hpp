@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include "DSC.h"
 
-#define NUM_THREADS 6
+#define NUM_THREADS 8
 #define CHUNK_SIZE 100
 
 
@@ -29,14 +29,23 @@ public:
     ~parallel(){};
     
     
-    void random_flip(dsc_class &dsc, double proba = 0.01);
+    
     
 public:
-    // Split work outside and avoid lock
+    // Edge flip
+    void random_flip(dsc_class &dsc, double proba = 0.1);
     void parallel_flip_edge(dsc_class &dsc);
-
     void serial_flip(dsc_class *dsc);
     
+    // Remove degenerate edges
+    void random_irregular_edge(dsc_class &dsc, double proba = 0.2);
+    void parallel_remove_degenerate_edges(dsc_class &dsc);
+    void serial_remove_degenerate_edges(dsc_class *dsc);
+    
+    // Remove degenerate face
+    void parallel_remove_degenerate_faces(dsc_class &dsc);
+    void random_shrink_face(dsc_class &dsc, double proba = 0.2);
+    void serial_remove_degenerate_faces(dsc_class *dsc);
 };
 
 class Barrier
@@ -56,6 +65,25 @@ public:
             _cv.wait(lock, [this] { return _count == 0; });
         }
     }
+};
+
+class time_profile
+{
+public:
+    time_profile(std::string text = "Process")
+    {
+        start = std::chrono::system_clock::now();
+        m_text = text;
+    }
+    
+    ~time_profile()
+    {
+        std::chrono::duration<double> t = std::chrono::system_clock::now() - start;
+        printf("-- %s in time: %f --\n", m_text.c_str(), t.count());
+    }
+    
+    std::chrono::system_clock::time_point start;
+    std::string m_text;
 };
 
 

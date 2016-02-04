@@ -833,7 +833,7 @@ namespace DSC2D
                 {
                     collapse(*ei, false);
                     if (count) {
-                        *count ++;
+                        (*count) ++;
                     }
                 }
             }

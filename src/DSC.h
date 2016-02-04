@@ -666,7 +666,7 @@ namespace DSC2D {
         
         //************** UTIL ***************
     private:
-        
+    public:
         /**
          Checks that the mesh is valid, i.e. that each face has three vertices and that the area of a face is positive (the face is not degenerate).
          */

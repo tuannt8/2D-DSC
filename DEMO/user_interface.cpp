@@ -193,13 +193,18 @@ void UI::animate()
 void UI::keyboard(unsigned char key, int x, int y) {
     switch(key) {
         case 'i':
-            m_para.parallel_flip_edge(*dsc);
+            //m_para.parallel_flip_edge(*dsc);
+            //m_para.parallel_remove_degenerate_edges(*dsc);
+            m_para.parallel_remove_degenerate_faces(*dsc);
             break;
         case 'o':
-            m_para.serial_flip(&*dsc);
+            //m_para.serial_flip(&*dsc);
+            //m_para.serial_remove_degenerate_edges(&*dsc);
+            m_para.serial_remove_degenerate_faces(&*dsc);
             break;
         case 'p':
-            m_para.random_flip(*dsc);
+            //m_para.random_flip(*dsc);
+            init_mesh_for_parallel();
             break;
         case '\033':
             stop();
@@ -312,7 +317,7 @@ void UI::draw()
     Painter::begin();
     if (dsc)
     {
-  //      Painter::draw_complex(*dsc);
+        Painter::draw_complex(*dsc);
         if(RECORD && CONTINUOUS)
         {
             Painter::save_painting(WIN_SIZE_X, WIN_SIZE_Y, basic_log->get_path(), vel_fun->get_time_step());
@@ -373,7 +378,7 @@ void UI::rotate_square()
 
 void UI::init_mesh_for_parallel()
 {
-    DISCRETIZATION = 1;
+    DISCRETIZATION = 10;
     
     int width = WIN_SIZE_X - DISCRETIZATION*2;
     int height = WIN_SIZE_Y - DISCRETIZATION*2;
@@ -392,7 +397,9 @@ void UI::init_mesh_for_parallel()
     
     reshape(width + 2*DISCRETIZATION, height + 2*DISCRETIZATION);
     
-    m_para.random_flip(*dsc);
+    // m_para.random_flip(*dsc);
+    // m_para.random_irregular_edge(*dsc);
+    m_para.random_shrink_face(*dsc);
 }
 
 void UI::smooth_filled()
