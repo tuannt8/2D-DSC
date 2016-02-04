@@ -30,8 +30,6 @@
 		7A82D65017E272BB00C19874 /* design_domain.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A82D64E17E272BB00C19874 /* design_domain.h */; };
 		7A9C20DB17DFBE080064171E /* draw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A9C20D917DFBE070064171E /* draw.cpp */; };
 		A69915F21C622F96001FE032 /* parallel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A69915F01C622F96001FE032 /* parallel.cpp */; };
-		A69915F61C623C71001FE032 /* libboost_system.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A69915F51C623C71001FE032 /* libboost_system.dylib */; };
-		A69915FC1C6247CE001FE032 /* libboost_thread.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A69915FB1C6247CE001FE032 /* libboost_thread.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -91,8 +89,6 @@
 				7A51F3E517D63A0E00A8F8F2 /* OpenGL.framework in Frameworks */,
 				7A51F3E617D63A0E00A8F8F2 /* GLUT.framework in Frameworks */,
 				7A51F3E317D639FD00A8F8F2 /* libDSC.a in Frameworks */,
-				A69915FC1C6247CE001FE032 /* libboost_thread.dylib in Frameworks */,
-				A69915F61C623C71001FE032 /* libboost_system.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -343,14 +339,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = /Library/Frameworks;
-				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
-					/Library/Frameworks/GEL.framework/Headers,
-				);
-				LIBRARY_SEARCH_PATHS = (
-					/usr/local/lib,
-					"$(inherited)",
-				);
+				HEADER_SEARCH_PATHS = /Library/Frameworks/GEL.framework/Headers;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -359,14 +349,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = /Library/Frameworks;
-				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
-					/Library/Frameworks/GEL.framework/Headers,
-				);
-				LIBRARY_SEARCH_PATHS = (
-					/usr/local/lib,
-					"$(inherited)",
-				);
+				HEADER_SEARCH_PATHS = /Library/Frameworks/GEL.framework/Headers;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
