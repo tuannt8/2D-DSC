@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include "DSC.h"
+#include <functional>
 
 #define NUM_THREADS 8
 #define CHUNK_SIZE 100
@@ -18,35 +19,6 @@
 
 #define _min(a,b) (a<b?a:b)
 
-class parallel
-{
-public:
-    typedef DSC2D::DeformableSimplicialComplex dsc_class;
-
-    
-public:
-    parallel(){};
-    ~parallel(){};
-    
-    
-    
-    
-public:
-    // Edge flip
-    void random_flip(dsc_class &dsc, double proba = 0.1);
-    void parallel_flip_edge(dsc_class &dsc);
-    void serial_flip(dsc_class *dsc);
-    
-    // Remove degenerate edges
-    void random_irregular_edge(dsc_class &dsc, double proba = 0.2);
-    void parallel_remove_degenerate_edges(dsc_class &dsc);
-    void serial_remove_degenerate_edges(dsc_class *dsc);
-    
-    // Remove degenerate face
-    void parallel_remove_degenerate_faces(dsc_class &dsc);
-    void random_shrink_face(dsc_class &dsc, double proba = 0.2);
-    void serial_remove_degenerate_faces(dsc_class *dsc);
-};
 
 class Barrier
 {
@@ -66,6 +38,40 @@ public:
         }
     }
 };
+
+class parallel
+{
+public:
+    typedef DSC2D::DeformableSimplicialComplex dsc_class;
+
+    
+public:
+    parallel(){};
+    ~parallel(){};
+    
+    
+    void parallel_thread_edges(dsc_class &dsc, std::function<void(dsc_class *, std::vector<HMesh::HalfEdgeID> *, int, int, Barrier&)> func);
+    
+public:
+    // Edge flip
+    void random_flip(dsc_class &dsc, double proba = 0.1);
+    void parallel_flip_edge(dsc_class &dsc);
+    void serial_flip(dsc_class *dsc);
+    
+    // Remove degenerate edges
+    void random_irregular_edge(dsc_class &dsc, double proba = 0.2);
+    void parallel_remove_degenerate_edges(dsc_class &dsc);
+    void serial_remove_degenerate_edges(dsc_class *dsc);
+    
+    // Remove degenerate face
+    void parallel_remove_degenerate_faces(dsc_class &dsc);
+    void random_shrink_face(dsc_class &dsc, double proba = 0.2);
+    void serial_remove_degenerate_faces(dsc_class *dsc);
+    
+    // Smooth
+    void parallel_smooth(dsc_class &dsc);
+};
+
 
 class time_profile
 {

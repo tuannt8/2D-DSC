@@ -14,9 +14,6 @@
 		7A51F3CF17D6393200A8F8F2 /* demo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A51F3C917D6393200A8F8F2 /* demo.cpp */; };
 		7A51F3D017D6393200A8F8F2 /* user_interface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A51F3CA17D6393200A8F8F2 /* user_interface.cpp */; };
 		7A51F3DB17D639C900A8F8F2 /* DSC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A51F3A517D6386100A8F8F2 /* DSC.cpp */; };
-		7A51F3DC17D639C900A8F8F2 /* DSC.h in Sources */ = {isa = PBXBuildFile; fileRef = 7A51F3A617D6386100A8F8F2 /* DSC.h */; };
-		7A51F3DF17D639C900A8F8F2 /* util.h in Sources */ = {isa = PBXBuildFile; fileRef = 7A51F3A917D6386100A8F8F2 /* util.h */; };
-		7A51F3E117D639C900A8F8F2 /* velocity_function.h in Sources */ = {isa = PBXBuildFile; fileRef = 7A51F3AB17D6386100A8F8F2 /* velocity_function.h */; };
 		7A51F3E217D639D800A8F8F2 /* GEL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A51F3B417D638B500A8F8F2 /* GEL.framework */; };
 		7A51F3E317D639FD00A8F8F2 /* libDSC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A51F3D517D6399200A8F8F2 /* libDSC.a */; };
 		7A51F3E417D63A0800A8F8F2 /* GEL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A51F3B417D638B500A8F8F2 /* GEL.framework */; };
@@ -29,6 +26,10 @@
 		7A82D64F17E272BB00C19874 /* design_domain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A82D64D17E272BB00C19874 /* design_domain.cpp */; };
 		7A82D65017E272BB00C19874 /* design_domain.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A82D64E17E272BB00C19874 /* design_domain.h */; };
 		7A9C20DB17DFBE080064171E /* draw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A9C20D917DFBE070064171E /* draw.cpp */; };
+		A63F0FD01C63974900B8E42F /* parallel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A69915F01C622F96001FE032 /* parallel.cpp */; };
+		A63F0FD11C6397A800B8E42F /* parallel.hpp in Sources */ = {isa = PBXBuildFile; fileRef = A69915F11C622F96001FE032 /* parallel.hpp */; };
+		A6467E431C639D9A003FF35D /* profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6467E411C639D9A003FF35D /* profile.cpp */; };
+		A6467E461C64CBDB003FF35D /* profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6467E411C639D9A003FF35D /* profile.cpp */; };
 		A69915F21C622F96001FE032 /* parallel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A69915F01C622F96001FE032 /* parallel.cpp */; };
 /* End PBXBuildFile section */
 
@@ -73,11 +74,10 @@
 		7A82D64E17E272BB00C19874 /* design_domain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = design_domain.h; path = src/design_domain.h; sourceTree = SOURCE_ROOT; };
 		7A9C20D917DFBE070064171E /* draw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = draw.cpp; sourceTree = "<group>"; };
 		7A9C20DA17DFBE080064171E /* draw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = draw.h; sourceTree = "<group>"; };
+		A6467E411C639D9A003FF35D /* profile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = profile.cpp; sourceTree = "<group>"; };
+		A6467E421C639D9A003FF35D /* profile.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = profile.hpp; sourceTree = "<group>"; };
 		A69915F01C622F96001FE032 /* parallel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = parallel.cpp; sourceTree = "<group>"; };
 		A69915F11C622F96001FE032 /* parallel.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = parallel.hpp; sourceTree = "<group>"; };
-		A69915F31C623BB9001FE032 /* libboost_thread.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_thread.dylib; path = "../../../../../usr/local/boost_1_59_0/bin/libs/thread/build/darwin-4.2.1/release/threading-multi/libboost_thread.dylib"; sourceTree = "<group>"; };
-		A69915F51C623C71001FE032 /* libboost_system.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_system.dylib; path = ../../../../../usr/local/lib/libboost_system.dylib; sourceTree = "<group>"; };
-		A69915FB1C6247CE001FE032 /* libboost_thread.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_thread.dylib; path = ../../../../../usr/local/lib/libboost_thread.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,9 +106,6 @@
 		7A51F38E17D6383500A8F8F2 = {
 			isa = PBXGroup;
 			children = (
-				A69915FB1C6247CE001FE032 /* libboost_thread.dylib */,
-				A69915F51C623C71001FE032 /* libboost_system.dylib */,
-				A69915F31C623BB9001FE032 /* libboost_thread.dylib */,
 				7A51F3B417D638B500A8F8F2 /* GEL.framework */,
 				7A51F3B217D6388800A8F8F2 /* OpenGL.framework */,
 				7A51F3B017D6388200A8F8F2 /* GLUT.framework */,
@@ -162,6 +159,8 @@
 				7A51F3CB17D6393200A8F8F2 /* user_interface.h */,
 				A69915F01C622F96001FE032 /* parallel.cpp */,
 				A69915F11C622F96001FE032 /* parallel.hpp */,
+				A6467E411C639D9A003FF35D /* profile.cpp */,
+				A6467E421C639D9A003FF35D /* profile.hpp */,
 			);
 			path = DEMO;
 			sourceTree = "<group>";
@@ -252,6 +251,7 @@
 				7A51F3CD17D6393200A8F8F2 /* normal_function.cpp in Sources */,
 				A69915F21C622F96001FE032 /* parallel.cpp in Sources */,
 				7A470AE617F5282C001FC0CB /* log.cpp in Sources */,
+				A6467E431C639D9A003FF35D /* profile.cpp in Sources */,
 				7A51F3CE17D6393200A8F8F2 /* rotate_function.cpp in Sources */,
 				7A51F3CF17D6393200A8F8F2 /* demo.cpp in Sources */,
 				7A51F3D017D6393200A8F8F2 /* user_interface.cpp in Sources */,
@@ -263,10 +263,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A6467E461C64CBDB003FF35D /* profile.cpp in Sources */,
+				A63F0FD11C6397A800B8E42F /* parallel.hpp in Sources */,
 				7A51F3DB17D639C900A8F8F2 /* DSC.cpp in Sources */,
-				7A51F3DC17D639C900A8F8F2 /* DSC.h in Sources */,
-				7A51F3DF17D639C900A8F8F2 /* util.h in Sources */,
-				7A51F3E117D639C900A8F8F2 /* velocity_function.h in Sources */,
+				A63F0FD01C63974900B8E42F /* parallel.cpp in Sources */,
 				7A82D64717E23E9400C19874 /* object_generator.cpp in Sources */,
 				7A82D64B17E23EAC00C19874 /* trializer.cpp in Sources */,
 				7A82D64F17E272BB00C19874 /* design_domain.cpp in Sources */,

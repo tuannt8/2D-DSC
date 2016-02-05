@@ -78,6 +78,8 @@ public:
     
     void animate();
     
+    void close();
+    
     void reshape(int width, int height);
     
     void visible(int v);
@@ -156,7 +158,4 @@ public:
     // Testing
     void random_short_edge(dsc_obj &complex);
     
-#ifdef PROFILE
-    void log_profile();
-#endif
 };

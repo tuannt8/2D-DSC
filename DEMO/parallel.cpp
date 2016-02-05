@@ -45,89 +45,148 @@ void parallel::random_flip(dsc_class &dsc, double proba)
     }
 }
 
-
-void flip_worker3(parallel::dsc_class *dsc, std::vector<HMesh::HalfEdgeID> * all_edges, int start, int stop,
-                  Barrier& cur_barier)
-{
-    
-    HMesh::MinAngleEnergy energy_fun(dsc->MIN_ANGLE);
-    // Find potential edge first
-    std::vector<HMesh::HalfEdgeID> to_flip;
-    for (int i = start; i < stop; i++)
-    {
-        auto eid = all_edges->at(i);
-        auto hew = dsc->walker(eid);
-        if (hew.halfedge().get_index() > hew.opp().halfedge().get_index())
-        {
-            continue;
-        }
-        
-        double ene = energy_fun.delta_energy(*dsc->mesh, eid);
-        if (ene < 0)
-        {
-            if(HMesh::precond_flip_edge(*dsc->mesh, eid))
-                to_flip.push_back(eid);
-        }
-    }
-    
-    cur_barier.Wait();
-    
-    // Perform flip
-    int count = 0;
-    for (auto e:to_flip)
-    {
-        dsc_stdlock.lock();
-        auto valid = !invalid[e.get_index()];
-        
-        
-        if (valid)
-        {
-            // Invalid the neighbor
-            auto hew = dsc->walker(e);
-            invalid[hew.next().halfedge().get_index()] = 1;
-            invalid[hew.next().next().halfedge().get_index()] = 1;
-            invalid[hew.opp().next().halfedge().get_index()] = 1;
-            invalid[hew.opp().next().next().halfedge().get_index()] = 1;
-            
-            dsc_stdlock.unlock();
-            
-            
-            dsc->mesh->flip_edge(e);
-            count ++;
-        }
-        else
-            dsc_stdlock.unlock();
-    }
-}
+//
+//void flip_worker3(parallel::dsc_class *dsc, std::vector<HMesh::HalfEdgeID> * all_edges, int start, int stop,
+//                  Barrier& cur_barier)
+//{
+//    
+//    HMesh::MinAngleEnergy energy_fun(dsc->MIN_ANGLE);
+//    // Find potential edge first
+//    std::vector<HMesh::HalfEdgeID> to_flip;
+//    for (int i = start; i < stop; i++)
+//    {
+//        auto eid = all_edges->at(i);
+//        auto hew = dsc->walker(eid);
+//        if (hew.halfedge().get_index() > hew.opp().halfedge().get_index())
+//        {
+//            continue;
+//        }
+//        
+//        double ene = energy_fun.delta_energy(*dsc->mesh, eid);
+//        if (ene < 0
+//            && HMesh::precond_flip_edge(*dsc->mesh, eid)
+//            && dsc->safe_editable(eid))
+//        {
+//            if(HMesh::precond_flip_edge(*dsc->mesh, eid))
+//                to_flip.push_back(eid);
+//        }
+//    }
+//    
+//    cur_barier.Wait();
+//    
+//    // Perform flip
+//    int count = 0;
+//    for (auto e:to_flip)
+//    {
+//        dsc_stdlock.lock();
+//        if (!invalid[e.get_index()]
+//            && dsc->mesh->in_use(e))
+//        {
+//            // Invalid the neighbor
+//            auto hew = dsc->walker(e);
+//            invalid[hew.next().halfedge().get_index()] = 1;
+//            invalid[hew.next().next().halfedge().get_index()] = 1;
+//            invalid[hew.opp().next().halfedge().get_index()] = 1;
+//            invalid[hew.opp().next().next().halfedge().get_index()] = 1;
+//            
+//            dsc_stdlock.unlock();
+//            
+//            
+//            dsc->mesh->flip_edge(e);
+//            count ++;
+//        }
+//        else
+//            dsc_stdlock.unlock();
+//    }
+//}
 
 void parallel::parallel_flip_edge(dsc_class &dsc)
 {
-    using namespace std;
     
-    invalid.reset();
-    
-    
-    std::vector<HMesh::HalfEdgeID> all_edges;
-    for (auto eid = dsc.halfedges_begin(); eid != dsc.halfedges_end(); eid++)
+    auto worker = [](dsc_class *dsc, std::vector<HMesh::HalfEdgeID> * all_edges, int start, int stop,
+                     Barrier& cur_barier)
     {
-        all_edges.push_back(*eid);
-    }
+        HMesh::MinAngleEnergy energy_fun(dsc->MIN_ANGLE);
+        // Find potential edge first
+        std::vector<HMesh::HalfEdgeID> to_flip;
+        for (int i = start; i < stop; i++)
+        {
+            auto eid = all_edges->at(i);
+            auto hew = dsc->walker(eid);
+            if (hew.halfedge().get_index() > hew.opp().halfedge().get_index())
+            {
+                continue;
+            }
+            
+            double ene = energy_fun.delta_energy(*dsc->mesh, eid);
+            if (ene < 0
+                && HMesh::precond_flip_edge(*dsc->mesh, eid)
+                && dsc->safe_editable(eid))
+            {
+                if(HMesh::precond_flip_edge(*dsc->mesh, eid))
+                    to_flip.push_back(eid);
+            }
+        }
+        
+        cur_barier.Wait();
+        
+        // Perform flip
+        int count = 0;
+        for (auto e:to_flip)
+        {
+            dsc_stdlock.lock();
+            if (!invalid[e.get_index()]
+                && dsc->mesh->in_use(e))
+            {
+                // Invalid the neighbor
+                auto hew = dsc->walker(e);
+                invalid[hew.next().halfedge().get_index()] = 1;
+                invalid[hew.next().next().halfedge().get_index()] = 1;
+                invalid[hew.opp().next().halfedge().get_index()] = 1;
+                invalid[hew.opp().next().next().halfedge().get_index()] = 1;
+                
+                dsc_stdlock.unlock();
+                
+                
+                dsc->mesh->flip_edge(e);
+                count ++;
+            }
+            else
+                dsc_stdlock.unlock();
+        }
+    };
     
-    int size = (int)(all_edges.size() + NUM_THREADS) / NUM_THREADS;
-
-    // Launch threads
-    std::thread th[NUM_THREADS];
-    Barrier bar(NUM_THREADS);
-    for (int i = 0; i < NUM_THREADS; i++)
-    {
-        th[i] = std::thread(flip_worker3, &dsc, &all_edges, i*size, _min(i*size+size, all_edges.size()),
-                            std::ref(bar));
-    }
     
-    for (int i = 0; i < NUM_THREADS; i++)
-    {
-        th[i].join();
-    }
+    parallel_thread_edges(dsc, worker);
+    
+    return;
+    
+//    using namespace std;
+//    
+//    invalid.reset();
+//    
+//    
+//    std::vector<HMesh::HalfEdgeID> all_edges;
+//    for (auto eid = dsc.halfedges_begin(); eid != dsc.halfedges_end(); eid++)
+//    {
+//        all_edges.push_back(*eid);
+//    }
+//    
+//    int size = (int)(all_edges.size() + NUM_THREADS) / NUM_THREADS;
+//
+//    // Launch threads
+//    std::thread th[NUM_THREADS];
+//    Barrier bar(NUM_THREADS);
+//    for (int i = 0; i < NUM_THREADS; i++)
+//    {
+//        th[i] = std::thread(flip_worker3, &dsc, &all_edges, i*size, _min(i*size+size, all_edges.size()),
+//                            std::ref(bar));
+//    }
+//    
+//    for (int i = 0; i < NUM_THREADS; i++)
+//    {
+//        th[i].join();
+//    }
 }
 
 #define move(a,b) a = a + (b - a)*0.9
@@ -189,55 +248,50 @@ void parallel:: random_irregular_edge(dsc_class &dsc, double proba)
     }
 }
 
+std::vector<HMesh::HalfEdgeID> neighbor_edge(parallel::dsc_class * dsc, HMesh::HalfEdgeID eid)
+{
+    std::vector<HMesh::HalfEdgeID> eids;
+    auto hew = dsc->walker(eid);
+
+    for (auto inithe = dsc->walker(hew.vertex()); !inithe.full_circle(); inithe = inithe.circulate_vertex_cw())
+    {
+        eids.push_back(inithe.halfedge());
+        eids.push_back(inithe.opp().halfedge());
+    }
+    
+    for (auto inithe = dsc->walker(hew.opp().vertex()); !inithe.full_circle(); inithe = inithe.circulate_vertex_cw())
+    {
+        eids.push_back(inithe.halfedge());
+        eids.push_back(inithe.opp().halfedge());
+    }
+
+    return eids;
+}
+
 void collapse_worker(parallel::dsc_class *dsc, std::vector<HMesh::HalfEdgeID> * all_edges, int start, int stop,
                   Barrier& cur_barier, int tid)
 {
-//    dsc_stdlock.lock();
-//    auto eid = dsc->halfedges_begin();
-//    dsc_stdlock.unlock();
-//    
-//    while (1)
-//    {
-//        auto idx = eid->get_index();
-//        int cid = (idx % (NUM_THREADS*CHUNK_SIZE)) / CHUNK_SIZE;
-//        
-//        dsc_stdlock.lock();
-//        
-//        if (cid == tid)
-//        {
-//            
-//            if (dsc->length(*eid) < dsc->DEG_LENGTH*dsc->AVG_LENGTH)
-//            {
-//                if (!dsc->collapse(*eid, true))
-//                {
-//                    dsc->collapse(*eid, false);
-//                }
-//            }
-//            
-//        }
-//        
-//        eid++;
-//        if (eid == dsc->halfedges_end())
-//        {
-//            dsc_stdlock.unlock();
-//            break;
-//        }
-//        dsc_stdlock.unlock();
-//        
-//    }
-    
     // Find potential edge first
     std::vector<HMesh::HalfEdgeID> to_collapse;
+    std::vector<std::vector<HMesh::HalfEdgeID>> neighbor;
     for (int i = start; i < stop; i++)
     {
         auto eid = all_edges->at(i);
         auto hew = dsc->walker(eid);
+        
+        if (hew.halfedge().get_index() > hew.opp().halfedge().get_index())
+        {
+            continue;
+        }
 
         if (dsc->length(eid) < dsc->DEG_LENGTH * dsc->AVG_LENGTH)
         {
             if(HMesh::precond_collapse_edge(*dsc->mesh, eid)
                && dsc->unsafe_editable(eid))
+            {
                 to_collapse.push_back(eid);
+                neighbor.push_back(neighbor_edge(dsc, eid));
+            }
         }
     }
     
@@ -245,19 +299,19 @@ void collapse_worker(parallel::dsc_class *dsc, std::vector<HMesh::HalfEdgeID> * 
     
     // Perform flip
     int count = 0;
-    for (auto e:to_collapse)
+    for (int i = 0; i < to_collapse.size(); i++)
     {
+        auto e = to_collapse[i];
+        
         dsc_stdlock.lock();
         if (!invalid[e.get_index()]
             && dsc->mesh->in_use(e))
         {
             // Invalid the neighbor
-            auto hew = dsc->walker(e);
-            invalid[e.get_index()] = 1;
-            invalid[hew.next().halfedge().get_index()] = 1;
-            invalid[hew.next().next().halfedge().get_index()] = 1;
-            invalid[hew.opp().next().halfedge().get_index()] = 1;
-            invalid[hew.opp().next().next().halfedge().get_index()] = 1;
+            for (auto &e : neighbor[i])
+            {
+                invalid[e.get_index()] = 1;
+            }
             
             dsc_stdlock.unlock();
             
@@ -349,9 +403,41 @@ void collapse_face_worker(parallel::dsc_class *dsc, std::vector<HMesh::FaceID> *
     }
 }
 
+void parallel::parallel_thread_edges(dsc_class &dsc,
+    std::function<void(dsc_class *, std::vector<HMesh::HalfEdgeID> *, int, int, Barrier&) >  func1)
+{
+    invalid.reset();
+    
+    
+    std::vector<HMesh::HalfEdgeID> all_edges;
+    for (auto fid : dsc.halfedges())
+    {
+        all_edges.push_back(fid);
+    }
+    
+    int size = (int)(all_edges.size() + NUM_THREADS) / NUM_THREADS;
+    
+    // Launch threads
+    std::thread th[NUM_THREADS];
+    Barrier bar(NUM_THREADS);
+    
+    
+    for (int i = 0; i < NUM_THREADS; i++)
+    {
+        th[i] = std::thread(func1, &dsc, & all_edges, i*size, _min(i*size+size, all_edges.size()),
+                            std::ref(bar) );
+    }
+    
+    for (int i = 0; i < NUM_THREADS; i++)
+    {
+        th[i].join();
+    }
+}
+
 void parallel::parallel_remove_degenerate_faces(dsc_class &dsc)
 {
-    time_profile t("remove face parallel");
+//    time_profile t("remove face parallel");
+    
     using namespace std;
     
     invalid.reset();
@@ -368,6 +454,8 @@ void parallel::parallel_remove_degenerate_faces(dsc_class &dsc)
     // Launch threads
     std::thread th[NUM_THREADS];
     Barrier bar(NUM_THREADS);
+    
+    
     for (int i = 0; i < NUM_THREADS; i++)
     {
         th[i] = std::thread(collapse_face_worker, &dsc, &all_edges, i*size, _min(i*size+size, all_edges.size()), std::ref(bar), i);
@@ -378,11 +466,73 @@ void parallel::parallel_remove_degenerate_faces(dsc_class &dsc)
         th[i].join();
     }
     
+    
+//    int i;
+//    for (i = 0; i < NUM_THREADS-1; i++)
+//    {
+//        th[i] = std::thread(collapse_face_worker, &dsc, &all_edges, i*size, _min(i*size+size, all_edges.size()), std::ref(bar), i);
+//    }
+//    
+//    collapse_face_worker(&dsc, &all_edges, i*size, _min(i*size+size, all_edges.size()), std::ref(bar), i);
+//    
+//    for (int i = 0; i < NUM_THREADS-1; i++)
+//    {
+//        th[i].join();
+//    }
+}
+
+void smooth_worker(parallel::dsc_class *dsc, std::vector<HMesh::VertexID> * all_verts, int start, int stop, Barrier& cur_barier, int tid)
+{
+    std::vector<DSC2D::vec2> positions(stop - start);
+    for (int i = start; i < stop; i++)
+    {
+        auto vid = all_verts->at(i);
+        
+        if(dsc->safe_editable(vid))
+        {
+            positions[i - start] = dsc->get_barycenter(vid, false);
+        }
+    }
+    
+    cur_barier.Wait();
+    
+    for (int i = start; i < stop; i++)
+    {
+        auto vid = all_verts->at(i);
+        if(dsc->safe_editable(vid))
+        {
+            dsc->set_pos(vid, positions[i - start]);
+        }
+    }
+}
+
+void parallel::parallel_smooth(dsc_class &dsc)
+{
+    std::vector<HMesh::VertexID> all_vertices;
+    for (auto vid : dsc.vertices())
+    {
+        all_vertices.push_back(vid);
+    }
+    
+    int size = (int)(all_vertices.size() + NUM_THREADS) / NUM_THREADS;
+    
+    // Launch threads
+    std::thread th[NUM_THREADS];
+    Barrier bar(NUM_THREADS);
+    for (int i = 0; i < NUM_THREADS; i++)
+    {
+        th[i] = std::thread(smooth_worker, &dsc, &all_vertices, i*size, _min(i*size+size, all_vertices.size()), std::ref(bar), i);
+    }
+    
+    for (int i = 0; i < NUM_THREADS; i++)
+    {
+        th[i].join();
+    }
 }
 
 void parallel::parallel_remove_degenerate_edges(dsc_class &dsc)
 {
-    time_profile t;
+//    time_profile t;
     using namespace std;
     
     invalid.reset();

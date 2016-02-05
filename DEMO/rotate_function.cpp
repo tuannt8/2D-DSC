@@ -22,6 +22,8 @@
 #include <GEL/CGLA/Mat3x3f.h>
 #endif
 
+#include "profile.hpp"
+
 
 void RotateFunc::deform(DSC2D::DeformableSimplicialComplex& dsc)
 {
@@ -44,7 +46,10 @@ void RotateFunc::deform(DSC2D::DeformableSimplicialComplex& dsc)
     update_compute_time(init_time);
     init_time = std::chrono::system_clock::now();
     
-    dsc.deform();
-    
+    {
+        //profile p("Deform");
+        dsc.deform();
+    }
+
     update_deform_time(init_time);
 }

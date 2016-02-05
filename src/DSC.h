@@ -28,25 +28,7 @@
 #include <GEL/HMesh/mesh_optimization.h>
 #endif
 
-
-
-#ifdef PROFILE
-#define TIME_NOW (std::chrono::system_clock::now())
-typedef std::chrono::duration<double> duration_t;
-enum{
-    smooth_t = 0,
-    angle_t,
-    rm_edge_t,
-    rm_face_t,
-    resize_t,
-    attribute_t,
-    count_t, //in while loop
-    total_iter_t, // nb of iterations
-    total_t // nb of enum
-};
-
-#define P_COUNT 20
-#endif
+#include "../DEMO/profile.hpp"
 
 namespace DSC2D {
     
@@ -591,6 +573,8 @@ namespace DSC2D {
         /**
          Improves the quality of the simplicial complex by smoothing, removing needles and caps, maximize the minimum angle and removing degenerate faces.
          */
+        void fix_complex_parallel();
+        
         void fix_complex();
         
     private:

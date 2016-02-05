@@ -23,6 +23,7 @@
 #include "trializer.h"
 #include "object_generator.h"
 #include "draw.h"
+#include "profile.hpp"
 
 void _check_gl_error(const char *file, int line)
 {
@@ -67,7 +68,14 @@ void animate_(){
     UI::get_instance()->animate();
 }
 
+void close_()
+{
+    UI::get_instance()->close();
+}
+
 UI* UI::instance = NULL;
+
+
 
 UI::UI(int &argc, char** argv)
 {
@@ -98,6 +106,8 @@ UI::UI(int &argc, char** argv)
     glutVisibilityFunc(visible_);
     glutReshapeFunc(reshape_);
     
+    glutWMCloseFunc(close_);
+    
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     
@@ -120,7 +130,7 @@ UI::UI(int &argc, char** argv)
     }
     else {
         VELOCITY = 10.;
-        DISCRETIZATION = 100.;
+        DISCRETIZATION = 5.;
         ACCURACY = 5.;
         
         CONTINUOUS = false;
@@ -130,8 +140,7 @@ UI::UI(int &argc, char** argv)
     update_title();
     check_gl_error();
     
-    
-    init_mesh_for_parallel();
+    profile::init();
 }
 
 void UI::update_title()
@@ -185,6 +194,13 @@ void UI::reshape(int width, int height)
     glutReshapeWindow(WIN_SIZE_X, WIN_SIZE_Y);
 }
 
+void UI::close()
+{
+    profile::close();
+    
+    exit(0);
+}
+
 void UI::animate()
 {
     glutPostRedisplay();
@@ -193,22 +209,28 @@ void UI::animate()
 void UI::keyboard(unsigned char key, int x, int y) {
     switch(key) {
         case 'i':
+        {
+            profile t("Parallel ");
             //m_para.parallel_flip_edge(*dsc);
             //m_para.parallel_remove_degenerate_edges(*dsc);
             m_para.parallel_remove_degenerate_faces(*dsc);
             break;
+        }
         case 'o':
-            //m_para.serial_flip(&*dsc);
-            //m_para.serial_remove_degenerate_edges(&*dsc);
+        {
             m_para.serial_remove_degenerate_faces(&*dsc);
             break;
+        }
         case 'p':
+        {
             //m_para.random_flip(*dsc);
             init_mesh_for_parallel();
+            m_para.random_shrink_face(*dsc);
             break;
+        }
         case '\033':
             stop();
-            exit(0);
+            close();
             break;
         case '0':
             stop();
@@ -314,16 +336,32 @@ void UI::visible(int v)
 
 void UI::draw()
 {
+//    static auto last_t = std::chrono::system_clock::now();
+//    static double m_total = 0;
+//    std::chrono::duration<double> elapsed_t = std::chrono::system_clock::now() - last_t;
+//    last_t = std::chrono::system_clock::now();
+//    m_total += elapsed_t.count();
+//    
+//    if (m_total > 0.3)
+    {
+        
     Painter::begin();
     if (dsc)
     {
-        Painter::draw_complex(*dsc);
-        if(RECORD && CONTINUOUS)
-        {
-            Painter::save_painting(WIN_SIZE_X, WIN_SIZE_Y, basic_log->get_path(), vel_fun->get_time_step());
-        }
+
+            Painter::draw_complex(*dsc);
+
+        
+        
+//        if(RECORD && CONTINUOUS)
+//        {
+//            Painter::save_painting(WIN_SIZE_X, WIN_SIZE_Y, basic_log->get_path(), vel_fun->get_time_step());
+//        }
     }
     Painter::end();
+        
+//        m_total = 0;
+    }
 }
 
 void UI::stop()
@@ -358,8 +396,8 @@ using namespace DSC2D;
 void UI::rotate_square()
 {
     stop();
-    int width = 450;
-    int height = 450;
+    int width = WIN_SIZE_X - 2*DISCRETIZATION;
+    int height = WIN_SIZE_Y - 2*DISCRETIZATION;
     
     std::vector<real> points;
     std::vector<int> faces;
@@ -378,7 +416,7 @@ void UI::rotate_square()
 
 void UI::init_mesh_for_parallel()
 {
-    DISCRETIZATION = 10;
+ //   DISCRETIZATION = 10;
     
     int width = WIN_SIZE_X - DISCRETIZATION*2;
     int height = WIN_SIZE_Y - DISCRETIZATION*2;
@@ -399,14 +437,14 @@ void UI::init_mesh_for_parallel()
     
     // m_para.random_flip(*dsc);
     // m_para.random_irregular_edge(*dsc);
-    m_para.random_shrink_face(*dsc);
+    // m_para.random_shrink_face(*dsc);
 }
 
 void UI::smooth_filled()
 {
     stop();
-    int width = 450;
-    int height = 450;
+    int width = WIN_SIZE_X - 2*DISCRETIZATION;
+    int height = WIN_SIZE_Y - 2*DISCRETIZATION;
     
     std::vector<real> points;
     std::vector<int> faces;
@@ -426,8 +464,8 @@ void UI::smooth_filled()
 void UI::expand_blobs()
 {
     stop();
-    int width = 450;
-    int height = 450;
+    int width = WIN_SIZE_X - 2*DISCRETIZATION;
+    int height = WIN_SIZE_Y - 2*DISCRETIZATION;
     
     std::vector<real> points;
     std::vector<int> faces;

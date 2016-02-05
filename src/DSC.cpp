@@ -17,6 +17,10 @@
 #include "DSC.h"
 #include "draw.h"
 #include <thread>
+#include "../DEMO/parallel.hpp"
+#include <functional>
+#include <thread>
+
 
 namespace DSC2D
 {    
@@ -52,6 +56,37 @@ namespace DSC2D
     
     void DeformableSimplicialComplex::cleanup_attributes(HMesh::IDRemap& cleanup_map)
     {
+        // Parallel
+
+        
+       
+//        mesh->cleanup(cleanup_map);
+//        
+//        auto t1 = std::thread(
+//                [](HMesh::VertexAttributeVector<int> * a, HMesh::IDRemap * b){a->cleanup(b->vmap);},
+//                              &vertex_labels, &cleanup_map
+//                              );
+//        auto t2 = std::thread(
+//                              [](HMesh::HalfEdgeAttributeVector<int> * a, HMesh::IDRemap * b){a->cleanup(b->hmap);},
+//                              &edge_labels, &cleanup_map
+//                              );
+//        auto t3 = std::thread(
+//                              [](HMesh::FaceAttributeVector<int> * a, HMesh::IDRemap * b){a->cleanup(b->fmap);},
+//                              &face_labels, &cleanup_map
+//                              );
+//        
+//        
+//       // vertex_labels.cleanup(cleanup_map.vmap);
+//       // edge_labels.cleanup(cleanup_map.hmap);
+//       // face_labels.cleanup(cleanup_map.fmap);
+//        destination.cleanup(cleanup_map.vmap);
+//        
+//         t1.join();
+//         t2.join();
+//        t3.join();
+//        
+//        return;
+        
         mesh->cleanup(cleanup_map);
         vertex_labels.cleanup(cleanup_map.vmap);
         edge_labels.cleanup(cleanup_map.hmap);
@@ -139,10 +174,25 @@ namespace DSC2D
             assert(area(*fi) > EPSILON);
         }
     }
+
+    void  DeformableSimplicialComplex::fix_complex_parallel()
+    {
+        parallel para;
+        
+        para.parallel_smooth(*this);
+        
+        para.parallel_flip_edge(*this);
+        para.parallel_remove_degenerate_edges(*this);
+        para.parallel_remove_degenerate_faces(*this);
+
+        para.parallel_smooth(*this);
+    }
     
     void DeformableSimplicialComplex::fix_complex()
     {
-
+        fix_complex_parallel();
+        return;
+        
         smooth();
         
         max_min_angle();
@@ -215,6 +265,8 @@ namespace DSC2D
         int count = 0;
         while(work && count < 10)
         {
+            {
+            profile p1("Set pos");
             work = false;
             for (auto vi = vertices_begin(); vi != vertices_end(); vi++)
             {
@@ -223,22 +275,34 @@ namespace DSC2D
                     work = work | !move_vertex(*vi);
                 }
             }
+            }
             
+            {
+            profile p1("Fix complex");
             fix_complex();
+            }
             count++;
         }
         
 
-        
+        {
+            profile p1("Resize complex");
         resize_complex();
-        
+        }
 
+    
+        {
+        profile p1("Clean map");
         
         HMesh::IDRemap cleanup_map;
         cleanup_attributes(cleanup_map);
+        }
         
+        {
+            profile p1("Update attribute");
         init_attributes();
         update_attributes();
+        }
 
     }
     
