@@ -49,9 +49,17 @@ public:
     parallel(){};
     ~parallel(){};
     
+    static std::vector<HMesh::FaceID> one_ring_triangle(parallel::dsc_class *dsc, HMesh::FaceID fid);
+    static std::vector<HMesh::HalfEdgeID> neighbor_edge(parallel::dsc_class * dsc, HMesh::HalfEdgeID eid);
     
-    void parallel_thread_edges(dsc_class &dsc, std::function<void(dsc_class *, std::vector<HMesh::HalfEdgeID> *, int, int, Barrier&)> func);
+    // Parallel edges
+    static void parallel_thread_edges(dsc_class &dsc, std::function<void(dsc_class *, std::vector<HMesh::HalfEdgeID> *, int, int, Barrier&)> func);
     
+    // Parallel faces
+    static void parallel_thread_faces(dsc_class &dsc, std::function<void(dsc_class *, std::vector<HMesh::FaceID> *, int, int, Barrier&)> func);
+    
+    // Parallel vertices
+    static void parallel_thread_vertices(dsc_class &dsc, std::function<void(dsc_class *, std::vector<HMesh::VertexID> *, int, int, Barrier&)> func);
 public:
     // Edge flip
     void random_flip(dsc_class &dsc, double proba = 0.1);

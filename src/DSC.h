@@ -29,6 +29,12 @@
 #endif
 
 #include "../DEMO/profile.hpp"
+#include <mutex>
+
+//#define PARALLEL_DSC
+
+extern std::bitset<10000000> invalid;
+extern std::mutex dsc_stdlock;
 
 namespace DSC2D {
     

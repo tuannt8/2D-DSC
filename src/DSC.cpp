@@ -1224,6 +1224,62 @@ namespace DSC2D
     
     void DeformableSimplicialComplex::thickening()
     {
+//#ifdef PARALLEL_DSC
+//        if(MAX_AREA == INFINITY)
+//        {
+//            return;
+//        }
+//        
+//        auto worker = [](parallel::dsc_class *dsc, std::vector<HMesh::FaceID> * all_faces, int start, int stop, Barrier& cur_barier)
+//        {
+//            std::vector<HMesh::HalfEdgeID> to_thick;
+//            std::vector<std::vector<HMesh::HalfEdgeID>> neighbor_faces;
+//            for (int i = start; i < stop; i++)
+//            {
+//                auto fid = all_faces->at(i);
+//                if (dsc->area(fid) > dsc->MAX_AREA*dsc->AVG_AREA)
+//                {
+//                    auto largestID = dsc->sorted_face_edges(fid).back();
+//                    to_thick.push_back(largestID);
+//                    
+//                    auto hew = dsc->walker(largestID);
+//                    neighbor_faces.push_back(parallel::neighbor_edge(dsc, hew.halfedge()));
+//                    neighbor_faces.push_back(parallel::neighbor_edge(dsc, hew.next().halfedge()));
+//                    neighbor_faces.push_back(parallel::neighbor_edge(dsc, hew.next().next().halfedge()));
+//                    neighbor_faces.push_back(parallel::neighbor_edge(dsc, hew.opp().next().halfedge()));
+//                    neighbor_faces.push_back(parallel::neighbor_edge(dsc, hew.opp().next().next().halfedge()));
+//                }
+//            }
+//            
+//            cur_barier.Wait();
+//            
+//            for (int i = 0; i < to_thick.size(); i++)
+//            {
+//                auto eid = to_thick[i];
+//                // Lock
+//                dsc_stdlock.lock();
+//                if (!invalid[eid.get_index()] && dsc->mesh->in_use(eid))
+//                {
+//                    auto & ll = neighbor_faces[i];
+//                    for (auto  nf : ll)
+//                    {
+//                        invalid[nf.get_index()] = 1;
+//                    }
+//                    dsc_stdlock.unlock();
+//                    
+//
+//                    dsc->split(eid);
+//                    
+//                }
+//                else
+//                    dsc_stdlock.unlock();
+//            }
+//
+//        };
+//        
+//        parallel::parallel_thread_faces(*this, worker);
+//#else
+        
         if(MAX_AREA == INFINITY)
         {
             return;
@@ -1251,10 +1307,58 @@ namespace DSC2D
 #endif
             }
         }
+//#endif
     }
     
     void DeformableSimplicialComplex::thinning()
     {
+#ifdef PARALLEL_DSC
+        if(MIN_AREA <= 0.)
+        {
+            return;
+        }
+        
+        //Parallel
+        auto worker = [](parallel::dsc_class *dsc, std::vector<HMesh::FaceID> * all_faces, int start, int stop, Barrier& cur_barier)
+        {
+            std::vector<HMesh::FaceID> to_thin;
+            std::vector<std::vector<HMesh::FaceID>> neighbor_faces;
+            
+            for (int i = start; i < stop; i++)
+            {
+                auto fid = all_faces->at(i);
+                if(dsc->mesh->in_use(fid) && dsc->area(fid) < dsc->MIN_AREA*dsc->AVG_AREA)
+                {
+                    to_thin.push_back(fid);
+                    neighbor_faces.push_back(parallel::one_ring_triangle(dsc, fid));
+                }
+            }
+            
+            cur_barier.Wait();
+            
+            for (int i = 0; i < to_thin.size(); i++)
+            {
+                auto fid = to_thin[i];
+                // Lock
+                dsc_stdlock.lock();
+                if (!invalid[fid.get_index()] && dsc->mesh->in_use(fid))
+                {
+                    auto & ll = neighbor_faces[i];
+                    for (auto  nf : ll)
+                    {
+                        invalid[nf.get_index()] = 1;
+                    }
+                    dsc_stdlock.unlock();
+                    
+                    dsc->collapse(fid, true);
+                }
+                else
+                    dsc_stdlock.unlock();
+            }
+        };
+        parallel::parallel_thread_faces(*this, worker);
+        
+#else
         if(MIN_AREA <= 0.)
         {
             return;
@@ -1273,6 +1377,7 @@ namespace DSC2D
 #endif
             }
         }
+#endif
     }
     
     
