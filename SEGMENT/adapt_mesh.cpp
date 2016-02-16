@@ -50,29 +50,16 @@ void adapt_mesh::split_face(DSC2D::DeformableSimplicialComplex &dsc, image &img)
     {
         
         auto pts = dsc_->get_pos(fkey);
-//        /*
-//         Shrink the triangle
-//         */
-//        auto center = (pts[0] + pts[1] + pts[2]) / 3.0;
-//        double aa = 1 - 0.2;
-//        pts[0] = center + (pts[0] - center)*aa;
-//        pts[1] = center + (pts[1] - center)*aa;
-//        pts[2] = center + (pts[2] - center)*aa;
-//        /**/
         
         double area;
         double mi = img.get_tri_intensity_f(pts, &area); mi /= area;
+
+        
         double e = img.get_tri_differ_f(pts, mi)/ (area + SINGULAR_AREA);
         
         variation[fkey] = e;
         if (e < flip_thres)
         {
-      //      auto area = dsc_->area(fkey);
-//            if (area < SMALLEST_SIZE*SMALLEST_SIZE / 2.0)
-//            {
-//                cout << "Too small trinagle, not relabeled" << endl;
-//                continue;
-//            }
             // Consider flipping
             int min_label = -1;
             double min_differ = INFINITY;

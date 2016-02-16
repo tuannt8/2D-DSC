@@ -57,40 +57,40 @@
 //#define DT_ 1.0
 //#define STABLE_MOVE 1e-2
 
+///*
+// * Fuel cell
+// */
+//// Coefficient
+//#define IMAGE_PATH "Data/fuel_cell/small_gap.png"
+//// Mesh control
+//#define DISCRETIZE_RES 20.0
+//#define SMALLEST_SIZE   3.0
+//// Adaptive mesh
+//#define SPLIT_FACE_COEFFICIENT  0.6 // split thres = coe*(1-coe)*(ci-cj)^2
+//#define SPLIT_EDGE_COEFFICIENT 1    // Split thres = coe*(ci-cj)^2
+//// Mumford
+//#define ALPHA 0.1  // internal force
+//#define BETA    1.0 // external force
+//#define DT_ 0.2
+//#define ADD_NOISE
+//#define STABLE_MOVE 1e-2
+
 /*
- * Fuel cell
+ * Hamster -- easy
  */
 // Coefficient
-#define IMAGE_PATH "Data/fuel_cell/small_gap.png"
+#define IMAGE_PATH "Data/Gomu/TallHamster_x_135.png"
 // Mesh control
-#define DISCRETIZE_RES 20.0
-#define SMALLEST_SIZE   3.0
+#define DISCRETIZE_RES 10.0
+#define SMALLEST_SIZE   2.0
 // Adaptive mesh
 #define SPLIT_FACE_COEFFICIENT  0.08 // split thres = coe*(1-coe)*(ci-cj)^2
-#define SPLIT_EDGE_COEFFICIENT 1    // Split thres = coe*(ci-cj)^2
+#define SPLIT_EDGE_COEFFICIENT 10    // Split thres = coe*(ci-cj)^2
 // Mumford
 #define ALPHA 0.1  // internal force
 #define BETA    1.0 // external force
 #define DT_ 0.5
-#define ADD_NOISE
 #define STABLE_MOVE 1e-2
-
-///*
-// * Hamster -- easy
-// */
-//// Coefficient
-//#define IMAGE_PATH "Data/Gomu/TallHamster_x_135.png"
-//// Mesh control
-//#define DISCRETIZE_RES 10.0
-//#define SMALLEST_SIZE   5.0
-//// Adaptive mesh
-//#define SPLIT_FACE_COEFFICIENT  0.08 // split thres = coe*(1-coe)*(ci-cj)^2
-//#define SPLIT_EDGE_COEFFICIENT 10    // Split thres = coe*(ci-cj)^2
-//// Mumford
-//#define ALPHA 0.1  // internal force
-//#define BETA    1.0 // external force
-//#define DT_ 0.5
-//#define STABLE_MOVE 1e-2
 
 ///*
 // * Star
