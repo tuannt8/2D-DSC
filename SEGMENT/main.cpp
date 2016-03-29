@@ -12,7 +12,8 @@
 
 int main(int argc, char ** argv) {
     interface ui(argc, argv);
-    std::cout<<"GL ver: " << glGetString(GL_VERSION)<<std::endl;
+#ifndef TEST_PROBABILITY
     glutMainLoop();
+#endif
     return 0;
 }

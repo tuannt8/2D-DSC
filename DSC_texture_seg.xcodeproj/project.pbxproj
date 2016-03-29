@@ -40,6 +40,11 @@
 		A663DE681AD6B25B006CC422 /* libX11.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A663DE671AD6B25B006CC422 /* libX11.6.dylib */; };
 		A67962501AB965D400EACF40 /* DSC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A51F3A517D6386100A8F8F2 /* DSC.cpp */; };
 		A67B0CED1BC569950060D2A8 /* libarmadillo.5.000.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A67B0CEC1BC569950060D2A8 /* libarmadillo.5.000.1.dylib */; };
+		A6894FFC1C8ECDD0002DC0B7 /* biadjacency_matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6894FF61C8ECDD0002DC0B7 /* biadjacency_matrix.cpp */; };
+		A6894FFE1C8ECDD0002DC0B7 /* build_km_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6894FF81C8ECDD0002DC0B7 /* build_km_tree.cpp */; };
+		A68950011C8ECDD0002DC0B7 /* search_km_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6894FFB1C8ECDD0002DC0B7 /* search_km_tree.cpp */; };
+		A68950051C8EDE16002DC0B7 /* texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A68950041C8EDE16002DC0B7 /* texture.cpp */; };
+		A68950081C906812002DC0B7 /* profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A68950071C906812002DC0B7 /* profile.cpp */; };
 		A699B3681AE4E7B500522DA2 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A699B3671AE4E7B500522DA2 /* Accelerate.framework */; };
 		A69B8AD71AF7B3690031E45D /* polygon_f.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A69B8AD51AF7B3690031E45D /* polygon_f.cpp */; };
 		A6B45F1F1A88CE120091F5A6 /* interface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B45F1E1A88CE120091F5A6 /* interface.cpp */; };
@@ -124,6 +129,13 @@
 		A64C512D1B54FFD600BDF016 /* options_disp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = options_disp.cpp; sourceTree = "<group>"; };
 		A663DE671AD6B25B006CC422 /* libX11.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libX11.6.dylib; path = ../../../../../opt/X11/lib/libX11.6.dylib; sourceTree = "<group>"; };
 		A67B0CEC1BC569950060D2A8 /* libarmadillo.5.000.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libarmadillo.5.000.1.dylib; path = "../../../armadillo-5.000.1/libarmadillo.5.000.1.dylib"; sourceTree = "<group>"; };
+		A6894FF61C8ECDD0002DC0B7 /* biadjacency_matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = biadjacency_matrix.cpp; path = texture/biadjacency_matrix.cpp; sourceTree = SOURCE_ROOT; };
+		A6894FF81C8ECDD0002DC0B7 /* build_km_tree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = build_km_tree.cpp; path = texture/build_km_tree.cpp; sourceTree = SOURCE_ROOT; };
+		A6894FFB1C8ECDD0002DC0B7 /* search_km_tree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = search_km_tree.cpp; path = texture/search_km_tree.cpp; sourceTree = SOURCE_ROOT; };
+		A68950031C8EDBF6002DC0B7 /* texture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = texture.h; path = texture/texture.h; sourceTree = SOURCE_ROOT; };
+		A68950041C8EDE16002DC0B7 /* texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = texture.cpp; path = texture/texture.cpp; sourceTree = SOURCE_ROOT; };
+		A68950061C906800002DC0B7 /* profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = profile.h; sourceTree = "<group>"; };
+		A68950071C906812002DC0B7 /* profile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = profile.cpp; sourceTree = "<group>"; };
 		A699B3671AE4E7B500522DA2 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		A69B8AD51AF7B3690031E45D /* polygon_f.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = polygon_f.cpp; sourceTree = "<group>"; };
 		A69B8AD61AF7B3690031E45D /* polygon_f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = polygon_f.h; sourceTree = "<group>"; };
@@ -246,13 +258,28 @@
 			children = (
 				A6EB2A0D1AE79B70008CBC7E /* CImg.h */,
 				A6FF355C1AC2C46E001071B3 /* tri_box_overlap.h */,
+				A68950061C906800002DC0B7 /* profile.h */,
+				A68950071C906812002DC0B7 /* profile.cpp */,
 			);
 			name = Lib;
+			sourceTree = "<group>";
+		};
+		A6894FF51C8ECDC2002DC0B7 /* texture */ = {
+			isa = PBXGroup;
+			children = (
+				A68950031C8EDBF6002DC0B7 /* texture.h */,
+				A6894FF61C8ECDD0002DC0B7 /* biadjacency_matrix.cpp */,
+				A6894FF81C8ECDD0002DC0B7 /* build_km_tree.cpp */,
+				A6894FFB1C8ECDD0002DC0B7 /* search_km_tree.cpp */,
+				A68950041C8EDE16002DC0B7 /* texture.cpp */,
+			);
+			name = texture;
 			sourceTree = "<group>";
 		};
 		A6B45F141A88CC9B0091F5A6 /* SEGMENT */ = {
 			isa = PBXGroup;
 			children = (
+				A6894FF51C8ECDC2002DC0B7 /* texture */,
 				A615B7E31ABC8520001E1EA7 /* Lib */,
 				A6B45F1D1A88CDFD0091F5A6 /* interface.h */,
 				A6B45F1E1A88CE120091F5A6 /* interface.cpp */,
@@ -362,7 +389,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 7A51F39217D6383500A8F8F2 /* Build configuration list for PBXProject "DSC_seg_integral" */;
+			buildConfigurationList = 7A51F39217D6383500A8F8F2 /* Build configuration list for PBXProject "DSC_texture_seg" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -419,19 +446,24 @@
 				A67962501AB965D400EACF40 /* DSC.cpp in Sources */,
 				A6B45F431A88F1BB0091F5A6 /* normal_function.cpp in Sources */,
 				A61F331D1A97745800C5C2F8 /* define.cpp in Sources */,
+				A68950081C906812002DC0B7 /* profile.cpp in Sources */,
 				A615B7E71ABC8708001E1EA7 /* dynamics_mul.cpp in Sources */,
 				A6B45F1F1A88CE120091F5A6 /* interface.cpp in Sources */,
 				A6B45F421A88F1B40091F5A6 /* average_function.cpp in Sources */,
 				A61E857E1B0E2F150064FB92 /* dyn_integral.cpp in Sources */,
+				A6894FFE1C8ECDD0002DC0B7 /* build_km_tree.cpp in Sources */,
 				A6B45F291A88EE190091F5A6 /* main.cpp in Sources */,
 				A69B8AD71AF7B3690031E45D /* polygon_f.cpp in Sources */,
 				A6B45F411A88F1AF0091F5A6 /* log.cpp in Sources */,
+				A6894FFC1C8ECDD0002DC0B7 /* biadjacency_matrix.cpp in Sources */,
 				A6B45F401A88F1AD0091F5A6 /* draw.cpp in Sources */,
 				A6B460EF1A8CADF30091F5A6 /* helper.cpp in Sources */,
 				A60796651B15CB6E00A70D70 /* dynamics_edge.cpp in Sources */,
 				A635BFA51B4A7766003F2DE4 /* adapt_mesh.cpp in Sources */,
 				A64C512E1B54FFD600BDF016 /* options_disp.cpp in Sources */,
 				A61F33181A937CDF00C5C2F8 /* gl_debug_helper.cpp in Sources */,
+				A68950011C8ECDD0002DC0B7 /* search_km_tree.cpp in Sources */,
+				A68950051C8EDE16002DC0B7 /* texture.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -656,7 +688,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		7A51F39217D6383500A8F8F2 /* Build configuration list for PBXProject "DSC_seg_integral" */ = {
+		7A51F39217D6383500A8F8F2 /* Build configuration list for PBXProject "DSC_texture_seg" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7A51F39E17D6383500A8F8F2 /* Debug */,

@@ -28,6 +28,15 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "A6B45F121A88CC9B0091F5A6"
+            BuildableName = "SEGMENT"
+            BlueprintName = "SEGMENT"
+            ReferencedContainer = "container:DSC_texture_seg.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -49,7 +58,7 @@
             BlueprintIdentifier = "A6B45F121A88CC9B0091F5A6"
             BuildableName = "SEGMENT"
             BlueprintName = "SEGMENT"
-            ReferencedContainer = "container:DSC_seg_integral.xcodeproj">
+            ReferencedContainer = "container:DSC_texture_seg.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>

@@ -26,6 +26,8 @@
 #include "dynamics.h"
 #include "dynamics_mul.h"
 
+//#define TEST_PROBABILITY;
+
 class interface{
 #pragma mark - Local variable
 public:

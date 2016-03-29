@@ -21,24 +21,24 @@
 
 #define PI_V1 3.14159
 
-///*
-// * Two phase synthetics image
-// */
-//// Coefficient
-//#define IMAGE_PATH "test.png"
-//// Mesh control
-//#define DISCRETIZE_RES 10.0
-//#define SMALLEST_SIZE   10
-//// Adaptive mesh
-//#define SPLIT_FACE_COEFFICIENT  0.2 // split thres = coe*(1-coe)*(ci-cj)^2
-//#define SPLIT_EDGE_COEFFICIENT 0.03    // Split thres = coe*(ci-cj)^2
-//// Mumford
-//#define ALPHA 1  // internal force
-//#define BETA    1.0 // external force
-//
-//#define DT_ 0.2
-////#define ADD_NOISE
-//#define STABLE_MOVE 1e-2
+/*
+ * Two phase synthetics image
+ */
+// Coefficient
+#define IMAGE_PATH "lion.png"
+// Mesh control
+#define DISCRETIZE_RES 25.0
+#define SMALLEST_SIZE   4
+// Adaptive mesh
+#define SPLIT_FACE_COEFFICIENT  0.2 // split thres = coe*(1-coe)*(ci-cj)^2
+#define SPLIT_EDGE_COEFFICIENT 3    // Split thres = coe*(ci-cj)^2
+// Mumford
+#define ALPHA 0.01  // internal force
+#define BETA    1.0 // external force
+
+#define DT_ 2
+//#define ADD_NOISE
+#define STABLE_MOVE 1e-2
 
 ///*
 // * Sound
@@ -79,18 +79,18 @@
  * Hamster -- easy
  */
 // Coefficient
-#define IMAGE_PATH "Data/Gomu/TallHamster_x_135.png"
-// Mesh control
-#define DISCRETIZE_RES 10.0
-#define SMALLEST_SIZE   2.0
-// Adaptive mesh
-#define SPLIT_FACE_COEFFICIENT  0.08 // split thres = coe*(1-coe)*(ci-cj)^2
-#define SPLIT_EDGE_COEFFICIENT 10    // Split thres = coe*(ci-cj)^2
-// Mumford
-#define ALPHA 0.1  // internal force
-#define BETA    1.0 // external force
-#define DT_ 0.5
-#define STABLE_MOVE 1e-2
+//#define IMAGE_PATH "Data/Gomu/TallHamster_x_135.png"
+//// Mesh control
+//#define DISCRETIZE_RES 10.0
+//#define SMALLEST_SIZE   2.0
+//// Adaptive mesh
+//#define SPLIT_FACE_COEFFICIENT  0.08 // split thres = coe*(1-coe)*(ci-cj)^2
+//#define SPLIT_EDGE_COEFFICIENT 10    // Split thres = coe*(ci-cj)^2
+//// Mumford
+//#define ALPHA 0.1  // internal force
+//#define BETA    1.0 // external force
+//#define DT_ 0.5
+//#define STABLE_MOVE 1e-2
 
 ///*
 // * Star

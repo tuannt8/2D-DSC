@@ -129,13 +129,13 @@ void dynamics_mul::update_dsc_with_adaptive_mesh()
         compute_intensity_force();
         compute_curvature_force();
         
-        update_vertex_stable();
-        am.split_face(*s_dsc, *s_img);
-        
-        compute_mean_intensity(mean_inten_);
-        g_param.mean_intensity = mean_inten_;
-        compute_intensity_force();
-        compute_curvature_force();
+//        update_vertex_stable();
+//        am.split_face(*s_dsc, *s_img);
+//        
+//        compute_mean_intensity(mean_inten_);
+//        g_param.mean_intensity = mean_inten_;
+//        compute_intensity_force();
+//        compute_curvature_force();
         
         update_vertex_stable();
         am.thinning(*s_dsc, *s_img);

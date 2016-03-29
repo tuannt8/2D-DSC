@@ -18,6 +18,7 @@
 #include "adapt_mesh.h"
 
 #include "options_disp.h"
+#include "../texture/texture.h"
 
 void _check_gl_error(const char *file, int line)
 {
@@ -610,6 +611,13 @@ void interface::update_title()
 
 interface::interface(int &argc, char** argv){
     instance = this;
+    
+#ifdef TEST_PROBABILITY
+    texture::test();
+    return;
+#endif
+
+    
     WIN_SIZE_X = 900;
     WIN_SIZE_Y = 600;
     
@@ -634,10 +642,6 @@ interface::interface(int &argc, char** argv){
     init_dsc();
     
     gl_debug_helper::set_dsc(&(*dsc));
-//    init_sqaure_boundary();
-//   init_boundary();
-    
-//    init_boundary_brain();
     
     reshape(WIN_SIZE_X, WIN_SIZE_Y);
     display();
@@ -671,7 +675,7 @@ void interface::init_dsc(){
     dsc->img = &*image_;
 #endif
     
-    printf("Average edge length: %f ; # faces: %d\n", dsc->get_avg_edge_length(), dsc->get_no_faces());
+//    printf("Average edge length: %f ; # faces: %d\n", dsc->get_avg_edge_length(), dsc->get_no_faces());
 }
 
 void interface::thres_hold_init(){
