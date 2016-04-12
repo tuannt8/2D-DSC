@@ -20,8 +20,12 @@
 class texture_segment
 {
 public:
+    void draw_dictionary();
+public:
     texture_segment();
     ~texture_segment();
+    
+    void update_probability();
     
     void update_dsc();
     
@@ -30,11 +34,14 @@ public:
     
 public:
     dsc_sharedptr _dsc;
+    // The original image
     std::shared_ptr<smooth_image> _origin_img;
     
     std::unique_ptr<texture::dictionary> _dict;
+    std::shared_ptr<smooth_image> _dict_over_lay_img;
 public: // Get shared data
-    void set_mesh(dsc_sharedptr dsc){_dsc = dsc;}
+    
+    std::vector<std::shared_ptr<smooth_image>> _prob_imgs;
 };
 
 

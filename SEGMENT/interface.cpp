@@ -310,6 +310,10 @@ void interface::draw()
         _origin_img->draw_image();
     }
     
+    if (options_disp::get_option("Dictionary", false) and _origin_img) {
+        _tex_seg->draw_dictionary();
+    }
+    
     
     if (options_disp::get_option("DSC faces", true) and dsc) {
         Painter::draw_faces(*dsc);

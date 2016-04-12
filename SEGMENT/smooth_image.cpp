@@ -8,6 +8,12 @@
 
 #include "smooth_image.hpp"
 
+smooth_image::smooth_image(int width, int height)
+{
+    _core_img = CImg_class(width, height, 1, 1);
+    _core_img.fill(0.5);
+}
+
 void smooth_image::load_image(std::string file_path)
 {
     _core_img.load(file_path.data());
@@ -35,6 +41,24 @@ double smooth_image::get_value_f(double x, double y)
     double v = vdown * (1 - ep_y) + vup * ep_y;
     
     return v;
+}
+
+void smooth_image::set_value(int x, int y, double v)
+{
+    _core_img(x,y) = v;
+}
+
+void smooth_image::averaging(const std::vector<std::shared_ptr<smooth_image>> imgs)
+{
+    _core_img.fill(0.0);
+    for (auto iptr : imgs)
+    {
+        _core_img = _core_img + iptr->_core_img;
+    }
+    
+    _core_img = _core_img / imgs.size();
+    
+    update_gl_texgture();
 }
 
 void smooth_image::update_gl_texgture()

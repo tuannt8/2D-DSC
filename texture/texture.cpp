@@ -21,6 +21,14 @@ namespace texture
     
     dictionary::dictionary(std::string imName)
     {
+//        if (load_up(imName))
+//        {
+//            std::cout << "Dictionary loaded at " << get_back_up_name(imName) << std::endl;
+//            return;
+//        }
+        
+        std::cout << "Building dictionary" << std::endl;
+        
         // Load test image
         imageb im;
         im.load(imName.data());
@@ -39,6 +47,7 @@ namespace texture
             }
         }
         
+        std::cout << "Building tree" << std::endl;
         // Build tree
         double Md = 15;             // batch size
         double bd = 2;              // branching factor
@@ -50,6 +59,7 @@ namespace texture
         int treeDim[2];
         double * tree =  build_tree( &I[0], &Md, &bd, &n_train_d, &Ld, ndim, dim, treeDim);
         
+        std::cout << "Building adjacency matrix" << std::endl;
         // Build matrix A; same dimension with image
         double * A = search_tree(&I[0], tree, &bd, ndim, 2, dim, treeDim);
         
@@ -80,8 +90,7 @@ namespace texture
             Bt1(ij.j)++;
         }
         
-        printf("Mapping matrix \n");
-        
+        std::cout << "Compute T1 and T2" << std::endl;
         Mat<double> T1 = zeros(Bt.n_rows, Bt.n_cols);
         
         for(auto ij : Bij)
@@ -96,17 +105,82 @@ namespace texture
         }
     
         
-        _T = T2*T1;
+        _T1 = T1;
+        _T2 = T2;
+        
+        //        back_up(imName);
+        std::cout << "Dictionary built" << std::endl;
     }
     
     void dictionary::save_matrix(std::string imName)
     {
-        _T.save(imName.data(), arma::arma_ascii);
+        std::ostringstream mat_name1, mat_name2;
+        mat_name1 << imName << "_1.txt";
+        mat_name2 << imName << "_2.txt";
+        _T1.save(mat_name1.str().data(), arma::arma_ascii);
+        _T2.save(mat_name2.str().data(), arma::arma_ascii);
     }
     
     bool dictionary::load_matrix(std::string imName)
-    {        
-        return _T.load(imName.data(), arma::arma_ascii);
+    {
+        std::ostringstream mat_name1, mat_name2;
+        mat_name1 << imName << "_1.txt";
+        mat_name2 << imName << "_2.txt";
+        std::ifstream f1(mat_name1.str());
+        std::ifstream f2(mat_name2.str());
+        if (f1.good() and f2.good())
+        {
+            _T1.load(mat_name1.str().data(), arma::arma_ascii);
+            _T2.load(mat_name2.str().data(), arma::arma_ascii);
+            return true;
+        }
+        else
+            return false;
+    }
+#ifdef __APPLE__
+#ifndef st_mtime
+#define st_mtime st_mtimespec.tv_sec
+#endif
+#endif
+    
+    std::string dictionary::get_back_up_name(const std::string file) {
+        struct tm *clock;
+        struct stat attr;
+        
+        stat(file.c_str(), &attr);
+        clock = gmtime(&(attr.st_mtime));
+        
+        auto name = file.substr(file.find_last_of("/\\") + 1);
+        
+        std::ostringstream os;
+        os << "DATA/dictionary_backup/" << name << "_" << clock->tm_year << "_" << clock->tm_mon << "_"
+            << clock->tm_mday << "_" << clock->tm_hour << "_"
+            << clock->tm_min  << "_" << clock->tm_sec ;
+        
+        return os.str();
+    }
+    
+    bool dictionary::load_up(std::string imName)
+    {
+        auto name = get_back_up_name(imName);
+        return load_matrix(name);
+    }
+    
+    void dictionary::back_up(std::string imName, bool overwrite)
+    {
+        auto name = get_back_up_name(imName);
+        // Load the info file
+        std::ifstream ifile(name);
+        if (!overwrite and ifile.good())
+        {
+            ifile.close();
+            // Existed
+        }
+        else
+        {
+            save_matrix(name);
+            std::cout << "Dictionary saved at " << name << std::endl;
+        }
     }
     
     void test()
@@ -190,34 +264,7 @@ namespace texture
         printf("Compute mapping matrix \n");
         
 
-        
-//        for (int i = 0; i < B1.n_elem; i++)
-//        {
-//            B1(i) = 1 / (B1(i) + 0.00000001);
-//        }
-//        
-//        for (int i = 0; i < Bt1.n_elem; i++)
-//        {
-//            Bt1(i) = 1 / (Bt1(i) + 0.00000001);
-//        }
-        
-//        vec one = ones<vec>(Bt.n_cols);
-//        
-//        vec Bt1 = Bt*one;
-//        Mat<double> Bt1_i = zeros(Bt1.n_elem, Bt1.n_elem);
-//        for (int i = 0; i < Bt1.n_elem; i++)
-//        {
-//            Bt1_i(i,i) = 1./(Bt1(i) + 0.00000001);
-//        }
-//        
-//        
-//        vec one_h = ones<vec>(B.n_cols);
-//        vec B1 = B*one_h;
-//        Mat<double> B1_i = zeros(B1.n_elem, B1.n_elem);
-//        for(int i = 0; i < B1.n_elem; i++)
-//        {
-//            B1_i(i,i) = 1./(B1(i) + 0.00000001);
-//        }
+
         
 
         printf("Mapping matrix \n");
@@ -229,14 +276,6 @@ namespace texture
             T1(ij.j, ij.i) = Bt(ij.j, ij.i)/(Bt1(ij.j) + 0.00001);
         }
         
-//        for (int i = 0; i < Bt.n_rows; i++)
-//        {
-//            for (int j = 0; j < Bt.n_cols; j++)
-//            {
-//                T1(i,j) = Bt(i,j)/(Bt1(i) + 0.00001);
-//            }
-//        }
-        
         Mat<double> T2 = zeros(B.n_rows, B.n_cols);
         
         for(auto ij : Bij)
@@ -244,15 +283,6 @@ namespace texture
             T2(ij.i, ij.j) = B(ij.i, ij.j)/(B1(ij.i) + 0.00001);
         }
         
-//        for (int i = 0; i < B.n_rows; i++)
-//        {
-//            for (int j = 0; j < B.n_cols; j++)
-//            {
-//                T2(i,j) = B(i,j)/(B1(i) + 0.00001);
-//            }
-//        }
-        
-
         
 
         

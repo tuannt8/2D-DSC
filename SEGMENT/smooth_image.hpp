@@ -1,4 +1,4 @@
-//
+ //
 //  smooth_image.hpp
 //  DSC_texture_seg
 //
@@ -27,6 +27,9 @@ private: // Inheritances from CImg class
     CImg_class _core_img;
     
 public:
+    smooth_image(){};
+    ~smooth_image(){};
+    
     int width(){return _core_img.width();}
     int height(){return _core_img.height();}
     // Interpretor [0:1]
@@ -39,6 +42,13 @@ public:
     // Bind GL texture for rendering
     void draw_image();
     void bind_texture(){glBindTexture(GL_TEXTURE_2D, _gl_texture_ID);}
+    
+public:
+    // For probability image
+    smooth_image(int width, int height);
+    void fill(double val){ _core_img.fill(val); }
+    void set_value(int x, int y, double v);
+    void averaging(const std::vector<std::shared_ptr<smooth_image>> imgs);
 private:
     // For OpenGL texture mapping
     GLuint _gl_texture_ID;

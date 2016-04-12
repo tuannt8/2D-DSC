@@ -90,9 +90,13 @@ namespace texture
         
         void save_matrix(std::string imName);
         bool load_matrix(std::string imName);
+        
+        std::string get_back_up_name(const std::string file);
+        void back_up(std::string imName, bool overwrite = false);
+        bool load_up(std::string imName);
     private:
         // The dictionary matrix
-        arma::Mat<double> _T;
+        arma::Mat<double> _T1, _T2;
     public:
     };
 }
