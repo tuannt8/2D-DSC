@@ -9,10 +9,18 @@
 #ifndef texture_h
 #define texture_h
 #include <vector>
+#include <stdlib.h>
+#include "CImg.h"
+#include <armadillo>
+#include <string>
 
 namespace texture
 {
-
+    typedef unsigned char BYTE;
+    #define MAX_BYTE 255
+    
+    typedef cimg_library::CImg<BYTE> imageb;
+    typedef cimg_library::CImg<double> imaged;
 
     // struct for the tree
     struct tree_st
@@ -70,6 +78,23 @@ namespace texture
     void test();
  
     void log_im(double *I, int width, int height, char* name);
+    
+    /*
+     Class dictionary
+     Build base on image range [0:1]
+     */
+    class dictionary{
+    public:
+        dictionary(std::string imName);
+        ~dictionary(){}
+        
+        void save_matrix(std::string imName);
+        bool load_matrix(std::string imName);
+    private:
+        // The dictionary matrix
+        arma::Mat<double> _T;
+    public:
+    };
 }
 
 #endif /* texture_h */

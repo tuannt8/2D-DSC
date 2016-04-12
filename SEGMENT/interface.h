@@ -26,12 +26,15 @@
 #include "dynamics.h"
 #include "dynamics_mul.h"
 
+#include "texture_segment.hpp"
+#include "smooth_image.hpp"
+
 //#define TEST_PROBABILITY;
 
 class interface{
 #pragma mark - Local variable
 public:
-    std::unique_ptr<DSC2D::DeformableSimplicialComplex> dsc;
+    std::shared_ptr<DSC2D::DeformableSimplicialComplex> dsc;
     
     // Windows size
     int     WIN_SIZE_X;
@@ -46,9 +49,9 @@ public:
     
     static interface *instance;
     
-    std::unique_ptr<dynamics_mul> dyn_;
-    std::unique_ptr<image> image_;
-    
+    // texture segmentation
+    std::shared_ptr<texture_segment> _tex_seg;
+    std::shared_ptr<smooth_image> _origin_img;
 private:
     int debug_num_[10];
     

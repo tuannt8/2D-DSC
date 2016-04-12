@@ -10,6 +10,7 @@
 #define DSC_define_h
 #include "DSC.h"
 #include <string>
+#include <memory.h>
 
 // Data directory
 #ifdef WIN32
@@ -20,6 +21,9 @@
 #endif
 
 #define PI_V1 3.14159
+
+typedef unsigned char BYTE;
+#define MAX_BYTE 255
 
 /*
  * Two phase synthetics image
@@ -40,145 +44,6 @@
 //#define ADD_NOISE
 #define STABLE_MOVE 1e-2
 
-///*
-// * Sound
-// */
-//// Coefficient
-//#define IMAGE_PATH "Data/sound_gap.png"
-//// Mesh control
-//#define DISCRETIZE_RES 20.0
-//#define SMALLEST_SIZE   3.0
-//// Adaptive mesh
-//#define SPLIT_FACE_COEFFICIENT  0.08 // split thres = coe*(1-coe)*(ci-cj)^2
-//#define SPLIT_EDGE_COEFFICIENT 3    // Split thres = coe*(ci-cj)^2
-//// Mumford
-//#define ALPHA 0.1  // internal force
-//#define BETA    1.0 // external force
-//#define DT_ 1.0
-//#define STABLE_MOVE 1e-2
-
-///*
-// * Fuel cell
-// */
-//// Coefficient
-//#define IMAGE_PATH "Data/fuel_cell/small_gap.png"
-//// Mesh control
-//#define DISCRETIZE_RES 20.0
-//#define SMALLEST_SIZE   3.0
-//// Adaptive mesh
-//#define SPLIT_FACE_COEFFICIENT  0.6 // split thres = coe*(1-coe)*(ci-cj)^2
-//#define SPLIT_EDGE_COEFFICIENT 1    // Split thres = coe*(ci-cj)^2
-//// Mumford
-//#define ALPHA 0.1  // internal force
-//#define BETA    1.0 // external force
-//#define DT_ 0.2
-//#define ADD_NOISE
-//#define STABLE_MOVE 1e-2
-
-/*
- * Hamster -- easy
- */
-// Coefficient
-//#define IMAGE_PATH "Data/Gomu/TallHamster_x_135.png"
-//// Mesh control
-//#define DISCRETIZE_RES 10.0
-//#define SMALLEST_SIZE   2.0
-//// Adaptive mesh
-//#define SPLIT_FACE_COEFFICIENT  0.08 // split thres = coe*(1-coe)*(ci-cj)^2
-//#define SPLIT_EDGE_COEFFICIENT 10    // Split thres = coe*(ci-cj)^2
-//// Mumford
-//#define ALPHA 0.1  // internal force
-//#define BETA    1.0 // external force
-//#define DT_ 0.5
-//#define STABLE_MOVE 1e-2
-
-///*
-// * Star
-// */
-//// Coefficient
-//#define IMAGE_PATH "Star.png"
-//// Mesh control
-//#define DISCRETIZE_RES 10.0
-//#define SMALLEST_SIZE   15.0
-//// Adaptive mesh
-//#define SPLIT_FACE_COEFFICIENT  0.2 // split thres = coe*(1-coe)*(ci-cj)^2
-//#define SPLIT_EDGE_COEFFICIENT 20    // Split thres = coe*(ci-cj)^2
-//// Mumford
-//#define ALPHA 0.1  // internal force
-//#define BETA    1.0 // external force
-//#define DT_ 0.5
-//#define STABLE_MOVE 1e-1
-//#define ADD_NOISE
-
-///*
-// * Multi phase
-// */
-//// Coefficient
-//#define IMAGE_PATH "multi_700x700.png"
-//// Mesh control
-//#define DISCRETIZE_RES 10.0
-//#define SMALLEST_SIZE   5.0
-//// Adaptive mesh
-//#define SPLIT_FACE_COEFFICIENT  0.2 // split thres = coe*(1-coe)*(ci-cj)^2
-//#define SPLIT_EDGE_COEFFICIENT 2    // Split thres = coe*(ci-cj)^2
-//// Mumford
-//#define ALPHA 0.1  // internal force
-//#define BETA    1.0 // external force
-//#define DT_ 3
-//#define STABLE_MOVE 1e-2
-//#define ADD_NOISE
-
-///*
-// * adapt mesh
-// */
-//// Coefficient
-//#define IMAGE_PATH "adaptive.png"
-//// Mesh control
-//#define DISCRETIZE_RES 10.0
-//#define SMALLEST_SIZE   3.0
-//// Adaptive mesh
-//#define SPLIT_FACE_COEFFICIENT  0.2 // split thres = coe*(1-coe)*(ci-cj)^2
-//#define SPLIT_EDGE_COEFFICIENT 0.3    // Split thres = coe*(ci-cj)^2
-//// Mumford
-//#define ALPHA 0.1  // internal force
-//#define BETA    1.0 // external force
-//#define DT_ 3
-//#define STABLE_MOVE 1e-2
-//#define ADD_NOISE
-
-///*
-// * Cement
-// */
-//// Coefficient
-//#define IMAGE_PATH "Data/cement/sample.png"
-//// Mesh control
-//#define DISCRETIZE_RES 20.0
-//#define SMALLEST_SIZE   4.0
-//// Adaptive mesh
-//#define SPLIT_FACE_COEFFICIENT  0.08 // split thres = coe*(1-coe)*(ci-cj)^2
-//#define SPLIT_EDGE_COEFFICIENT 10    // Split thres = coe*(ci-cj)^2
-//// Mumford
-//#define ALPHA 0.2  // internal force
-//#define BETA    1.0 // external force
-//#define DT_ 0.5
-//#define STABLE_MOVE 1e-2
-
-///*
-// * Dental
-// */
-//// Coefficient
-//#define IMAGE_PATH "Data/dental/sample_gap.png"
-//// Mesh control
-//#define DISCRETIZE_RES 20.0
-//#define SMALLEST_SIZE   8.0
-//// Adaptive mesh
-//#define SPLIT_FACE_COEFFICIENT  0.5 // split thres = coe*(1-coe)*(ci-cj)^2
-//#define SPLIT_EDGE_COEFFICIENT 5   // Split thres = coe*(ci-cj)^2
-//// Mumford
-//#define ALPHA 0.2  // internal force
-//#define BETA    1.0 // external force
-//#define DT_ 0.5
-//#define STABLE_MOVE 1e-2
 
 using std::vector;
 using std::cout;
@@ -190,6 +55,7 @@ using std::endl;
 typedef DSC2D::vec2 Vec2;
 typedef DSC2D::vec3 Vec3;
 typedef DSC2D::DeformableSimplicialComplex dsc_obj;
+typedef std::shared_ptr<DSC2D::DeformableSimplicialComplex> dsc_sharedptr;
 typedef dsc_obj::node_key Node_key;
 typedef dsc_obj::face_key Face_key;
 typedef dsc_obj::edge_key Edge_key;

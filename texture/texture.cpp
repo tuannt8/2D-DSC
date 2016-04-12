@@ -8,9 +8,7 @@
 
 #include <stdio.h>
 #include "texture.h"
-#include <armadillo>
-#include "CImg.h"
-#include <string>
+
 #include "define.h"
 
 #include "profile.h"
@@ -21,11 +19,95 @@ namespace texture
     using namespace cimg_library;
     using namespace arma;
     
-    typedef unsigned char BYTE;
-    #define MAX_BYTE 255
+    dictionary::dictionary(std::string imName)
+    {
+        // Load test image
+        imageb im;
+        im.load(imName.data());
+        
+        int width = im.width();
+        int height = im.height();
+       
+        // Image 1 layer
+        vector<double> I;
+        I.resize(width*height);
+        for (int i = 0; i < height; i++)
+        {
+            for(int j = 0; j < width; j++)
+            {
+                I[i*width + j] = (double)im(j,i) / MAX_BYTE;
+            }
+        }
+        
+        // Build tree
+        double Md = 15;             // batch size
+        double bd = 2;              // branching factor
+        double n_train_d = 1000;    // training patch
+        double Ld = 5;              // number of layer
+        int ndim = 1;
+        int dim[2] = {width, height};
+        
+        int treeDim[2];
+        double * tree =  build_tree( &I[0], &Md, &bd, &n_train_d, &Ld, ndim, dim, treeDim);
+        
+        // Build matrix A; same dimension with image
+        double * A = search_tree(&I[0], tree, &bd, ndim, 2, dim, treeDim);
+        
+        // Matrix B
+        vector<ij> Bij = biadjacency_matrix(A, width, height, Md);
+        
+        
+        // Using armadillo to compute the matrix
+        long B_width = width*height;
+        int K = 0;
+        for (int a=0; a<width*height; a++)
+            if (A[a]>K)
+                K = A[a];
+        long B_height = Md*Md*K;
+        
+        Mat<double> B(B_width, B_height);
+        Mat<double> Bt(B_height, B_width);
+        
+        vec B1 = zeros(B.n_rows);
+        vec Bt1 = zeros(B.n_rows);
+        
+        for (auto & ij : Bij)
+        {
+            B(ij.i, ij.j) = 1;
+            B1(ij.i) ++;
+            
+            Bt(ij.j, ij.i) = 1;
+            Bt1(ij.j)++;
+        }
+        
+        printf("Mapping matrix \n");
+        
+        Mat<double> T1 = zeros(Bt.n_rows, Bt.n_cols);
+        
+        for(auto ij : Bij)
+        {
+            T1(ij.j, ij.i) = Bt(ij.j, ij.i)/(Bt1(ij.j) + 0.00001);
+        }
+        
+        Mat<double> T2 = zeros(B.n_rows, B.n_cols);
+        for(auto ij : Bij)
+        {
+            T2(ij.i, ij.j) = B(ij.i, ij.j)/(B1(ij.i) + 0.00001);
+        }
     
-    typedef CImg<BYTE> imageb;
-    typedef CImg<double> imaged;
+        
+        _T = T2*T1;
+    }
+    
+    void dictionary::save_matrix(std::string imName)
+    {
+        _T.save(imName.data(), arma::arma_ascii);
+    }
+    
+    bool dictionary::load_matrix(std::string imName)
+    {        
+        return _T.load(imName.data(), arma::arma_ascii);
+    }
     
     void test()
     {
@@ -235,3 +317,52 @@ namespace texture
 //        }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

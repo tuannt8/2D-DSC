@@ -28,13 +28,6 @@
 #include <GEL/HMesh/mesh_optimization.h>
 #endif
 
-//#define TUAN_SEG
-
- #define TUAN_MULTI_RES
-
-#ifdef TUAN_MULTI_RES
-class image;
-#endif
 
 #define NB_FORCES 10
 
@@ -50,12 +43,6 @@ namespace DSC2D {
      */
     class DeformableSimplicialComplex
     {
-#ifdef TUAN_MULTI_RES
-    public:
-        image * img;
-        int pixel_spread = 4;  // To avoid computing energy near edge
-        double collapse_ene_thres = 0.15;
-#endif
         friend class ObjectGenerator;
     public:
         enum LABEL_OPT {NO_LABEL = -3, OUTSIDE = 0, INTERFACE = -1, CROSSING = -2};

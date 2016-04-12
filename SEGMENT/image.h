@@ -13,8 +13,7 @@
 #include "define.h"
 #include "CImg.h"
 
-typedef unsigned char BYTE;
-#define MAX_BYTE 255
+
 
 /*
  Image 
@@ -32,7 +31,7 @@ struct intensity_out{
     int total_pixel;
 };
 
-class image: public cimg_library::CImg<BYTE>{
+class image: public cimg_library::CImg<double>{
 private:
     // Row order storage idx = y * width + x
     Vec2_array gradient_;

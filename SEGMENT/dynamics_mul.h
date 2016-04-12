@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "define.h"
 #include "image.h"
+#include "texture.h"
 
 //#define EX_BOUND 1
 //#define IN_BOUND 2

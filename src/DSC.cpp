@@ -17,10 +17,6 @@
 #include "DSC.h"
 #include "draw.h"
 
-#ifdef TUAN_MULTI_RES
-#include "image.h"
-#endif
-
 #include <iostream>
 #include <fstream>
 

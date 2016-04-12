@@ -37,7 +37,10 @@
 		A61F331D1A97745800C5C2F8 /* define.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A61F331C1A97745800C5C2F8 /* define.cpp */; };
 		A635BFA51B4A7766003F2DE4 /* adapt_mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A635BFA31B4A7766003F2DE4 /* adapt_mesh.cpp */; };
 		A64C512E1B54FFD600BDF016 /* options_disp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A64C512D1B54FFD600BDF016 /* options_disp.cpp */; };
+		A652948D1CB620C800301077 /* texture_segment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A652948B1CB620C800301077 /* texture_segment.cpp */; };
 		A663DE681AD6B25B006CC422 /* libX11.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A663DE671AD6B25B006CC422 /* libX11.6.dylib */; };
+		A67096F01CBB8DB300A9B6BC /* setting_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A67096EF1CBB8DB300A9B6BC /* setting_file.cpp */; };
+		A67096F31CBBACEA00A9B6BC /* smooth_image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A67096F11CBBACEA00A9B6BC /* smooth_image.cpp */; };
 		A67962501AB965D400EACF40 /* DSC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A51F3A517D6386100A8F8F2 /* DSC.cpp */; };
 		A67B0CED1BC569950060D2A8 /* libarmadillo.5.000.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A67B0CEC1BC569950060D2A8 /* libarmadillo.5.000.1.dylib */; };
 		A6894FFC1C8ECDD0002DC0B7 /* biadjacency_matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6894FF61C8ECDD0002DC0B7 /* biadjacency_matrix.cpp */; };
@@ -114,6 +117,7 @@
 		7A9C20DA17DFBE080064171E /* draw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = draw.h; sourceTree = "<group>"; };
 		A60796631B15CB6E00A70D70 /* dynamics_edge.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dynamics_edge.cpp; sourceTree = "<group>"; };
 		A60796641B15CB6E00A70D70 /* dynamics_edge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dynamics_edge.h; sourceTree = "<group>"; };
+		A6122C851CBB8A3500169600 /* setting_file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = setting_file.h; sourceTree = "<group>"; };
 		A615B7E51ABC8708001E1EA7 /* dynamics_mul.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dynamics_mul.cpp; sourceTree = "<group>"; };
 		A615B7E61ABC8708001E1EA7 /* dynamics_mul.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dynamics_mul.h; sourceTree = "<group>"; };
 		A61E857C1B0E2F150064FB92 /* dyn_integral.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dyn_integral.cpp; sourceTree = "<group>"; };
@@ -127,7 +131,12 @@
 		A635BFA41B4A7766003F2DE4 /* adapt_mesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = adapt_mesh.h; sourceTree = "<group>"; };
 		A64C512C1B54FFB800BDF016 /* options_disp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = options_disp.h; sourceTree = "<group>"; };
 		A64C512D1B54FFD600BDF016 /* options_disp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = options_disp.cpp; sourceTree = "<group>"; };
+		A652948B1CB620C800301077 /* texture_segment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = texture_segment.cpp; sourceTree = "<group>"; };
+		A652948C1CB620C800301077 /* texture_segment.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = texture_segment.hpp; sourceTree = "<group>"; };
 		A663DE671AD6B25B006CC422 /* libX11.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libX11.6.dylib; path = ../../../../../opt/X11/lib/libX11.6.dylib; sourceTree = "<group>"; };
+		A67096EF1CBB8DB300A9B6BC /* setting_file.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = setting_file.cpp; sourceTree = "<group>"; };
+		A67096F11CBBACEA00A9B6BC /* smooth_image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = smooth_image.cpp; sourceTree = "<group>"; };
+		A67096F21CBBACEA00A9B6BC /* smooth_image.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = smooth_image.hpp; sourceTree = "<group>"; };
 		A67B0CEC1BC569950060D2A8 /* libarmadillo.5.000.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libarmadillo.5.000.1.dylib; path = "../../../armadillo-5.000.1/libarmadillo.5.000.1.dylib"; sourceTree = "<group>"; };
 		A6894FF61C8ECDD0002DC0B7 /* biadjacency_matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = biadjacency_matrix.cpp; path = texture/biadjacency_matrix.cpp; sourceTree = SOURCE_ROOT; };
 		A6894FF81C8ECDD0002DC0B7 /* build_km_tree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = build_km_tree.cpp; path = texture/build_km_tree.cpp; sourceTree = SOURCE_ROOT; };
@@ -304,6 +313,12 @@
 				A635BFA41B4A7766003F2DE4 /* adapt_mesh.h */,
 				A64C512C1B54FFB800BDF016 /* options_disp.h */,
 				A64C512D1B54FFD600BDF016 /* options_disp.cpp */,
+				A652948B1CB620C800301077 /* texture_segment.cpp */,
+				A652948C1CB620C800301077 /* texture_segment.hpp */,
+				A6122C851CBB8A3500169600 /* setting_file.h */,
+				A67096EF1CBB8DB300A9B6BC /* setting_file.cpp */,
+				A67096F11CBBACEA00A9B6BC /* smooth_image.cpp */,
+				A67096F21CBBACEA00A9B6BC /* smooth_image.hpp */,
 			);
 			path = SEGMENT;
 			sourceTree = "<group>";
@@ -444,10 +459,13 @@
 				A6B45F441A88F1BE0091F5A6 /* rotate_function.cpp in Sources */,
 				A61F331B1A94860D00C5C2F8 /* image.cpp in Sources */,
 				A67962501AB965D400EACF40 /* DSC.cpp in Sources */,
+				A67096F01CBB8DB300A9B6BC /* setting_file.cpp in Sources */,
 				A6B45F431A88F1BB0091F5A6 /* normal_function.cpp in Sources */,
 				A61F331D1A97745800C5C2F8 /* define.cpp in Sources */,
 				A68950081C906812002DC0B7 /* profile.cpp in Sources */,
+				A67096F31CBBACEA00A9B6BC /* smooth_image.cpp in Sources */,
 				A615B7E71ABC8708001E1EA7 /* dynamics_mul.cpp in Sources */,
+				A652948D1CB620C800301077 /* texture_segment.cpp in Sources */,
 				A6B45F1F1A88CE120091F5A6 /* interface.cpp in Sources */,
 				A6B45F421A88F1B40091F5A6 /* average_function.cpp in Sources */,
 				A61E857E1B0E2F150064FB92 /* dyn_integral.cpp in Sources */,

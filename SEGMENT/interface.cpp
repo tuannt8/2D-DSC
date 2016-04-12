@@ -19,6 +19,7 @@
 
 #include "options_disp.h"
 #include "../texture/texture.h"
+#include "setting_file.h"
 
 void _check_gl_error(const char *file, int line)
 {
@@ -148,7 +149,6 @@ void interface::keyboard(unsigned char key, int x, int y){
             break;
         case 'p':
             gl_debug_helper::print_debug_info_nearest(*dsc);
-            gl_debug_helper::print_image_info(*image_);
             break;
         case 'r':
         {
@@ -171,15 +171,12 @@ void interface::keyboard(unsigned char key, int x, int y){
             break;
         case 'f': // Flipping phase
         {
-            adapt_mesh am;
-//            am.split_face(*dsc, *image_);
-            am.split_face_and_relabel(*dsc, *image_);
+
         }
             break;
         case 's': // Split edge
         {
-            adapt_mesh am;
-            am.split_edge(*dsc, *image_);
+
         }
             break;
         case 'b': // Split edge
@@ -194,7 +191,7 @@ void interface::keyboard(unsigned char key, int x, int y){
             break;
         case 'w': // Split edge
         {
-            dyn_->write_energy();
+//            dyn_->write_energy();
         }
             break;
         case 'u':
@@ -252,11 +249,9 @@ void interface::load_dsc()
         
         DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, 0 /* DISCRETIZATION */);
         
-        dsc = std::unique_ptr<DeformableSimplicialComplex>(
+        dsc = std::shared_ptr<DeformableSimplicialComplex>(
                                                            new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
-#ifdef TUAN_MULTI_RES
-        dsc->img = &*image_;
-#endif
+
         gl_debug_helper::set_dsc(&(*dsc));
         
         myfile.close();
@@ -311,27 +306,19 @@ void interface::draw()
     
     reshape(WIN_SIZE_X, WIN_SIZE_Y);
     
-    
-    if (options_disp::get_option("Image", true)) {
-        image_->draw_image(WIN_SIZE_X);
+    if (options_disp::get_option("Image", true) and _origin_img) {
+        _origin_img->draw_image();
     }
-    else
-        glColor3f(0.4, 0.4, 0.4);
+    
     
     if (options_disp::get_option("DSC faces", true) and dsc) {
         Painter::draw_faces(*dsc);
     }
     
-    draw_test();
-    
-    if(options_disp::get_option("Image gradient", false)){
-        image_->draw_grad(WIN_SIZE_X);
-    }
-    
     if (options_disp::get_option("Face intensity", false) and dsc) {
         Painter::draw_faces_intensity(*dsc);
     }
-    
+
     if (options_disp::get_option("Edge and vertices ", true) and dsc) {
         glLineWidth(1.0);
         Painter::draw_edges(*dsc);
@@ -339,19 +326,12 @@ void interface::draw()
         glPointSize(1.0);
     //    Painter::draw_vertices(*dsc);
     }
-    
+
     if(options_disp::get_option("Phase index", false)){
         Painter::draw_face_label(*dsc);
     }
-    
-    if(options_disp::get_option("Triangle variation", false)){
-        draw_tri_variant();
-    }
 
-    
-    if(options_disp::get_option("Edge energy", false)){
-        draw_edge_energy();
-    }
+
     
     if(options_disp::get_option("Vertices index", false)){
         glColor3f(1, 0, 0);
@@ -368,16 +348,7 @@ void interface::draw()
     if (options_disp::get_option("Face index")){
         Painter::draw_faces_index(*dsc);
     }
-    
-    if (options_disp::get_option("Node external force")) {
-        Painter::draw_external_force(*dsc);
-    }
-    
-    // Debug
-//    auto fid = dsc->faces_begin();
-//    auto pts = dsc->get_pos(*fid);
-//    image_->debug_integral(pts);
-    
+
     
     gl_debug_helper::draw();
     
@@ -387,135 +358,14 @@ void interface::draw()
 }
 
 void interface::draw_tri_variant(){
-    for (auto fkey : dsc->faces()){
-        auto pts = dsc->get_pos(fkey);
-        /*
-         Shrink the triangle
-         */
-        {
-        auto center = (pts[0] + pts[1] + pts[2]) / 3.0;
-        double aa = 1 - 0.1;
-        pts[0] = center + (pts[0] - center)*aa;
-        pts[1] = center + (pts[1] - center)*aa;
-        pts[2] = center + (pts[2] - center)*aa;
-        }
-        /**/
-        double area;
-        double mi = image_->get_tri_intensity_f(pts, &area); mi /= area;
-        double e = image_->get_tri_differ_f(pts, mi)/ (area + SINGULAR_AREA);
-        
-        auto center = (pts[0] + pts[1] + pts[2])/3.0;
-        
-        std::ostringstream is;
-        is.precision(3);
-        is << e;
-        Painter::print_gl(center[0], center[1], is.str().c_str());
-    }
 }
 
 void interface::draw_edge_energy(){
-    
-    // By total force energy
-    if (1) {
-        
-        glColor3f(0, 0, 0);
-        
-        std::vector<Edge_key> edges;
-        for(auto hei = dsc->halfedges_begin(); hei != dsc->halfedges_end(); ++hei)
-        {
-            if (dsc->is_interface(*hei)) {
-                auto hew = dsc->walker(*hei);
-                if(dsc->is_movable(*hei)
-                   and dsc->get_label(hew.face()) < dsc->get_label(hew.opp().face()))
-                {
-                    edges.push_back(*hei);
-                }
-            }
-        }
-        
-        auto mean_inten_ = g_param.mean_intensity;
-        
-        for (auto ekey : edges){
-            auto hew = dsc->walker(ekey);
-            
-            double ev = 0;
-            double c0 = mean_inten_[dsc->get_label(hew.face())];
-            double c1 = mean_inten_[dsc->get_label(hew.opp().face())];
-            
-            // Loop on the edge
-            auto p0 = dsc->get_pos(hew.opp().vertex());
-            auto p1 = dsc->get_pos(hew.vertex());
-            
-            
-                double length = (p1 - p0).length();
-                int N = (int)length;
-                double dl = length/(double)N;
-                for (int i = 0; i <= N; i++) {
-                    auto p = p0 + (p1 - p0)*(i/(double)N)*dl;
-                    double I = image_->get_intensity_f(p[0], p[1]);
-                    
-                    // Normalize force
-                    double f = (2*I - c0 - c1) / (c0-c1);
-                    
-                    ev += std::abs(f)*dl;
-                }
-            
-            
-            ev = ev / ((double)length + 3);
-            
-            // draw
-            auto tris = dsc->get_pos(ekey);
-            auto center = (tris[0] + tris[1])/2.0;
-            std::ostringstream is;
-            is << ev;
-            Painter::print_gl(center[0], center[1], is.str().c_str());
-        }
-    }
 }
 
 
 void interface::draw_test(){
     
-    if (options_disp::get_option("Face energy", false)) {
-        if (g_param.mean_intensity.size() == 0) {
-            return;
-        }
-        
-        HMesh::FaceAttributeVector<Vec3> intensity(dsc->get_no_faces(), Vec3(0.0));
-        glColor3f(0, 0, 0);
-        for (auto fkey : dsc->faces())
-        {
-            auto tris = dsc->get_pos(fkey);
-            auto area = dsc->area(fkey);
-            double ci = g_param.mean_intensity[dsc->get_label(fkey)];
-            
-            double sum = image_->get_sum_on_tri_differ(tris, ci);
-            //        double sum = image_->get_sum_on_tri_variation(tris, 3);
-            
-            if(sum < 0.001) sum = 0;
-            
-            auto center = (tris[0] + tris[1] + tris[2])/3.0;
-            std::ostringstream is;
-            is << sum/area;
-            Painter::print_gl(center[0], center[1], is.str().c_str());
-        }
-    }
-
-//    if (options_disp::get_option("Edge energy", false)) {
-//        for (auto ekey : dsc->halfedges()){
-//            auto hew = dsc->walker(ekey);
-//            if (dsc->is_interface(ekey) and
-//                hew.vertex().get_index() > hew.opp().vertex().get_index())
-//            {
-//                auto pts = dsc->get_pos(ekey);
-//                double energy = std::abs(image_->get_edge_energy(pts[0], pts[1], 1));
-//                auto c = (pts[0] + pts[1])/2;
-//                std::ostringstream str;
-//                str << energy;
-//                Painter::print_gl(c[0], c[1], str.str().c_str());
-//            }
-//        }
-//    }
 
 }
 
@@ -567,34 +417,34 @@ void interface::draw_coord(){
 }
 
 void interface::draw_image(){
-
-    DSC2D::DesignDomain const * domain = dsc->get_design_domain();
-    std::vector<DSC2D::vec2> corners = domain->get_corners();
-
-    std::vector<DSC2D::vec2> quad_v = get_quad(0, 0, imageSize[0], imageSize[1]);
-    std::vector<DSC2D::vec2> quad_tex;// = get_quad(0.0, 0.0, 1.0, 1.0);
-
-    quad_tex.push_back(DSC2D::vec2(1, 0));
-    quad_tex.push_back(DSC2D::vec2(1, 1));
-    quad_tex.push_back(DSC2D::vec2(0, 1));
-    quad_tex.push_back(DSC2D::vec2(0, 0));
-    
-    glColor3f(1, 1, 1);
-    glBegin(GL_QUADS);
-    for (int i = 0; i < 4; i++) {
-        glVertex2dv((GLdouble*)quad_v[i].get());
-        glTexCoord2dv((GLdouble*)quad_tex[i].get());
-    }
-    glEnd();
-    
-    glLineWidth(2.0);
-    glColor3f(1, 0, 0);
-    glBegin(GL_LINES);
-    for (int i = 0; i < 4; i++) {
-        glVertex2dv((GLdouble*)quad_v[i].get());
-        glVertex2dv((GLdouble*)quad_v[(i+1)%4].get());
-    }
-    glEnd();
+//
+//    DSC2D::DesignDomain const * domain = dsc->get_design_domain();
+//    std::vector<DSC2D::vec2> corners = domain->get_corners();
+//
+//    std::vector<DSC2D::vec2> quad_v = get_quad(0, 0, imageSize[0], imageSize[1]);
+//    std::vector<DSC2D::vec2> quad_tex;// = get_quad(0.0, 0.0, 1.0, 1.0);
+//
+//    quad_tex.push_back(DSC2D::vec2(1, 0));
+//    quad_tex.push_back(DSC2D::vec2(1, 1));
+//    quad_tex.push_back(DSC2D::vec2(0, 1));
+//    quad_tex.push_back(DSC2D::vec2(0, 0));
+//    
+//    glColor3f(1, 1, 1);
+//    glBegin(GL_QUADS);
+//    for (int i = 0; i < 4; i++) {
+//        glVertex2dv((GLdouble*)quad_v[i].get());
+//        glTexCoord2dv((GLdouble*)quad_tex[i].get());
+//    }
+//    glEnd();
+//    
+//    glLineWidth(2.0);
+//    glColor3f(1, 0, 0);
+//    glBegin(GL_LINES);
+//    for (int i = 0; i < 4; i++) {
+//        glVertex2dv((GLdouble*)quad_v[i].get());
+//        glVertex2dv((GLdouble*)quad_v[(i+1)%4].get());
+//    }
+//    glEnd();
 }
 
 void interface::update_title()
@@ -612,12 +462,6 @@ void interface::update_title()
 interface::interface(int &argc, char** argv){
     instance = this;
     
-#ifdef TEST_PROBABILITY
-    texture::test();
-    return;
-#endif
-
-    
     WIN_SIZE_X = 900;
     WIN_SIZE_Y = 600;
     
@@ -627,19 +471,17 @@ interface::interface(int &argc, char** argv){
     glutInit(&argc, argv);
     initGL();
     
-    dyn_ = std::unique_ptr<dynamics_mul>(new dynamics_mul);
-    dsc = nullptr;
+    _tex_seg = std::shared_ptr<texture_segment>(new texture_segment);
+    _tex_seg->init();
     
-    image_ = std::unique_ptr<image>(new image);
-    if (argc > 1) {
-        image_->load_image(std::string(argv[1]));
-    }else
-    image_->load_image(std::string(DATA_PATH) + IMAGE_NAME);
-    imageSize = Vec2(image_->width(), image_->height());
+    _origin_img = _tex_seg->_origin_img;
+    imageSize = Vec2(_origin_img->width(), _origin_img->height());
 
-    check_gl_error();
-    
     init_dsc();
+    dsc->deform();
+    
+    _tex_seg->_dsc = dsc;
+    _tex_seg->init_dsc_phases();
     
     gl_debug_helper::set_dsc(&(*dsc));
     
@@ -654,7 +496,7 @@ void interface::init_dsc(){
     double width = imageSize[0];
     double height = imageSize[1];
     
-    DISCRETIZATION = (double) height / (double)DISCRETIZE_RES;
+    DISCRETIZATION = (double) height / (double)setting_file.dsc_discretization;
     
     width -= 2*DISCRETIZATION;
     height -= 2*DISCRETIZATION;
@@ -667,107 +509,42 @@ void interface::init_dsc(){
     height += 2*DISCRETIZATION;
     DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, 0 /*,  DISCRETIZATION */);
     
-    dsc = std::unique_ptr<DeformableSimplicialComplex>(
+    dsc = std::shared_ptr<DeformableSimplicialComplex>(
                             new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
     
     dsc->set_smallest_feature_size(SMALLEST_SIZE);
-#ifdef TUAN_MULTI_RES
-    dsc->img = &*image_;
-#endif
-    
-//    printf("Average edge length: %f ; # faces: %d\n", dsc->get_avg_edge_length(), dsc->get_no_faces());
 }
 
 void interface::thres_hold_init(){
-    for (auto fid = dsc->faces_begin(); fid != dsc->faces_end(); fid++) {
-        auto tris = dsc->get_pos(*fid);
-        int totalPixel = 0;
-        double total_inten = 0.0;
-        image_->get_tri_intensity(tris, & totalPixel, & total_inten);
-        double mean_c = total_inten / (double)totalPixel;
-        
-        if (mean_c < 0.2) {
-            dsc->set_label(*fid, 0);
-        }
-        else if (mean_c < 0.7)
-            dsc->set_label(*fid, 1);
-        else
-            dsc->set_label(*fid, 3);
-    }
+
 }
 
 void interface::init_sqaure_boundary(){
-    Vec2 s = imageSize;// tex->get_image_size();
-    double left = 0.2;
-    double right = 0.6;
-    ObjectGenerator::create_square(*dsc, vec2(left*s[0], left*s[1]), vec2(right*s[0], right*s[1]), 1);
+
 }
 
 void interface::init_boundary(){
-    std::vector<DSC2D::DeformableSimplicialComplex::face_key> faceKeys;
-    for (auto p = dsc->faces_begin(); p != dsc->faces_end(); p++) {
-        // Compute average intensity inside triangle
-        auto pts = dsc->get_pos(*p);
-        int count;
-//        if(image_->get_triangle_intensity_count(pts, &count) > 0.1*count*MAX_BYTE ){
-//            faceKeys.push_back(*p);
-//        }
-    }
-    
-    ObjectGenerator::label_tris(*dsc, faceKeys, 1);
+//    std::vector<DSC2D::DeformableSimplicialComplex::face_key> faceKeys;
+//    for (auto p = dsc->faces_begin(); p != dsc->faces_end(); p++) {
+//        // Compute average intensity inside triangle
+//        auto pts = dsc->get_pos(*p);
+//        int count;
+////        if(image_->get_triangle_intensity_count(pts, &count) > 0.1*count*MAX_BYTE ){
+////            faceKeys.push_back(*p);
+////        }
+//    }
+//    
+//    ObjectGenerator::label_tris(*dsc, faceKeys, 1);
 }
 
 void interface::dynamics_image_seg(){
-    // Old approach
-    // Edge-based force
-    dyn_->update_dsc(*dsc, *image_);
-    
-    // Virtual displacement
-    // Compute energy change with assumed movement
-//    static dyn_integral dyn;
-//    dyn.update_dsc(*dsc, *image_);
 
-//    static dynamics_edge dyn;
-//    dyn.update_dsc(*dsc, *image_);
+//    dyn_->update_dsc(*dsc, *image_);
+    _tex_seg->update_dsc();
+
 }
 
-int closest(std::vector<double> & array, double v){
-    
-    int idx = -1;
-    double smallest = INFINITY;
-    
-    for (int i = 0; i < array.size(); i++) {
-        double dis = std::abs(v - array[i]);
-        if (dis < smallest) {
-            smallest = dis;
-            idx = i;
-        }
-    }
-    
-    return idx;
-}
 
 void interface::init_boundary_brain(){
-    // Threshold initialization
-    std::vector<double> threshold = {0.0, 70./255., 77./255.};
-    
-    std::vector<vector<Face_key>> labels_list;
-    labels_list.resize(threshold.size());
-    
-    for (auto fkey : dsc->faces()) {
-        auto pts = dsc->get_pos(fkey);
-        double area;
-        double inten = image_->get_tri_intensity_f(pts, &area);
-        
-        double mean_i = inten / area;
-        
-        int idx = closest(threshold, mean_i);
-        labels_list[idx].push_back(fkey);
-    }
-    
-    
-    for (int i = 0; i < labels_list.size(); i++) {
-        ObjectGenerator::label_tris(*dsc, labels_list[i], i);
-        std::cout << labels_list[i].size() << " in phase " << i << std::endl;
-    }
+
 }
