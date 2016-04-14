@@ -21,40 +21,39 @@ namespace texture
     
     dictionary::dictionary(std::string imName)
     {
-//        if (load_up(imName))
-//        {
-//            std::cout << "Dictionary loaded at " << get_back_up_name(imName) << std::endl;
-//            return;
-//        }
-        
         std::cout << "Building dictionary" << std::endl;
         
         // Load test image
-        imageb im;
+        imaged im;
         im.load(imName.data());
+        im.normalize(0, 1);
         
         int width = im.width();
         int height = im.height();
        
         // Image 1 layer
-        vector<double> I;
-        I.resize(width*height);
-        for (int i = 0; i < height; i++)
-        {
-            for(int j = 0; j < width; j++)
-            {
-                I[i*width + j] = (double)im(j,i) / MAX_BYTE;
-            }
-        }
+//        vector<double> I;
+//        I.resize(width*height);
+//        for (int i = 0; i < height; i++)
+//        {
+//            for(int j = 0; j < width; j++)
+//            {
+//                I[i*width + j] = (double)im(j,i);
+//            }
+//
+        double * I = im.data();
         
         std::cout << "Building tree" << std::endl;
         // Build tree
         double Md = 15;             // batch size
         double bd = 2;              // branching factor
-        double n_train_d = 1000;    // training patch
-        double Ld = 5;              // number of layer
+        double n_train_d = 4000;    // training patch
+        double Ld = 4;              // number of layer
+//        int ndim = im.spectrum();
+//        int dim[3] = {width, height, 3};
         int ndim = 1;
-        int dim[2] = {width, height};
+        int dim[3] = {width, height};
+        
         
         int treeDim[2];
         double * tree =  build_tree( &I[0], &Md, &bd, &n_train_d, &Ld, ndim, dim, treeDim);
@@ -91,102 +90,28 @@ namespace texture
         }
         
         std::cout << "Compute T1 and T2" << std::endl;
-        Mat<double> T1 = zeros(Bt.n_rows, Bt.n_cols);
+        _T1 = zeros(Bt.n_rows, Bt.n_cols);
         
         for(auto ij : Bij)
         {
-            T1(ij.j, ij.i) = Bt(ij.j, ij.i)/(Bt1(ij.j) + 0.00001);
+            _T1(ij.j, ij.i) = Bt(ij.j, ij.i)/(Bt1(ij.j) + 0.00001);
         }
         
-        Mat<double> T2 = zeros(B.n_rows, B.n_cols);
+        _T2 = zeros(B.n_rows, B.n_cols);
         for(auto ij : Bij)
         {
-            T2(ij.i, ij.j) = B(ij.i, ij.j)/(B1(ij.i) + 0.00001);
+            _T2(ij.i, ij.j) = B(ij.i, ij.j)/(B1(ij.i) + 0.00001);
         }
-    
-        
-        _T1 = T1;
-        _T2 = T2;
         
         //        back_up(imName);
         std::cout << "Dictionary built" << std::endl;
     }
     
-    void dictionary::save_matrix(std::string imName)
-    {
-        std::ostringstream mat_name1, mat_name2;
-        mat_name1 << imName << "_1.txt";
-        mat_name2 << imName << "_2.txt";
-        _T1.save(mat_name1.str().data(), arma::arma_ascii);
-        _T2.save(mat_name2.str().data(), arma::arma_ascii);
-    }
-    
-    bool dictionary::load_matrix(std::string imName)
-    {
-        std::ostringstream mat_name1, mat_name2;
-        mat_name1 << imName << "_1.txt";
-        mat_name2 << imName << "_2.txt";
-        std::ifstream f1(mat_name1.str());
-        std::ifstream f2(mat_name2.str());
-        if (f1.good() and f2.good())
-        {
-            _T1.load(mat_name1.str().data(), arma::arma_ascii);
-            _T2.load(mat_name2.str().data(), arma::arma_ascii);
-            return true;
-        }
-        else
-            return false;
-    }
-#ifdef __APPLE__
-#ifndef st_mtime
-#define st_mtime st_mtimespec.tv_sec
-#endif
-#endif
-    
-    std::string dictionary::get_back_up_name(const std::string file) {
-        struct tm *clock;
-        struct stat attr;
-        
-        stat(file.c_str(), &attr);
-        clock = gmtime(&(attr.st_mtime));
-        
-        auto name = file.substr(file.find_last_of("/\\") + 1);
-        
-        std::ostringstream os;
-        os << "DATA/dictionary_backup/" << name << "_" << clock->tm_year << "_" << clock->tm_mon << "_"
-            << clock->tm_mday << "_" << clock->tm_hour << "_"
-            << clock->tm_min  << "_" << clock->tm_sec ;
-        
-        return os.str();
-    }
-    
-    bool dictionary::load_up(std::string imName)
-    {
-        auto name = get_back_up_name(imName);
-        return load_matrix(name);
-    }
-    
-    void dictionary::back_up(std::string imName, bool overwrite)
-    {
-        auto name = get_back_up_name(imName);
-        // Load the info file
-        std::ifstream ifile(name);
-        if (!overwrite and ifile.good())
-        {
-            ifile.close();
-            // Existed
-        }
-        else
-        {
-            save_matrix(name);
-            std::cout << "Dictionary saved at " << name << std::endl;
-        }
-    }
     
     void test()
     {
 
-        profile t1("Begining to bij");
+        profile t1("Begin to bij");
     
 //        printf("Test build probability \n");
         

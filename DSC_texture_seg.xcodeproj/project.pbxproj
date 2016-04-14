@@ -62,8 +62,28 @@
 		A6B45F461A88F3990091F5A6 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A51F3B017D6388200A8F8F2 /* GLUT.framework */; };
 		A6B45F471A88F3D80091F5A6 /* GEL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A51F3B417D638B500A8F8F2 /* GEL.framework */; };
 		A6B460EF1A8CADF30091F5A6 /* helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B460ED1A8CADF30091F5A6 /* helper.cpp */; };
+		A6C74C1E1CBE36EB008A5288 /* CImg.h in Headers */ = {isa = PBXBuildFile; fileRef = A6C74C1D1CBE36EB008A5288 /* CImg.h */; };
+		A6C74C241CBE395F008A5288 /* Cimg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6C74C231CBE395F008A5288 /* Cimg.cpp */; };
+		A6C74C251CBE3980008A5288 /* libCimg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A6C74C121CBE36A7008A5288 /* libCimg.a */; };
 		A6E1B0241B1D9F6B00F31E48 /* libpng15.15.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A6E1B0231B1D9F6B00F31E48 /* libpng15.15.dylib */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A6C74C1F1CBE373A008A5288 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7A51F38F17D6383500A8F8F2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7A51F3D417D6399200A8F8F2;
+			remoteInfo = DSC;
+		};
+		A6C74C211CBE373E008A5288 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7A51F38F17D6383500A8F8F2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A6C74C111CBE36A7008A5288;
+			remoteInfo = Cimg;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		7A51F3B817D6391500A8F8F2 /* CopyFiles */ = {
@@ -155,8 +175,10 @@
 		A6B460AA1A8B6B530091F5A6 /* define.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = define.h; sourceTree = "<group>"; };
 		A6B460ED1A8CADF30091F5A6 /* helper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = helper.cpp; sourceTree = "<group>"; };
 		A6B460EE1A8CADF30091F5A6 /* helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = helper.h; sourceTree = "<group>"; };
+		A6C74C121CBE36A7008A5288 /* libCimg.a */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libCimg.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		A6C74C1D1CBE36EB008A5288 /* CImg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CImg.h; path = CImg/CImg.h; sourceTree = SOURCE_ROOT; };
+		A6C74C231CBE395F008A5288 /* Cimg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Cimg.cpp; path = CImg/Cimg.cpp; sourceTree = SOURCE_ROOT; };
 		A6E1B0231B1D9F6B00F31E48 /* libpng15.15.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng15.15.dylib; path = ../../../../../opt/X11/lib/libpng15.15.dylib; sourceTree = "<group>"; };
-		A6EB2A0D1AE79B70008CBC7E /* CImg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CImg.h; path = CImg/CImg.h; sourceTree = SOURCE_ROOT; };
 		A6FF355C1AC2C46E001071B3 /* tri_box_overlap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tri_box_overlap.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -186,12 +208,20 @@
 			files = (
 				A67B0CED1BC569950060D2A8 /* libarmadillo.5.000.1.dylib in Frameworks */,
 				A6E1B0241B1D9F6B00F31E48 /* libpng15.15.dylib in Frameworks */,
+				A6C74C251CBE3980008A5288 /* libCimg.a in Frameworks */,
 				A699B3681AE4E7B500522DA2 /* Accelerate.framework in Frameworks */,
 				A663DE681AD6B25B006CC422 /* libX11.6.dylib in Frameworks */,
 				A6B45F471A88F3D80091F5A6 /* GEL.framework in Frameworks */,
 				A6B45F461A88F3990091F5A6 /* GLUT.framework in Frameworks */,
 				A6B45F451A88F3910091F5A6 /* OpenGL.framework in Frameworks */,
 				A6B45F201A88E9230091F5A6 /* libDSC.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A6C74C0F1CBE36A7008A5288 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -211,6 +241,7 @@
 				7A51F39917D6383500A8F8F2 /* DSC */,
 				7A51F3BB17D6391500A8F8F2 /* DEMO */,
 				A6B45F141A88CC9B0091F5A6 /* SEGMENT */,
+				A6C74C131CBE36A7008A5288 /* Cimg */,
 				7A51F39817D6383500A8F8F2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -221,6 +252,7 @@
 				7A51F3BA17D6391500A8F8F2 /* DEMO */,
 				7A51F3D517D6399200A8F8F2 /* libDSC.a */,
 				A6B45F131A88CC9B0091F5A6 /* SEGMENT */,
+				A6C74C121CBE36A7008A5288 /* libCimg.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -265,7 +297,6 @@
 		A615B7E31ABC8520001E1EA7 /* Lib */ = {
 			isa = PBXGroup;
 			children = (
-				A6EB2A0D1AE79B70008CBC7E /* CImg.h */,
 				A6FF355C1AC2C46E001071B3 /* tri_box_overlap.h */,
 				A68950061C906800002DC0B7 /* profile.h */,
 				A68950071C906812002DC0B7 /* profile.cpp */,
@@ -323,6 +354,15 @@
 			path = SEGMENT;
 			sourceTree = "<group>";
 		};
+		A6C74C131CBE36A7008A5288 /* Cimg */ = {
+			isa = PBXGroup;
+			children = (
+				A6C74C1D1CBE36EB008A5288 /* CImg.h */,
+				A6C74C231CBE395F008A5288 /* Cimg.cpp */,
+			);
+			path = Cimg;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -333,6 +373,14 @@
 				7A82D64817E23E9400C19874 /* object_generator.h in Headers */,
 				7A82D64C17E23EAC00C19874 /* trializer.h in Headers */,
 				7A82D65017E272BB00C19874 /* design_domain.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A6C74C101CBE36A7008A5288 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A6C74C1E1CBE36EB008A5288 /* CImg.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -384,11 +432,30 @@
 			buildRules = (
 			);
 			dependencies = (
+				A6C74C221CBE373E008A5288 /* PBXTargetDependency */,
+				A6C74C201CBE373A008A5288 /* PBXTargetDependency */,
 			);
 			name = SEGMENT;
 			productName = SEGMENT;
 			productReference = A6B45F131A88CC9B0091F5A6 /* SEGMENT */;
 			productType = "com.apple.product-type.tool";
+		};
+		A6C74C111CBE36A7008A5288 /* Cimg */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A6C74C1C1CBE36A7008A5288 /* Build configuration list for PBXNativeTarget "Cimg" */;
+			buildPhases = (
+				A6C74C0E1CBE36A7008A5288 /* Sources */,
+				A6C74C0F1CBE36A7008A5288 /* Frameworks */,
+				A6C74C101CBE36A7008A5288 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Cimg;
+			productName = Cimg;
+			productReference = A6C74C121CBE36A7008A5288 /* libCimg.a */;
+			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
 
@@ -401,6 +468,9 @@
 				TargetAttributes = {
 					A6B45F121A88CC9B0091F5A6 = {
 						CreatedOnToolsVersion = 6.1.1;
+					};
+					A6C74C111CBE36A7008A5288 = {
+						CreatedOnToolsVersion = 7.3;
 					};
 				};
 			};
@@ -419,6 +489,7 @@
 				7A51F3D417D6399200A8F8F2 /* DSC */,
 				7A51F3B917D6391500A8F8F2 /* DEMO */,
 				A6B45F121A88CC9B0091F5A6 /* SEGMENT */,
+				A6C74C111CBE36A7008A5288 /* Cimg */,
 			);
 		};
 /* End PBXProject section */
@@ -485,7 +556,28 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A6C74C0E1CBE36A7008A5288 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A6C74C241CBE395F008A5288 /* Cimg.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A6C74C201CBE373A008A5288 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7A51F3D417D6399200A8F8F2 /* DSC */;
+			targetProxy = A6C74C1F1CBE373A008A5288 /* PBXContainerItemProxy */;
+		};
+		A6C74C221CBE373E008A5288 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A6C74C111CBE36A7008A5288 /* Cimg */;
+			targetProxy = A6C74C211CBE373E008A5288 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		7A51F39E17D6383500A8F8F2 /* Debug */ = {
@@ -703,6 +795,68 @@
 			};
 			name = Release;
 		};
+		A6C74C1A1CBE36A7008A5288 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_IDENTITY = "-";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				EXECUTABLE_EXTENSION = a;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		A6C74C1B1CBE36A7008A5288 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXECUTABLE_EXTENSION = a;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -741,6 +895,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		A6C74C1C1CBE36A7008A5288 /* Build configuration list for PBXNativeTarget "Cimg" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A6C74C1A1CBE36A7008A5288 /* Debug */,
+				A6C74C1B1CBE36A7008A5288 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

@@ -21,6 +21,9 @@ class texture_segment
 {
 public:
     void draw_dictionary();
+    void draw_probability();
+    void draw_test_coord();
+    
 public:
     texture_segment();
     ~texture_segment();
@@ -32,16 +35,25 @@ public:
     void init(); // Load image and construct dictionary
     void init_dsc_phases();
     
+private:
+    void compute_probability_forces();
+    void compute_curvature_force();
+    void displace_dsc();
 public:
     dsc_sharedptr _dsc;
     // The original image
     std::shared_ptr<smooth_image> _origin_img;
     
+    // Dictionary map
     std::unique_ptr<texture::dictionary> _dict;
-    std::shared_ptr<smooth_image> _dict_over_lay_img;
-public: // Get shared data
     
-    std::vector<std::shared_ptr<smooth_image>> _prob_imgs;
+    // Labeled image. Convert from DSC
+    std::vector<std::shared_ptr<smooth_image>> _labeled_imgs;
+    std::shared_ptr<smooth_image> _labeled_over_lay_img;
+    
+    // Probability
+    std::vector<std::shared_ptr<smooth_image>> _probability_imgs;
+    smooth_image_ptr _probability_over_lay_img;
 };
 
 

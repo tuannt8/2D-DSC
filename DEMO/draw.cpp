@@ -341,6 +341,11 @@ void Painter::draw_edges_index(const DSC2D::DeformableSimplicialComplex& dsc){
     vec3 p1, p2;
     for(auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei)
     {
+        if (!dsc.is_interface(*hei))
+        {
+            continue;
+        }
+        
         auto hew = dsc.walker(*hei);
         if (hew.vertex().get_index() > hew.opp().vertex().get_index()) {
             p1 = vec3(dsc.get_pos(hew.vertex())[0], dsc.get_pos(hew.vertex())[1], 0.);

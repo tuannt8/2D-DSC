@@ -1,9 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="DEMO" type="AppleRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="DSC" TARGET_NAME="DEMO" CONFIG_NAME="Debug" SCHEME_NAME="DEMO" RUN_TARGET_PROJECT_NAME="DSC" RUN_TARGET_NAME="DEMO" MAKE_ACTIVE="TRUE" WAIT_FOR="FALSE">
-    <envs />
-    <EXTENSION ID="org.jetbrains.appcode.reveal.RevealRunConfigurationExtension">
-      <REVEAL_SETTINGS autoInject="false" autoInstall="true" askToEnableAutoInstall="true" />
-    </EXTENSION>
-    <method />
-  </configuration>
-</component>

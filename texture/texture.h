@@ -87,13 +87,9 @@ namespace texture
     public:
         dictionary(std::string imName);
         ~dictionary(){}
+
+        arma::vec compute_probability(const arma::vec & labeled){return _T2*(_T1*labeled);};
         
-        void save_matrix(std::string imName);
-        bool load_matrix(std::string imName);
-        
-        std::string get_back_up_name(const std::string file);
-        void back_up(std::string imName, bool overwrite = false);
-        bool load_up(std::string imName);
     private:
         // The dictionary matrix
         arma::Mat<double> _T1, _T2;

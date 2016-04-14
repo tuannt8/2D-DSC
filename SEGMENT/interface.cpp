@@ -152,7 +152,7 @@ void interface::keyboard(unsigned char key, int x, int y){
             break;
         case 'r':
         {
-            dsc->refine_without_change_interface();
+            _tex_seg->update_probability();
         }
             break;
         case ' ':
@@ -306,14 +306,23 @@ void interface::draw()
     
     reshape(WIN_SIZE_X, WIN_SIZE_Y);
     
+    
+    
     if (options_disp::get_option("Image", true) and _origin_img) {
         _origin_img->draw_image();
     }
     
-    if (options_disp::get_option("Dictionary", false) and _origin_img) {
+    if (options_disp::get_option("Test corrdinate", false) and _tex_seg) {
+        _tex_seg->draw_test_coord();
+    }
+    
+    if (options_disp::get_option("Labeled", false) and _origin_img) {
         _tex_seg->draw_dictionary();
     }
     
+    if (options_disp::get_option("Probability", false) and _origin_img) {
+        _tex_seg->draw_probability();
+    }
     
     if (options_disp::get_option("DSC faces", true) and dsc) {
         Painter::draw_faces(*dsc);
@@ -335,7 +344,10 @@ void interface::draw()
         Painter::draw_face_label(*dsc);
     }
 
-
+    if (options_disp::get_option("External force", false))
+    {
+        Painter::draw_external_force(*dsc);
+    }
     
     if(options_disp::get_option("Vertices index", false)){
         glColor3f(1, 0, 0);
@@ -421,34 +433,6 @@ void interface::draw_coord(){
 }
 
 void interface::draw_image(){
-//
-//    DSC2D::DesignDomain const * domain = dsc->get_design_domain();
-//    std::vector<DSC2D::vec2> corners = domain->get_corners();
-//
-//    std::vector<DSC2D::vec2> quad_v = get_quad(0, 0, imageSize[0], imageSize[1]);
-//    std::vector<DSC2D::vec2> quad_tex;// = get_quad(0.0, 0.0, 1.0, 1.0);
-//
-//    quad_tex.push_back(DSC2D::vec2(1, 0));
-//    quad_tex.push_back(DSC2D::vec2(1, 1));
-//    quad_tex.push_back(DSC2D::vec2(0, 1));
-//    quad_tex.push_back(DSC2D::vec2(0, 0));
-//    
-//    glColor3f(1, 1, 1);
-//    glBegin(GL_QUADS);
-//    for (int i = 0; i < 4; i++) {
-//        glVertex2dv((GLdouble*)quad_v[i].get());
-//        glTexCoord2dv((GLdouble*)quad_tex[i].get());
-//    }
-//    glEnd();
-//    
-//    glLineWidth(2.0);
-//    glColor3f(1, 0, 0);
-//    glBegin(GL_LINES);
-//    for (int i = 0; i < 4; i++) {
-//        glVertex2dv((GLdouble*)quad_v[i].get());
-//        glVertex2dv((GLdouble*)quad_v[(i+1)%4].get());
-//    }
-//    glEnd();
 }
 
 void interface::update_title()

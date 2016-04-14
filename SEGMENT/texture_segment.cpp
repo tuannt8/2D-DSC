@@ -73,18 +73,15 @@ bool intersect_tri(const vector<Vec2> & pts, double x, double & miny, double &ma
 
 void texture_segment::update_probability()
 {
-    for (auto im : _prob_imgs)
+    // 1. Update the labeled image
+    for (auto im : _labeled_imgs)
     {
-        im->fill(0.5);
+        im->fill(0.0);
     }
     
     for(auto tri : _dsc->faces())
     {
         int phase = _dsc->get_label(tri);
-        if (phase == 0)
-        {
-            continue;
-        }
         
         auto pts = _dsc->get_pos(tri);
         CGLA::Vec2i ld, ru;
@@ -100,27 +97,191 @@ void texture_segment::update_probability()
                 // update dictionary
                 for (int y = floor(min_y); y < ceil(max_y); y++)
                 {
-                    _prob_imgs[phase-1]->set_value(x,y,1.0);
+                    _labeled_imgs[phase]->set_value(x,y,1.0);
                 }
             }
         }
     }
     
-    _dict_over_lay_img->averaging(_prob_imgs);
+    // For visualization
+    _labeled_over_lay_img->averaging(_labeled_imgs);
+    
+//    _labeled_imgs[0]->ex_display("Label 0");
+//    _labeled_imgs[1]->ex_display("Label 1");
+    
+    // 2. Update the probability image
+    for (int i = 0; i < _labeled_imgs.size(); i++)
+    {
+        auto l_m = _labeled_imgs[i]->reshape_to_vector();
+        auto probability = _dict->compute_probability(l_m);
+        
+        _probability_imgs[i]->update(probability);
+    }
+    
+    // Normalize the probability
+    std::vector<double> area(_probability_imgs.size(), 0.0);
+    for (auto tri : _dsc->faces())
+    {
+        int phase = _dsc->get_label(tri);
+        area[phase] += _dsc->area(tri);
+    }
+    smooth_image::area_normalization(_probability_imgs, area);
+    
+    
+    _probability_over_lay_img->averaging(_probability_imgs);
+    
+//    _probability_imgs[0]->ex_display("Probability 0");
+//    _probability_imgs[1]->ex_display("Probability 1");
+    
+}
+
+void texture_segment::draw_test_coord()
+{    
+    glBegin(GL_TRIANGLES);
+    for (auto tri: _dsc->faces())
+    {
+        for (auto pt : _dsc->get_pos(tri))
+        {
+            double c = _probability_imgs[0]->get_value_f(pt[0], pt[1]);
+            glColor3f(c, c, c);
+            glVertex2dv(pt.get());
+        }
+    }
+    glEnd();
 }
 
 void texture_segment::draw_dictionary()
 {
-    if (_dict_over_lay_img)
+    if (_labeled_over_lay_img)
     {
-        _dict_over_lay_img->draw_image();
+        _labeled_over_lay_img->draw_image();
     }
 }
 
+void texture_segment::draw_probability()
+{
+    if(_probability_over_lay_img)
+    {
+        _probability_over_lay_img->draw_image();
+    }
+}
+
+#define UPDATE_PROB_FREQUENCY 100
 void texture_segment::update_dsc()
 {
-    update_probability();
+//    static int count = UPDATE_PROB_FREQUENCY;
+//    if (count == UPDATE_PROB_FREQUENCY)
+//    {
+//        update_probability();
+//        count = 0;
+//        std::cout << "Probability updated\n";
+//    }
+//    count ++;
+    
+    displace_dsc();
+    
+    // Compute vertex forces
+    compute_probability_forces();
+    
+    compute_curvature_force();
+    
+
+}
+
+void texture_segment::compute_probability_forces()
+{
+    for (auto eid : _dsc->halfedges())
+    {
+        auto hew = _dsc->walker(eid);
+        
+        // Only interface edge, and one time per edge
+        if (!_dsc->is_interface(eid)
+            or hew.halfedge().get_index() > hew.opp().halfedge().get_index())
+        {
+            continue;
+        }
+        
+        int phase0 = _dsc->get_label(hew.face());
+        int phase1 = _dsc->get_label(hew.opp().face());
+        
+        // Loop on the edge
+        auto p0 = _dsc->get_pos(hew.opp().vertex());
+        auto p1 = _dsc->get_pos(hew.vertex());
+        double length = (p1 - p0).length();
+        assert (length > 0.001);
+        
+        int N = ceil(length);
+        double dl = (double)length / (double)N;
+        
+        double f0 = 0.0, f1 = 0.0; // The two forces
+        for (int i = 0; i <= N; i++)
+        {
+            auto p = p0 + (p1 - p0)*((double)i / (double)N);
+            auto prob_0 = _probability_imgs[phase0]->get_value_f(p[0], p[1]);
+            auto prob_1 = _probability_imgs[phase1]->get_value_f(p[0], p[1]);
+            
+            auto f = (prob_0 - prob_1) * dl / length * 10;
+            
+            f0 += f*(N-i)/(double)N;
+            f1 += f*i/(double)N;
+        }
+        
+        // Normal vector
+        Vec2 L01 = p1 - p0;
+        L01.normalize();
+        Vec2 N01(L01[1], -L01[0]);
+        
+        assert(f0 != NAN and f1 != NAN);
+        
+        _dsc->add_node_external_force(hew.opp().vertex(), N01*f0);
+        _dsc->add_node_external_force(hew.vertex(), N01*f1);
+    }
+}
+
+void texture_segment::displace_dsc()
+{
+    for (auto ni = _dsc->vertices_begin(); ni != _dsc->vertices_end(); ni++)
+    {
+        _dsc->bStable[*ni] = 1;
+        
+        if ((_dsc->is_interface(*ni) or _dsc->is_crossing(*ni)))
+        {
+            Vec2 dis = (_dsc->get_node_internal_force(*ni)
+                        + _dsc->get_node_external_force(*ni));
+            assert(dis.length() != NAN);
+            
+            double n_dt = 0.1;//s_dsc->time_step(*ni);
+            
+            _dsc->set_destination(*ni, _dsc->get_pos(*ni) + dis*n_dt);
+            
+        }
+    }
+    
     _dsc->deform();
+}
+
+void texture_segment::compute_curvature_force()
+{
+    double alpha = 0.1;
+    for (auto vkey : _dsc->vertices())
+    {
+        if (_dsc->is_interface(vkey)
+            or _dsc->is_crossing(vkey))
+        {
+            for(auto w = _dsc->walker(vkey); !w.full_circle(); w = w.circulate_vertex_ccw())
+            {
+                if (_dsc->is_interface(w.halfedge()))
+                {
+                    auto p12 = _dsc->get_pos(w.vertex()) - _dsc->get_pos(w.opp().vertex());
+                    assert(p12.length() > 0.001);
+
+                    p12.normalize();
+                    _dsc->add_node_internal_force(vkey, p12*alpha);
+
+                }
+            }
+        }
+    }
 }
 
 void texture_segment::init()
@@ -129,18 +290,26 @@ void texture_segment::init()
     _origin_img = std::shared_ptr<smooth_image>(new smooth_image);
     _origin_img->load_image(setting_file._image_name);
     
-    // Update the probability
-    _prob_imgs = std::vector<std::shared_ptr<smooth_image>>
-                        (setting_file._circle_inits.size(),
-                         std::shared_ptr<smooth_image>(
-                        new smooth_image(_origin_img->width(), _origin_img->height()))
-                         );
-    _dict_over_lay_img = std::shared_ptr<smooth_image>(
+    // Initialize the probability
+    for (int i = 0; i< setting_file._circle_inits.size() + 1; i++)
+    {
+        _labeled_imgs.push_back(std::shared_ptr<smooth_image>(
+                            new smooth_image(_origin_img->width(), _origin_img->height()))
+                                );
+        _probability_imgs.push_back(std::shared_ptr<smooth_image>
+                                (
+                                 new smooth_image(_origin_img->width(), _origin_img->height()))
+                                );
+    }
+    _labeled_over_lay_img = std::shared_ptr<smooth_image>(
                         new smooth_image(_origin_img->width(), _origin_img->height())
                                          );
+    _probability_over_lay_img = std::shared_ptr<smooth_image>(
+                        new smooth_image(_origin_img->width(), _origin_img->height())
+                                                          );
     // Construct dictionary
-//    _dict = std::unique_ptr<texture::dictionary>
-//                (new texture::dictionary(setting_file._image_name));
+    _dict = std::unique_ptr<texture::dictionary>
+                (new texture::dictionary(setting_file._image_name));
 }
 
 void texture_segment::init_dsc_phases()
@@ -158,7 +327,7 @@ void texture_segment::init_dsc_phases()
             {
                 auto & circle = circles[j];
                 if(circle.is_in_circle(pts)){
-                    _dsc->update_attributes(tri, i+1);
+                    _dsc->update_attributes(tri, i+1); // Phase 0 is reserved for background
                 }
             }
         }
