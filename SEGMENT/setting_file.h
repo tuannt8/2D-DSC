@@ -43,6 +43,8 @@ struct setting
     std::string _image_name; // Image to segment
     std::vector<std::vector<init_circle>> _circle_inits; // Initialization by circle
     double dsc_discretization;
+    
+//    double variation_relabel_thres;
 };
 
 extern setting setting_file;

@@ -10,7 +10,7 @@
 #define smooth_image_hpp
 
 #include <stdio.h>
-#include "CImg.h"
+//#include "CImg.h"
 #include <GL/glew.h>
 #include "define.h"
 #include <armadillo>
@@ -24,6 +24,7 @@ class smooth_image
 {
     typedef cimg_library::CImg<double> CImg_class;
     
+    friend class texture_segment;
 private: // Inheritances from CImg class
     CImg_class _core_img;
     
@@ -36,6 +37,13 @@ public:
     // Interpretor [0:1]
     double get_value_f(double x, double y);
     double get_value_i(int x, int y, int channel = 0);
+    
+    // Integration
+    template <typename T>
+    T get_sum_on_tri_template(Vec2_array tris, std::function<T(Vec2)> get_v);
+    double sum_over_tri(std::vector<Vec2> tris);
+    double get_variation_tri(std::vector<Vec2> tris, double c_mean);
+    double ci_temp;
 public:
     // Load image from file
     void load_image(std::string file_path);
@@ -43,7 +51,14 @@ public:
     // Bind GL texture for rendering
     void draw_image();
     void bind_texture(){glBindTexture(GL_TEXTURE_2D, _gl_texture_ID);}
-    void ex_display(std::string name = "Image"){_core_img.display(name.data());};
+    void ex_display(std::string name = "Image"){
+        //_core_img.display(name.data(), false);
+        main_disp = cimg_library::CImgDisplay(_core_img, name.c_str());
+        
+//        cimg_library::CImgList<smooth_image::CImg_class> imglist;
+//        imglist.push_back(_core_img);
+    };
+    void close_display(){main_disp.close();}
 public:
     // For probability image
     smooth_image(int width, int height);
@@ -57,6 +72,8 @@ private:
     // For OpenGL texture mapping
     GLuint _gl_texture_ID = 0;
     void update_gl_texgture();
+    
+    cimg_library::CImgDisplay main_disp;
 };
 
 typedef std::shared_ptr<smooth_image> smooth_image_ptr;

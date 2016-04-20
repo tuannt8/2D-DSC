@@ -175,6 +175,7 @@
 		A6B460AA1A8B6B530091F5A6 /* define.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = define.h; sourceTree = "<group>"; };
 		A6B460ED1A8CADF30091F5A6 /* helper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = helper.cpp; sourceTree = "<group>"; };
 		A6B460EE1A8CADF30091F5A6 /* helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = helper.h; sourceTree = "<group>"; };
+		A6C7495D1CC7C195000C4753 /* sparse_mat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sparse_mat.h; path = texture/sparse_mat.h; sourceTree = SOURCE_ROOT; };
 		A6C74C121CBE36A7008A5288 /* libCimg.a */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libCimg.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6C74C1D1CBE36EB008A5288 /* CImg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CImg.h; path = CImg/CImg.h; sourceTree = SOURCE_ROOT; };
 		A6C74C231CBE395F008A5288 /* Cimg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Cimg.cpp; path = CImg/Cimg.cpp; sourceTree = SOURCE_ROOT; };
@@ -307,6 +308,7 @@
 		A6894FF51C8ECDC2002DC0B7 /* texture */ = {
 			isa = PBXGroup;
 			children = (
+				A6C7495D1CC7C195000C4753 /* sparse_mat.h */,
 				A68950031C8EDBF6002DC0B7 /* texture.h */,
 				A6894FF61C8ECDD0002DC0B7 /* biadjacency_matrix.cpp */,
 				A6894FF81C8ECDD0002DC0B7 /* build_km_tree.cpp */,
@@ -903,6 +905,7 @@
 				A6C74C1B1CBE36A7008A5288 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

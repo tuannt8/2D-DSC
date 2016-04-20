@@ -30,9 +30,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
+            BlueprintIdentifier = "7A51F3B917D6391500A8F8F2"
             BuildableName = "DEMO"
             BlueprintName = "DEMO"
-            ReferencedContainer = "container:DSC.xcodeproj">
+            ReferencedContainer = "container:DSC_texture_seg.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -43,7 +44,8 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
-      useCustomWorkingDirectory = "NO"
+      useCustomWorkingDirectory = "YES"
+      customWorkingDirectory = "/Users/tuannt8/Documents/Github/2D-DSC"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
@@ -52,9 +54,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
+            BlueprintIdentifier = "7A51F3B917D6391500A8F8F2"
             BuildableName = "DEMO"
             BlueprintName = "DEMO"
-            ReferencedContainer = "container:DSC.xcodeproj">
+            ReferencedContainer = "container:DSC_texture_seg.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -66,6 +69,14 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BuildableName = "DEMO"
+            BlueprintName = "DEMO"
+            ReferencedContainer = "container:DSC.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

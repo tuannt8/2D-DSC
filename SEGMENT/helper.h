@@ -16,12 +16,28 @@ namespace helper_t {
     // Check point inside triangle
     float sign(Vec2 p1, Vec2 p2, Vec2 p3);
     
+    // Barrycentric coordinate
+    inline Vec2 get_coord_barry(Vec2_array & tris, double xi1, double xi2) {
+        return tris[0]*xi1 + tris[1]*xi2 + tris[2]*(1- xi1 -xi2);
+    }
+    
+    inline Vec2 get_barry_center(Vec2_array & tris){
+        return (tris[0] + tris[1] + tris[2])/3.0;
+    };
+    
+    void gl_text(const double &x, const double &y, const std::string str);
+    
+    // Get random color list
     class autoColor{
     public:
-        autoColor(){};
+        autoColor();
         ~autoColor(){};
         int index = 0;
         Vec3 next();
+        Vec3 operator [](int i){return colorList[i];};
+        
+    private:
+        std::vector<Vec3> colorList;
     };
 
     /**

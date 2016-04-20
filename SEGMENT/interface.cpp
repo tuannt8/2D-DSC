@@ -169,9 +169,9 @@ void interface::keyboard(unsigned char key, int x, int y){
         case 'i':
             dsc->increase_resolution_range();
             break;
-        case 'f': // Flipping phase
+        case 'c': // Command
         {
-
+            _tex_seg->show_all_probablity();
         }
             break;
         case 's': // Split edge
@@ -306,7 +306,7 @@ void interface::draw()
     
     reshape(WIN_SIZE_X, WIN_SIZE_Y);
     
-    
+    _tex_seg->draw_debug();
     
     if (options_disp::get_option("Image", true) and _origin_img) {
         _origin_img->draw_image();

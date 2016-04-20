@@ -8,6 +8,8 @@
 
 #include "texture_segment.hpp"
 #include "setting_file.h"
+#include "options_disp.h"
+#include "helper.h"
 
 using namespace std;
 #define INT_BIG 99999
@@ -133,6 +135,8 @@ void texture_segment::update_probability()
 //    _probability_imgs[0]->ex_display("Probability 0");
 //    _probability_imgs[1]->ex_display("Probability 1");
     
+    
+    optimize_label();
 }
 
 void texture_segment::draw_test_coord()
@@ -186,6 +190,75 @@ void texture_segment::update_dsc()
     compute_curvature_force();
     
 
+}
+
+void texture_segment::optimize_label()
+{
+    _tri_variation_debug.resize(_dsc->get_no_faces());
+    
+    for (auto tri : _dsc->faces())
+    {
+        auto pts = _dsc->get_pos(tri);
+        
+        // 1. Find highest probability
+        std::vector<double> probs;
+        for (auto p : _probability_imgs)
+        {
+            probs.push_back(p->sum_over_tri(pts));
+        }
+        
+        auto max_p = std::max_element(probs.begin(), probs.end());
+        int max_phase = (int)(max_p - probs.begin());
+        
+        // 2. Probability variation
+        double mean_p = (*max_p) / _dsc->area(tri);
+        auto var = _probability_imgs[max_phase]->get_variation_tri(pts, mean_p);
+        
+        _tri_variation_debug[tri] = tri_variation({max_phase, var});
+        
+        if (max_phase == _dsc->get_label(tri))
+        {
+            continue;
+        }
+        
+        // 3. Relabel of subdivide
+        // Relabeling does not need stable, but subdivision need stable.
+        if (var < 0.5) // relabel
+        {
+            _dsc->update_attributes(tri, max_phase);
+        }
+        
+
+    }
+}
+
+
+
+void texture_segment::draw_debug()
+{
+    if (options_disp::get_option("Triangle variation", false))
+    {
+        helper_t::autoColor colors;
+//        static std::vector<Vec3> colors = {Vec3(1,0,0), Vec3(0,1,0), Vec3(0,0,1),
+//            Vec3(0,1,1),Vec3(1,0,1), Vec3(1,1,0)};
+        
+        for (auto tri : _dsc->faces())
+        {
+            auto pts = _dsc->get_pos(tri);
+            auto & variation = _tri_variation_debug[tri];
+            glBegin(GL_TRIANGLES);
+            glColor3dv(colors[variation.phase].get());
+            glVertex2dv(pts[0].get());
+            glVertex2dv(pts[1].get());
+            glVertex2dv(pts[2].get());
+            glEnd();
+            
+            glColor3f(0, 0, 0);
+            auto c = helper_t::get_barry_center(pts);
+            std::ostringstream os; os << variation.variation;
+            helper_t::gl_text(c[0], c[1], os.str());
+        }
+    }
 }
 
 void texture_segment::compute_probability_forces()
@@ -284,6 +357,22 @@ void texture_segment::compute_curvature_force()
     }
 }
 
+
+void texture_segment::show_all_probablity()
+{
+    
+    
+    cimg_library::CImgList<double> imglist;
+    
+    for (auto p : _probability_imgs)
+    {
+        imglist.push_back(p->_core_img);
+    }
+
+    imglist.display("Probabilities");
+    
+}
+
 void texture_segment::init()
 {
     // Load image
@@ -310,6 +399,10 @@ void texture_segment::init()
     // Construct dictionary
     _dict = std::unique_ptr<texture::dictionary>
                 (new texture::dictionary(setting_file._image_name));
+    
+//    _dict = std::unique_ptr<texture::dictionary>
+//                (new texture::dictionary("DATA/randen15.png"));
+
 }
 
 void texture_segment::init_dsc_phases()

@@ -7,6 +7,15 @@
 //
 
 #include "helper.h"
+#ifdef WIN32
+#include <GL/glew.h>
+#include <GL/glut.h>
+#include <GLGraphics/SOIL.h>
+#else
+#include <GEL/GL/glew.h>
+#include <GLUT/glut.h>
+#include <GEL/GLGraphics/SOIL.h>
+#endif
 
 float helper_t::sign(Vec2 p1, Vec2 p2, Vec2 p3){
     return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1]);
@@ -51,19 +60,30 @@ double helper_t::distance_to_edge(Vec2 p, std::vector<Vec2> const & pts){
     return dis;
 }
 
+void helper_t::gl_text(const double &x, const double &y, const std::string str){
+    glRasterPos2f(x, y);
+    for (const char *c = str.c_str(); *c != '\0'; c++) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *c);
+    }
+}
+
+helper_t::autoColor::autoColor()
+{
+    static std::vector<Vec3> colorLists =
+    {
+        Vec3(1,0,0)     // red
+        ,Vec3(0,1,0)    // green
+        , Vec3(0,0,1)  // Blue
+        , Vec3(1, 1, 0) // yellow
+        , Vec3(1, 0, 1) // pink
+        , Vec3(0, 1, 1)
+        , Vec3(0.3, 0.3, 0.3)
+    };
+    
+    colorList = colorLists;
+}
 namespace helper_t {
     Vec3 autoColor::next(){
-        static std::vector<Vec3> colorList =
-        {
-            Vec3(1,0,0)     // red
-            ,Vec3(0,1,0)    // green
-            , Vec3(0,0,1)  // Blue
-            , Vec3(1, 1, 0) // yellow
-            , Vec3(1, 0, 1) // pink
-            , Vec3(0, 1, 1)
-            , Vec3(0.3, 0.3, 0.3)
-        };
-        
         return colorList[index++];
     }
     

@@ -7,6 +7,7 @@
 //
 
 #include "smooth_image.hpp"
+#include "helper.h"
 
 smooth_image::smooth_image(int width, int height)
 {
@@ -48,6 +49,60 @@ double smooth_image::get_value_f(double x, double y)
     return v;
 }
 
+template <typename T>
+T smooth_image::get_sum_on_tri_template(Vec2_array tris, std::function<T(Vec2)> get_v)
+{
+    double area = helper_t::area(tris);
+    int N = std::ceil(std::sqrt(2*area));
+    double dxi = 1./(double)N;
+    
+    double xi1, xi2;
+    Vec2 p;
+    T sum = T(0.0);
+    for (int i1 = 0; i1 < N; i1 ++) {
+        
+        xi1 = i1*dxi;
+        
+        for (int i2 = 0; i2 < N - i1; i2++) {
+            
+            xi2 = i2 * dxi;
+            
+            if (i1 + i2 == N - 1) {
+                p = helper_t::get_coord_barry(tris, (xi1 + dxi/3.), xi2 + dxi/3.);
+                sum += get_v(p)*0.5;
+            }else{
+                p = helper_t::get_coord_barry(tris, (xi1 + dxi/2.), xi2 + dxi/2.);
+                sum += get_v(p);
+            }
+        }
+    }
+    
+    sum *= 2*area/(double)(N*N); // |j| = 2A
+    
+    return sum;
+}
+
+double smooth_image::sum_over_tri(std::vector<Vec2> tris)
+{
+    return get_sum_on_tri_template<double>
+    (tris, std::function<double(Vec2)>([this](Vec2 p)
+                                      {
+                                          return get_value_f(p[0], p[1]);
+                                      }
+                                      ));
+}
+
+double smooth_image::get_variation_tri(std::vector<Vec2> tris, double c_mean)
+{
+    ci_temp = c_mean;
+    return get_sum_on_tri_template<double>
+    (tris, std::function<double(Vec2)>([this](Vec2 p)
+                    {
+                        return std::pow((get_value_f(p[0], p[1]) - ci_temp), 2);
+                    }
+                                       ));
+}
+
 double smooth_image::get_value_i(int x, int y, int channel)
 {
     if (x < 0 or x >= _core_img.width()
@@ -82,6 +137,12 @@ void smooth_image::update(arma::vec prob)
 void smooth_image::area_normalization
     (std::vector<std::shared_ptr<smooth_image>> imgs, std::vector<double> area)
 {
+//    for (auto & p:imgs)
+//    {
+//        p->_core_img.normalize(0.0, 1.0);
+//    }
+    
+    // Area normalization; from Vedrana
     int width = imgs[0]->width();
     int height = imgs[1]->height();
     

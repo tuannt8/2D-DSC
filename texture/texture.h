@@ -10,9 +10,11 @@
 #define texture_h
 #include <vector>
 #include <stdlib.h>
-#include "CImg.h"
+//#include "CImg.h"
+#include "define.h"
 #include <armadillo>
 #include <string>
+#include "sparse_mat.h"
 
 namespace texture
 {
@@ -36,14 +38,14 @@ namespace texture
         int rows, cols, layers, n_pix;
     };
     
-    struct ij
-    {
-        int i,j;
-        ij(int i_, int j_) : i(i_), j(j_){}; // constructor
-        bool operator<(const ij second) const{ // leq operator needed for sorting
-            return (j<second.j) || ((j==second.j) && (i<second.i));
-        }    
-    };
+//    struct ij
+//    {
+//        int i,j;
+//        ij(int i_, int j_) : i(i_), j(j_){}; // constructor
+//        bool operator<(const ij second) const{ // leq operator needed for sorting
+//            return (j<second.j) || ((j==second.j) && (i<second.i));
+//        }    
+//    };
 
 
     double * search_tree(
@@ -88,11 +90,19 @@ namespace texture
         dictionary(std::string imName);
         ~dictionary(){}
 
-        arma::vec compute_probability(const arma::vec & labeled){return _T2*(_T1*labeled);};
+        arma::vec compute_probability(const arma::vec & labeled);//{return _T2*(_T1*labeled);};
         
     private:
         // The dictionary matrix
         arma::Mat<double> _T1, _T2;
+        
+        std::map<std::pair<long,long>, double> T21;
+        
+        std::vector<ij> Bij1, Bij2;
+        long B_width, B_height;
+        
+        arma::vec multiply(const std::vector<ij> &  Bij, std::vector<double> row_val, const arma::vec & x, long num_row);
+        
     public:
     };
 }

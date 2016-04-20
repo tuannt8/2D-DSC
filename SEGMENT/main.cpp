@@ -10,7 +10,16 @@
 #include "interface.h"
 //#include "DSC.h"
 
+
 int main(int argc, char ** argv) {
+//    std::string sentence = "I have a feeling";
+//    std::istringstream iss(sentence);
+//    std::string buf;
+//    while (iss >> buf)
+//        std::cout << buf << std::endl;
+//    
+//    return 0;
+    
     interface ui(argc, argv);
 #ifndef TEST_PROBABILITY
     glutMainLoop();

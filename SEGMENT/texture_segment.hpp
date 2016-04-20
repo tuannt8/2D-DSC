@@ -35,10 +35,28 @@ public:
     void init(); // Load image and construct dictionary
     void init_dsc_phases();
     
+    void show_all_probablity();
+    
+    void draw_debug();
 private:
+    // Deform interface
     void compute_probability_forces();
     void compute_curvature_force();
+    
+    // Deform DSC
     void displace_dsc();
+    
+    // Relabel trinagle
+    void optimize_label();
+    
+private: // For debugging
+    struct tri_variation
+    {
+        int phase;
+        double variation;
+    };
+    HMesh::FaceAttributeVector<tri_variation> _tri_variation_debug;
+    
 public:
     dsc_sharedptr _dsc;
     // The original image
