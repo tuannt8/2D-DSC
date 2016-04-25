@@ -38,6 +38,8 @@ public:
     void show_all_probablity();
     
     void draw_debug();
+    
+    void run_single_step();
 private:
     // Deform interface
     void compute_probability_forces();
@@ -49,6 +51,12 @@ private:
     // Relabel trinagle
     void optimize_label();
     
+    // Vertices stability
+    void update_vertex_stable();
+    void adapt_edge();
+    void adapt_tri();
+    void adapt_tri_compare_phase();
+    void thinning_mesh();
 private: // For debugging
     struct tri_variation
     {
@@ -58,6 +66,9 @@ private: // For debugging
     HMesh::FaceAttributeVector<tri_variation> _tri_variation_debug;
     
 public:
+    // parammeters
+    double _dt = 1;
+    
     dsc_sharedptr _dsc;
     // The original image
     std::shared_ptr<smooth_image> _origin_img;

@@ -52,16 +52,13 @@ public:
     void draw_image();
     void bind_texture(){glBindTexture(GL_TEXTURE_2D, _gl_texture_ID);}
     void ex_display(std::string name = "Image"){
-        //_core_img.display(name.data(), false);
         main_disp = cimg_library::CImgDisplay(_core_img, name.c_str());
-        
-//        cimg_library::CImgList<smooth_image::CImg_class> imglist;
-//        imglist.push_back(_core_img);
     };
     void close_display(){main_disp.close();}
 public:
     // For probability image
     smooth_image(int width, int height);
+    void normalize(){_core_img.normalize(0.0,1.0);}
     void fill(double val){ _core_img.fill(val); }
     void set_value(int x, int y, double v);
     void averaging(const std::vector<std::shared_ptr<smooth_image>> imgs);

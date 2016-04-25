@@ -14,6 +14,10 @@
 using namespace std;
 #define INT_BIG 99999
 
+#define smallest_edge 4
+#define edge_split_thres 0.1
+#define face_split_thres 0.1
+
 texture_segment::texture_segment()
 {
     
@@ -105,12 +109,6 @@ void texture_segment::update_probability()
         }
     }
     
-    // For visualization
-    _labeled_over_lay_img->averaging(_labeled_imgs);
-    
-//    _labeled_imgs[0]->ex_display("Label 0");
-//    _labeled_imgs[1]->ex_display("Label 1");
-    
     // 2. Update the probability image
     for (int i = 0; i < _labeled_imgs.size(); i++)
     {
@@ -128,15 +126,6 @@ void texture_segment::update_probability()
         area[phase] += _dsc->area(tri);
     }
     smooth_image::area_normalization(_probability_imgs, area);
-    
-    
-    _probability_over_lay_img->averaging(_probability_imgs);
-    
-//    _probability_imgs[0]->ex_display("Probability 0");
-//    _probability_imgs[1]->ex_display("Probability 1");
-    
-    
-    optimize_label();
 }
 
 void texture_segment::draw_test_coord()
@@ -184,12 +173,305 @@ void texture_segment::update_dsc()
     
     displace_dsc();
     
-    // Compute vertex forces
+    static int count = UPDATE_PROB_FREQUENCY;
+    count ++;
+    
+    if (count > UPDATE_PROB_FREQUENCY)
+    {
+        count = 0;
+        update_probability();
+        
+//        optimize_label();
+        
+        std::cout <<"Probability updated \n";
+        
+//        // Compute vertex forces
+//        compute_probability_forces();
+//        compute_curvature_force();
+//        update_vertex_stable();
+//        adapt_edge();
+        
+        compute_probability_forces();
+        compute_curvature_force();
+        
+        adapt_tri_compare_phase();
+        
+        compute_probability_forces();
+        compute_curvature_force();
+        
+        thinning_mesh();
+    }
+    
     compute_probability_forces();
-    
     compute_curvature_force();
-    
+}
 
+void texture_segment::run_single_step()
+{
+    update_probability();
+    
+    _tri_variation_debug.resize(_dsc->get_no_faces());
+    
+    for (auto tri : _dsc->faces())
+    {
+        auto pts = _dsc->get_pos(tri);
+        double area = _dsc->area(tri);
+        
+        // 1. Find highest probability
+        std::vector<double> probs;
+        for (auto p : _probability_imgs)
+        {
+            probs.push_back(p->sum_over_tri(pts) / area);
+        }
+        
+        auto max_p = std::max_element(probs.begin(), probs.end());
+        int max_phase = (int)(max_p - probs.begin());
+        
+        // 2. Probability variation
+        double mean = 1.0 / (double)setting_file._circle_inits.size();
+        double var = 0;
+        for(auto p : probs)
+            var += (p - mean)*(p - mean);
+        
+        _tri_variation_debug[tri] = tri_variation({max_phase, var});
+    }
+}
+
+void texture_segment::thinning_mesh()
+{
+    for (auto nkey : _dsc->vertices())
+    {
+        if (_dsc->is_interface(nkey)
+            or HMesh::boundary(*_dsc->mesh, nkey))
+        {
+            continue;
+        }
+        
+        // Check if the one ring have low variation
+        bool low_var = true;
+        auto smallest = _dsc->walker(nkey);
+        double shortest = INFINITY;
+        for (auto hew = _dsc->walker(nkey); !hew.full_circle();
+             hew = hew.circulate_vertex_ccw())
+        {
+            auto fkey = hew.face();
+            auto pts = _dsc->get_pos(fkey);
+            double area = _dsc->area(fkey);
+            
+            // 1. Find highest probability
+            std::vector<double> probs;
+            for (auto p : _probability_imgs)
+            {
+                probs.push_back(p->sum_over_tri(pts)/ area);
+            }
+            
+            // 2. Probability variation
+            double mean = 1.0 / (double)setting_file._circle_inits.size();
+            double var = 0;
+            for(auto p : probs)
+                var += (p - mean)*(p - mean);
+            
+            if (var > face_split_thres)
+            {
+                low_var = false;
+            }
+            
+            if (_dsc->length(hew.halfedge()) < shortest)
+            {
+                shortest = _dsc->length(hew.halfedge());
+                smallest = hew;
+            }
+        }
+        
+        if (low_var)
+        {
+            _dsc->collapse(smallest.halfedge(), true);
+        }
+    }
+}
+
+void texture_segment::adapt_tri_compare_phase()
+{
+    _tri_variation_debug.resize(_dsc->get_no_faces());
+    
+    for (auto tri : _dsc->faces())
+    {
+        auto pts = _dsc->get_pos(tri);
+        double area = _dsc->area(tri);
+        
+        // 1. Find highest probability
+        std::vector<double> probs;
+        for (auto p : _probability_imgs)
+        {
+            probs.push_back(p->sum_over_tri(pts) / area);
+        }
+        
+        auto max_p = std::max_element(probs.begin(), probs.end());
+        int max_phase = (int)(max_p - probs.begin());
+        
+        // 2. Probability variation
+        double mean = 1.0 / (double)setting_file._circle_inits.size();
+        double var = 0;
+        for(auto p : probs)
+            var += (p - mean)*(p - mean);
+        
+        _tri_variation_debug[tri] = tri_variation({max_phase, var});
+        
+        if (var > face_split_thres)
+        {
+            // One phase is high
+            // relabel
+            if(max_phase != _dsc->get_label(tri))
+            {
+                _dsc->update_attributes(tri, max_phase);
+            }
+        }
+        else
+        {
+            if (_dsc->area(tri) < smallest_edge*smallest_edge / 2.0)
+            {
+                continue;
+            }
+            
+            // Only split stable triangle
+            // Triangle with 3 stable edge
+            int bStable = 0;
+            for (auto w = _dsc->walker(tri); !w.full_circle(); w = w.circulate_face_ccw())
+            {
+                bStable += _dsc->bStable[w.vertex()];
+            }
+            
+            if (bStable > 1)
+            {
+                
+                _dsc->split(tri);
+            }
+        }
+    }
+}
+
+void texture_segment::adapt_tri()
+{
+    _tri_variation_debug.resize(_dsc->get_no_faces());
+    
+    for (auto tri : _dsc->faces())
+    {
+        auto pts = _dsc->get_pos(tri);
+        
+        // 1. Find highest probability
+        std::vector<double> probs;
+        for (auto p : _probability_imgs)
+        {
+            probs.push_back(p->sum_over_tri(pts));
+        }
+        
+        auto max_p = std::max_element(probs.begin(), probs.end());
+        int max_phase = (int)(max_p - probs.begin());
+        
+        // 2. Probability variation
+        double mean_p = (*max_p) / _dsc->area(tri);
+        auto var = _probability_imgs[max_phase]->get_variation_tri(pts, mean_p);
+        
+        auto area = _dsc->area(tri);
+        var = var / area;
+        
+        _tri_variation_debug[tri] = tri_variation({max_phase, var});
+        
+        if (max_phase == _dsc->get_label(tri))
+        {
+            continue;
+        }
+        
+        // 3. Relabel of subdivide
+        // Relabeling does not need stable, but subdivision need stable.
+        if (var < face_split_thres) // relabel
+        {
+            _dsc->update_attributes(tri, max_phase);
+        }
+        else
+        {
+            if (area < smallest_edge*smallest_edge / 2.0)
+            {
+                continue;
+            }
+            
+            // Only split stable triangle
+            // Triangle with 3 stable edge
+            int bStable = 0;
+            for (auto w = _dsc->walker(tri); !w.full_circle(); w = w.circulate_face_ccw())
+            {
+                bStable += _dsc->bStable[w.vertex()];
+            }
+
+            if (bStable > 1)
+            {
+                
+                _dsc->split(tri);
+            }
+        }
+    }
+}
+
+void texture_segment::adapt_edge()
+{
+    for(auto ekey : _dsc->halfedges())
+    {
+        auto hew = _dsc->walker(ekey);
+        // 1. Avoid error
+        if (! _dsc->mesh->in_use(ekey)
+            or ! _dsc->is_interface(ekey)
+            or hew.vertex() < hew.opp().vertex()
+            or hew.face() == HMesh::InvalidFaceID
+            or hew.opp().face() == HMesh::InvalidFaceID)
+        {
+            continue;
+        }
+        
+        // 2. Edge energy
+        double ev = 0;
+        int phase0 = _dsc->get_label(hew.face());
+        int phase1 = _dsc->get_label(hew.opp().face());
+        
+        // Loop on the edge
+        auto p0 = _dsc->get_pos(hew.opp().vertex());
+        auto p1 = _dsc->get_pos(hew.vertex());
+        double length = (p1 - p0).length();
+        assert (length > 0.001);
+        
+        int N = ceil(length);
+        double dl = (double)length / (double)N;
+        
+        for (int i = 0; i <= N; i++)
+        {
+            auto p = p0 + (p1 - p0)*((double)i / (double)N);
+            auto prob_0 = _probability_imgs[phase0]->get_value_f(p[0], p[1]);
+            auto prob_1 = _probability_imgs[phase1]->get_value_f(p[0], p[1]);
+            
+            auto f = (prob_0 - prob_1) * dl;
+            
+            ev += std::abs(f);
+        }
+        
+        ev = ev / (length + smallest_edge/10); // reasonable to dl = 1 pixel size
+        
+        double thres = edge_split_thres;
+        double smallest_length = smallest_edge;
+        
+        if (_dsc->bStable[hew.vertex()] == 1
+            and _dsc->bStable[hew.opp().vertex()] == 1)
+        {
+            if (ev > thres and length > smallest_length)
+            {
+                // Split the edge
+                _dsc->split_adpat_mesh(ekey);
+            }
+            else
+            {
+                _dsc->collapse(ekey, true);
+            }
+        }
+        
+    }
 }
 
 void texture_segment::optimize_label()
@@ -227,21 +509,52 @@ void texture_segment::optimize_label()
         {
             _dsc->update_attributes(tri, max_phase);
         }
-        
-
     }
 }
 
-
+void texture_segment::update_vertex_stable()
+{
+    auto obj = _dsc;
+    
+    for (auto ni = obj->vertices_begin(); ni != obj->vertices_end(); ni++)
+    {
+        obj->bStable[*ni] = 1; // default stable
+        
+        if ((obj->is_interface(*ni) or obj->is_crossing(*ni)))
+        {
+            Vec2 dis = (obj->get_node_internal_force(*ni)
+                        + obj->get_node_external_force(*ni));
+            assert(dis.length() != NAN);
+            
+            double n_dt = _dt;
+            
+            auto norm = obj->get_normal(*ni);
+            
+            double move = DSC2D::Util::dot(dis, norm)*n_dt;
+            if (obj->is_crossing(*ni))
+            {
+                move = dis.length() * n_dt;
+            }
+            
+            if (move < STABLE_MOVE) // stable
+            {
+                // std::cout << "Stable : " << ni->get_index() << std::endl;
+                obj->bStable[*ni] = 1;
+            }
+            else
+            {
+                obj->bStable[*ni] = 0;
+            }
+        }
+    }
+}
 
 void texture_segment::draw_debug()
 {
     if (options_disp::get_option("Triangle variation", false))
     {
         helper_t::autoColor colors;
-//        static std::vector<Vec3> colors = {Vec3(1,0,0), Vec3(0,1,0), Vec3(0,0,1),
-//            Vec3(0,1,1),Vec3(1,0,1), Vec3(1,1,0)};
-        
+       
         for (auto tri : _dsc->faces())
         {
             auto pts = _dsc->get_pos(tri);
@@ -256,6 +569,64 @@ void texture_segment::draw_debug()
             glColor3f(0, 0, 0);
             auto c = helper_t::get_barry_center(pts);
             std::ostringstream os; os << variation.variation;
+            helper_t::gl_text(c[0], c[1], os.str());
+        }
+    }
+    
+    if (options_disp::get_option("Edge energy", false))
+    {
+        // Compute energy
+        HMesh::HalfEdgeAttributeVector<double> energy;
+        energy.resize(_dsc->get_no_halfedges());
+        for(auto ekey : _dsc->halfedges())
+        {
+            auto hew = _dsc->walker(ekey);
+            // 1. Avoid error
+            if (! _dsc->mesh->in_use(ekey)
+                or ! _dsc->is_interface(ekey)
+                or hew.vertex() < hew.opp().vertex()
+                or hew.face() == HMesh::InvalidFaceID
+                or hew.opp().face() == HMesh::InvalidFaceID)
+            {
+                continue;
+            }
+            
+            // 2. Edge energy
+            double ev = 0;
+            int phase0 = _dsc->get_label(hew.face());
+            int phase1 = _dsc->get_label(hew.opp().face());
+            
+            // Loop on the edge
+            auto p0 = _dsc->get_pos(hew.opp().vertex());
+            auto p1 = _dsc->get_pos(hew.vertex());
+            double length = (p1 - p0).length();
+            assert (length > 0.001);
+            
+            int N = ceil(length);
+            double dl = (double)length / (double)N;
+            
+            for (int i = 0; i <= N; i++)
+            {
+                auto p = p0 + (p1 - p0)*((double)i / (double)N);
+                auto prob_0 = _probability_imgs[phase0]->get_value_f(p[0], p[1]);
+                auto prob_1 = _probability_imgs[phase1]->get_value_f(p[0], p[1]);
+                
+                auto f = (prob_0 - prob_1) * dl;
+                
+                ev += std::abs(f);
+            }
+            
+            ev = ev / (length + 0.1); // reasonable to dl = 1 pixel size
+            
+            energy[ekey] = ev;
+        }
+        
+        for (auto ekey : _dsc->halfedges())
+        {
+            auto hew = _dsc->walker(ekey);
+            auto c = ( _dsc->get_pos(hew.vertex()) + _dsc->get_pos(hew.opp().vertex()) ) / 2;
+            
+            std::ostringstream os; os << energy[ekey];
             helper_t::gl_text(c[0], c[1], os.str());
         }
     }
@@ -293,7 +664,7 @@ void texture_segment::compute_probability_forces()
             auto prob_0 = _probability_imgs[phase0]->get_value_f(p[0], p[1]);
             auto prob_1 = _probability_imgs[phase1]->get_value_f(p[0], p[1]);
             
-            auto f = (prob_0 - prob_1) * dl / length * 10;
+            auto f = (prob_0 - prob_1) * dl / length;
             
             f0 += f*(N-i)/(double)N;
             f1 += f*i/(double)N;
@@ -323,9 +694,8 @@ void texture_segment::displace_dsc()
                         + _dsc->get_node_external_force(*ni));
             assert(dis.length() != NAN);
             
-            double n_dt = 0.1;//s_dsc->time_step(*ni);
             
-            _dsc->set_destination(*ni, _dsc->get_pos(*ni) + dis*n_dt);
+            _dsc->set_destination(*ni, _dsc->get_pos(*ni) + dis* _dt);
             
         }
     }
@@ -360,8 +730,6 @@ void texture_segment::compute_curvature_force()
 
 void texture_segment::show_all_probablity()
 {
-    
-    
     cimg_library::CImgList<double> imglist;
     
     for (auto p : _probability_imgs)

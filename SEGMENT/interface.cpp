@@ -152,7 +152,7 @@ void interface::keyboard(unsigned char key, int x, int y){
             break;
         case 'r':
         {
-            _tex_seg->update_probability();
+            _tex_seg->run_single_step();
         }
             break;
         case ' ':

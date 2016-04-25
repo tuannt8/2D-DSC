@@ -85,6 +85,7 @@ namespace texture
      Class dictionary
      Build base on image range [0:1]
      */
+    
     class dictionary{
     public:
         dictionary(std::string imName);
@@ -95,13 +96,16 @@ namespace texture
     private:
         // The dictionary matrix
         arma::Mat<double> _T1, _T2;
+        std::vector<double> T1_row_count, T2_row_count;
         
         std::map<std::pair<long,long>, double> T21;
         
         std::vector<ij> Bij1, Bij2;
         long B_width, B_height;
         
-        arma::vec multiply(const std::vector<ij> &  Bij, std::vector<double> row_val, const arma::vec & x, long num_row);
+        arma::vec multiply(const std::vector<ij> &  Bij, std::vector<double> & row_val, const arma::vec & x, long num_row);
+        
+        void preprocess_mat();
         
     public:
     };

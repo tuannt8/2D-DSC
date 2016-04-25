@@ -9,6 +9,9 @@
 #ifndef sparse_mat_h
 #define sparse_mat_h
 
+#include <vector>
+#include <armadillo>
+
 struct ij
 {
     long i,j;
@@ -23,16 +26,35 @@ struct ij
     }
 };
 
+#define NUM_THREADS 4
 class sparse_mat
 {
 public:
     sparse_mat(){};
     ~sparse_mat(){};
     
+    sparse_mat(const std::vector<ij> & Bij, long nrow, long ncol)
+    {
+        _n_row = nrow;
+        _n_col = ncol;
+        
+        long nb_thread_elem = std::ceil(_n_row / NUM_THREADS);
+        
+        long tidx = 0;
+        for(auto ije : Bij)
+        {
+            long r = ije.i;
+            
+            _indices[tidx].push_back(ije);
+            
+            tidx = r/nb_thread_elem;
+        }
+    };
     
-public:
-    long _n_row, n_col;
-    std::vector<ij> _indices;
+
+private:
+    long _n_row, _n_col;
+    std::vector<ij> _indices[NUM_THREADS];
     std::vector<double> _values;
 };
 
