@@ -38,13 +38,29 @@ struct init_circle
     }
 };
 
-struct setting
+class setting
 {
+public:
+    setting();
+    ~setting(){};
+    
     std::string _image_name; // Image to segment
     std::vector<std::vector<init_circle>> _circle_inits; // Initialization by circle
-    double dsc_discretization;
     
-//    double variation_relabel_thres;
+    double alpha = 0.1;
+
+    double dsc_discretization = 20.0;
+    double min_edge_length = 4; // DSC parammeter
+    double edge_split_energy = 0.1;
+    double tri_split_energy = 0.1;
+    double dt = 1.0;
+    
+private:
+    // randen15.png image
+    void load_raden();
+    void load_synthetic1();
+    
+    void trick_border_image();
 };
 
 extern setting setting_file;

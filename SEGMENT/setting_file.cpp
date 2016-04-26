@@ -9,45 +9,23 @@
 #include <stdio.h>
 
 #include "setting_file.h"
+#include "CImg.h"
 
 
-setting test =
+setting setting_file;
+
+setting::setting()
 {
-    "DATA/test.png" // name
-    ,{ // Initialization
-        { // Phase 0
-            {Vec2(100,100), 50}
-        }
-    }
-    , 25.0
-};
+    load_synthetic1();
+//    load_raden();
+    
+    trick_border_image();
+}
 
-setting leopard =
+void setting::load_raden()
 {
-    "DATA/leopard.png"
-    ,{ // Initialization
-        { // Phase 0
-            {Vec2(100,100), 20}
-        }
-    }
-    , 25.0 // DSC discretization
-};
-
-setting circle =
-{
-    "DATA/circle.png"
-    ,{ // Initialization
-        { // Phase 0
-            {Vec2(100,60), 20}
-        }
-    }
-    , 10.0 // DSC discretization
-};
-
-setting randen =
-{
-    "DATA/randen14.png"
-    ,{ // Initialization
+    _image_name = "DATA/randen14.png";
+    _circle_inits = { // Initialization
         { // Phase 0
             {Vec2(50,128), 20}
         }
@@ -63,9 +41,63 @@ setting randen =
         ,{ // Phase 4
             {Vec2(138,138), 20}
         }
+    };
+}
+
+void setting::load_synthetic1()
+{
+    dsc_discretization = 25;
+    _image_name = "DATA/test_images/test_C.png";
+    _circle_inits = {
+        {
+            {Vec2(250,250), 50}
+        }
+        ,{
+            {Vec2(250,350),25}
+        }
+        ,{
+            {Vec2(400,250),25}
+        }
+        ,{
+            {Vec2(550,250),50}
+        }
+    };
+}
+
+void setting::trick_border_image()
+{
+    try
+    {
+        // Create border on the image
+        cimg_library::CImg<double> img_temp;
+        img_temp.load(_image_name.c_str());
+        
+        // create bigger image
+        int border = 0.05 * img_temp.width();
+        cimg_library::CImg<double> newImg(img_temp.width() + 2*border,
+                                          img_temp.height() + 2*border);
+        newImg.fill(0.0);
+        for (int i = 0; i < img_temp.width(); i++)
+        {
+            for (int j = 0; j < img_temp.height(); j++)
+            {
+                newImg(i+border, j + border) = img_temp(i,j);
+            }
+        }
+        
+        newImg.save("DATA/temp.png");
+        
+        _image_name = "DATA/temp.png";
+        for (auto & init : _circle_inits)
+        {
+            for (auto & c : init)
+            {
+                c._center += Vec2(border, border);
+            }
+        }
     }
-    , 20.0 // DSC discretization
-};
-
-
-setting setting_file = randen;
+    catch (const std::exception& e)
+    {
+        std::cout << e.what();
+        exit(1);
+    }}

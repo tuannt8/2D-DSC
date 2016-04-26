@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include "define.h"
 #include "image.h"
+#include "texture_segment.hpp"
 
 #define LOG_VERTEX  true
 #define LOG_EDGE    true
@@ -59,6 +60,7 @@ public:
     
     // Index of nearest element
     static void print_debug_info_nearest(dsc_obj &complex);
+    static void print_texture_nearest_info(dsc_sharedptr complex, std::shared_ptr<texture_segment> texture);
 
     static void print_image_info(image &img);
     

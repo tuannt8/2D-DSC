@@ -159,6 +159,29 @@ void gl_debug_helper::draw(){
     }
 }
 
+void gl_debug_helper::print_texture_nearest_info(dsc_sharedptr complex,
+                                std::shared_ptr<texture_segment> texture)
+{
+    Vec2 pt = get_instance().cur_mouse_pos_;
+    
+    // 1. Face related
+    double nearest = INFINITY;
+    Face_key nearID;
+    for (auto fkey : complex->faces()) {
+        auto pts = complex->get_pos(fkey);
+        auto center = (pts[0] + pts[1] + pts[2])/3;
+        double dis = (pt - center).length();
+        if (dis < nearest) {
+            nearest = dis;
+            nearID = fkey;
+        }
+    }
+    
+    // variation
+    double var = texture->get_tri_variation(nearID) / complex->area(nearID);
+    std::cout << "Tri: " << (int)nearID.get_index() << " var: " << var << std::endl;
+}
+
 void gl_debug_helper::print_debug_info_nearest(dsc_obj &complex){
     Vec2 pt = get_instance().cur_mouse_pos_;
     
@@ -192,7 +215,10 @@ void gl_debug_helper::print_debug_info_nearest(dsc_obj &complex){
         }
         double area = complex.area(nearID);
         cout << "Face: " << nearID << ", A = " << area << endl;
+        
     }
+    
+    
 }
 
 void gl_debug_helper::print_debug_info(dsc_obj &complex){

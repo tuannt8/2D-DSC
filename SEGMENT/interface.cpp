@@ -148,7 +148,7 @@ void interface::keyboard(unsigned char key, int x, int y){
             gl_debug_helper::change_state();
             break;
         case 'p':
-            gl_debug_helper::print_debug_info_nearest(*dsc);
+            gl_debug_helper::print_texture_nearest_info(dsc, _tex_seg);
             break;
         case 'r':
         {

@@ -77,7 +77,7 @@ T smooth_image::get_sum_on_tri_template(Vec2_array tris, std::function<T(Vec2)> 
         }
     }
     
-    sum *= 2*area/(double)(N*N); // |j| = 2A
+    sum = sum * 2 * area/(double)(N*N); // |j| = 2A
     
     return sum;
 }

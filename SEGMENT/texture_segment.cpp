@@ -16,7 +16,7 @@ using namespace std;
 
 #define smallest_edge 4
 #define edge_split_thres 0.1
-#define face_split_thres 0.1
+#define face_split_thres 0.02
 
 texture_segment::texture_segment()
 {
@@ -160,50 +160,72 @@ void texture_segment::draw_probability()
 }
 
 #define UPDATE_PROB_FREQUENCY 100
+#define ADAPT_MESH_FREQUENCY 200
 void texture_segment::update_dsc()
 {
-//    static int count = UPDATE_PROB_FREQUENCY;
-//    if (count == UPDATE_PROB_FREQUENCY)
-//    {
-//        update_probability();
-//        count = 0;
-//        std::cout << "Probability updated\n";
-//    }
-//    count ++;
     
     displace_dsc();
     
     static int count = UPDATE_PROB_FREQUENCY;
+    static int adapt_count = 0;
     count ++;
+    adapt_count++;
     
     if (count > UPDATE_PROB_FREQUENCY)
     {
         count = 0;
         update_probability();
         
+        adapt_count = INFINITY;
+    }
+    
+    if(adapt_count > ADAPT_MESH_FREQUENCY)
+    {
+        adapt_count = 0;
 //        optimize_label();
         
         std::cout <<"Probability updated \n";
         
-//        // Compute vertex forces
-//        compute_probability_forces();
-//        compute_curvature_force();
-//        update_vertex_stable();
-//        adapt_edge();
+        // Compute vertex forces
+        compute_probability_forces();
+        update_vertex_stable();
+        adapt_edge();
         
         compute_probability_forces();
-        compute_curvature_force();
-        
+        update_vertex_stable();
         adapt_tri_compare_phase();
+//        optimize_label();
         
         compute_probability_forces();
-        compute_curvature_force();
-        
+        update_vertex_stable();
         thinning_mesh();
+        
+        compute_probability_forces();
+        update_vertex_stable();
+        remove_needle_triangle();
     }
     
     compute_probability_forces();
     compute_curvature_force();
+}
+
+void texture_segment::remove_needle_triangle()
+{
+    for (auto fit = _dsc->faces_begin(); fit != _dsc->faces_end(); fit++)
+    {
+        if (!_dsc->mesh->in_use(*fit))
+        {
+            continue;
+        }
+        
+        HMesh::Walker het = _dsc->walker(*fit);
+        if (_dsc->min_angle(*fit) < 10*M_PI/180.// dsc.DEG_ANGLE
+            and _dsc->max_angle(*fit, het) < 120*M_PI/180.
+            )
+        {
+            _dsc->remove_degenerate_needle(*fit);
+        }
+    }
 }
 
 void texture_segment::run_single_step()
@@ -228,10 +250,13 @@ void texture_segment::run_single_step()
         int max_phase = (int)(max_p - probs.begin());
         
         // 2. Probability variation
-        double mean = 1.0 / (double)setting_file._circle_inits.size();
-        double var = 0;
-        for(auto p : probs)
-            var += (p - mean)*(p - mean);
+        double mean = *max_p;
+        double var = _probability_imgs[max_phase]->get_variation_tri(pts, mean);
+        var = var / area;
+//        double mean = 1.0 / (double)setting_file._circle_inits.size();
+//        double var = 0;
+//        for(auto p : probs)
+//            var += (p - mean)*(p - mean);
         
         _tri_variation_debug[tri] = tri_variation({max_phase, var});
     }
@@ -258,18 +283,9 @@ void texture_segment::thinning_mesh()
             auto pts = _dsc->get_pos(fkey);
             double area = _dsc->area(fkey);
             
-            // 1. Find highest probability
-            std::vector<double> probs;
-            for (auto p : _probability_imgs)
-            {
-                probs.push_back(p->sum_over_tri(pts)/ area);
-            }
-            
-            // 2. Probability variation
-            double mean = 1.0 / (double)setting_file._circle_inits.size();
-            double var = 0;
-            for(auto p : probs)
-                var += (p - mean)*(p - mean);
+            int max_phase = _dsc->get_label(fkey);
+            auto mean = _probability_imgs[max_phase]->sum_over_tri(pts)/ area;
+            double var = _probability_imgs[max_phase]->get_variation_tri(pts, mean) / area;
             
             if (var > face_split_thres)
             {
@@ -310,14 +326,16 @@ void texture_segment::adapt_tri_compare_phase()
         int max_phase = (int)(max_p - probs.begin());
         
         // 2. Probability variation
-        double mean = 1.0 / (double)setting_file._circle_inits.size();
-        double var = 0;
-        for(auto p : probs)
-            var += (p - mean)*(p - mean);
+        double mean = *max_p;
+        double var = _probability_imgs[max_phase]->get_variation_tri(pts, mean);
+        var = var / area;
+//        double var = 0;
+//        for(auto p : probs)
+//            var += (p - mean)*(p - mean);
         
         _tri_variation_debug[tri] = tri_variation({max_phase, var});
         
-        if (var > face_split_thres)
+        if (var < face_split_thres)
         {
             // One phase is high
             // relabel
@@ -343,7 +361,7 @@ void texture_segment::adapt_tri_compare_phase()
             
             if (bStable > 1)
             {
-                
+                std::cout << "Split " << tri.get_index() << std::endl;
                 _dsc->split(tri);
             }
         }
@@ -352,64 +370,63 @@ void texture_segment::adapt_tri_compare_phase()
 
 void texture_segment::adapt_tri()
 {
-    _tri_variation_debug.resize(_dsc->get_no_faces());
-    
-    for (auto tri : _dsc->faces())
-    {
-        auto pts = _dsc->get_pos(tri);
-        
-        // 1. Find highest probability
-        std::vector<double> probs;
-        for (auto p : _probability_imgs)
-        {
-            probs.push_back(p->sum_over_tri(pts));
-        }
-        
-        auto max_p = std::max_element(probs.begin(), probs.end());
-        int max_phase = (int)(max_p - probs.begin());
-        
-        // 2. Probability variation
-        double mean_p = (*max_p) / _dsc->area(tri);
-        auto var = _probability_imgs[max_phase]->get_variation_tri(pts, mean_p);
-        
-        auto area = _dsc->area(tri);
-        var = var / area;
-        
-        _tri_variation_debug[tri] = tri_variation({max_phase, var});
-        
-        if (max_phase == _dsc->get_label(tri))
-        {
-            continue;
-        }
-        
-        // 3. Relabel of subdivide
-        // Relabeling does not need stable, but subdivision need stable.
-        if (var < face_split_thres) // relabel
-        {
-            _dsc->update_attributes(tri, max_phase);
-        }
-        else
-        {
-            if (area < smallest_edge*smallest_edge / 2.0)
-            {
-                continue;
-            }
-            
-            // Only split stable triangle
-            // Triangle with 3 stable edge
-            int bStable = 0;
-            for (auto w = _dsc->walker(tri); !w.full_circle(); w = w.circulate_face_ccw())
-            {
-                bStable += _dsc->bStable[w.vertex()];
-            }
-
-            if (bStable > 1)
-            {
-                
-                _dsc->split(tri);
-            }
-        }
-    }
+//    _tri_variation_debug.resize(_dsc->get_no_faces());
+//    
+//    for (auto tri : _dsc->faces())
+//    {
+//        auto pts = _dsc->get_pos(tri);
+//        
+//        // 1. Find highest probability
+//        std::vector<double> probs;
+//        for (auto p : _probability_imgs)
+//        {
+//            probs.push_back(p->sum_over_tri(pts));
+//        }
+//        
+//        auto max_p = std::max_element(probs.begin(), probs.end());
+//        int max_phase = (int)(max_p - probs.begin());
+//        
+//        // 2. Probability variation
+//        double mean_p = (*max_p) / _dsc->area(tri);
+//        auto var = _probability_imgs[max_phase]->get_variation_tri(pts, mean_p);
+//        
+//        auto area = _dsc->area(tri);
+//        var = var / area;
+//        
+//        _tri_variation_debug[tri] = tri_variation({max_phase, var});
+//        
+//        // 3. Relabel of subdivide
+//        // Relabeling does not need stable, but subdivision need stable.
+//        if (var < face_split_thres) // relabel
+//        {
+//            if (max_phase != _dsc->get_label(tri))
+//            {
+//                _dsc->update_attributes(tri, max_phase);
+//            }
+//            
+//        }
+//        else if(max_phase != _dsc->get_label(tri))
+//        {
+//            if (area < smallest_edge*smallest_edge / 2.0)
+//            {
+//                continue;
+//            }
+//            
+//            // Only split stable triangle
+//            // Triangle with 3 stable edge
+//            int bStable = 0;
+//            for (auto w = _dsc->walker(tri); !w.full_circle(); w = w.circulate_face_ccw())
+//            {
+//                bStable += _dsc->bStable[w.vertex()];
+//            }
+//
+//            if (bStable > 1)
+//            {
+//                
+//                _dsc->split(tri);
+//            }
+//        }
+//    }
 }
 
 void texture_segment::adapt_edge()
@@ -476,40 +493,40 @@ void texture_segment::adapt_edge()
 
 void texture_segment::optimize_label()
 {
-    _tri_variation_debug.resize(_dsc->get_no_faces());
-    
-    for (auto tri : _dsc->faces())
-    {
-        auto pts = _dsc->get_pos(tri);
-        
-        // 1. Find highest probability
-        std::vector<double> probs;
-        for (auto p : _probability_imgs)
-        {
-            probs.push_back(p->sum_over_tri(pts));
-        }
-        
-        auto max_p = std::max_element(probs.begin(), probs.end());
-        int max_phase = (int)(max_p - probs.begin());
-        
-        // 2. Probability variation
-        double mean_p = (*max_p) / _dsc->area(tri);
-        auto var = _probability_imgs[max_phase]->get_variation_tri(pts, mean_p);
-        
-        _tri_variation_debug[tri] = tri_variation({max_phase, var});
-        
-        if (max_phase == _dsc->get_label(tri))
-        {
-            continue;
-        }
-        
-        // 3. Relabel of subdivide
-        // Relabeling does not need stable, but subdivision need stable.
-        if (var < 0.5) // relabel
-        {
-            _dsc->update_attributes(tri, max_phase);
-        }
-    }
+//    _tri_variation_debug.resize(_dsc->get_no_faces());
+//    
+//    for (auto tri : _dsc->faces())
+//    {
+//        auto pts = _dsc->get_pos(tri);
+//        
+//        // 1. Find highest probability
+//        std::vector<double> probs;
+//        for (auto p : _probability_imgs)
+//        {
+//            probs.push_back(p->sum_over_tri(pts));
+//        }
+//        
+//        auto max_p = std::max_element(probs.begin(), probs.end());
+//        int max_phase = (int)(max_p - probs.begin());
+//        
+//        // 2. Probability variation
+//        double mean_p = (*max_p) / _dsc->area(tri);
+//        auto var = _probability_imgs[max_phase]->get_variation_tri(pts, mean_p);
+//        
+//        _tri_variation_debug[tri] = tri_variation({max_phase, var});
+//        
+//        if (max_phase == _dsc->get_label(tri))
+//        {
+//            continue;
+//        }
+//        
+//        // 3. Relabel of subdivide
+//        // Relabeling does not need stable, but subdivision need stable.
+//        if (var < face_split_thres) // relabel
+//        {
+//            _dsc->update_attributes(tri, max_phase);
+//        }
+//    }
 }
 
 void texture_segment::update_vertex_stable()
@@ -522,8 +539,7 @@ void texture_segment::update_vertex_stable()
         
         if ((obj->is_interface(*ni) or obj->is_crossing(*ni)))
         {
-            Vec2 dis = (obj->get_node_internal_force(*ni)
-                        + obj->get_node_external_force(*ni));
+            Vec2 dis = (obj->get_node_external_force(*ni));
             assert(dis.length() != NAN);
             
             double n_dt = _dt;
@@ -549,29 +565,46 @@ void texture_segment::update_vertex_stable()
     }
 }
 
+double texture_segment::get_tri_variation(Face_key fkey)
+{
+    auto pts = _dsc->get_pos(fkey);
+    auto area = _dsc->area(fkey);
+    double mean = _probability_imgs[_dsc->get_label(fkey)]->sum_over_tri(pts) / area;
+    return _probability_imgs[_dsc->get_label(fkey)]->get_variation_tri(pts, mean);
+}
+
 void texture_segment::draw_debug()
 {
-    if (options_disp::get_option("Triangle variation", false))
-    {
-        helper_t::autoColor colors;
-       
-        for (auto tri : _dsc->faces())
-        {
-            auto pts = _dsc->get_pos(tri);
-            auto & variation = _tri_variation_debug[tri];
-            glBegin(GL_TRIANGLES);
-            glColor3dv(colors[variation.phase].get());
-            glVertex2dv(pts[0].get());
-            glVertex2dv(pts[1].get());
-            glVertex2dv(pts[2].get());
-            glEnd();
-            
-            glColor3f(0, 0, 0);
-            auto c = helper_t::get_barry_center(pts);
-            std::ostringstream os; os << variation.variation;
-            helper_t::gl_text(c[0], c[1], os.str());
-        }
-    }
+//    if (options_disp::get_option("Triangle variation", false))
+//    {
+//        helper_t::autoColor colors;
+//        glBegin(GL_TRIANGLES);
+//        for (auto tri : _dsc->faces())
+//        {
+//            auto pts = _dsc->get_pos(tri);
+//            auto & variation = _tri_variation_debug[tri];
+//            
+//            glColor3dv(colors[variation.phase].get());
+//            glVertex2dv(pts[0].get());
+//            glVertex2dv(pts[1].get());
+//            glVertex2dv(pts[2].get());
+//            
+//        }
+//        glEnd();
+//        
+//        for (auto tri : _dsc->faces())
+//        {
+//            auto pts = _dsc->get_pos(tri);
+//            auto & variation = _tri_variation_debug[tri];
+//            glColor3f(0, 0, 0);
+//            auto c = helper_t::get_barry_center(pts);
+//            std::ostringstream os; os << variation.variation;
+//            helper_t::gl_text(c[0], c[1], os.str());
+//        }
+//       
+//
+//
+//    }
     
     if (options_disp::get_option("Edge energy", false))
     {
@@ -690,7 +723,7 @@ void texture_segment::displace_dsc()
         
         if ((_dsc->is_interface(*ni) or _dsc->is_crossing(*ni)))
         {
-            Vec2 dis = (_dsc->get_node_internal_force(*ni)
+            Vec2 dis = (_dsc->get_node_internal_force(*ni)*setting_file.alpha
                         + _dsc->get_node_external_force(*ni));
             assert(dis.length() != NAN);
             

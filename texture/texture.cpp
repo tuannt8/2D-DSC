@@ -147,11 +147,10 @@ namespace texture
         
         std::cout << "Build adjacency 1" << std::endl;
         
-        Bij1.resize(Bij2.size());
-        for (int i = 0; i < Bij2.size(); i++)
+        Bij1.reserve(Bij2.size());
+        for (auto & _ij : Bij2)
         {
-            auto & _ij = Bij2[i];
-            Bij1[i] = ij(_ij.j, _ij.i);
+            Bij1.push_back(ij(_ij.j, _ij.i));
         }
         std::sort(Bij1.begin(), Bij1.end());
         

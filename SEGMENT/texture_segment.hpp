@@ -57,6 +57,9 @@ private:
     void adapt_tri();
     void adapt_tri_compare_phase();
     void thinning_mesh();
+    void remove_needle_triangle();
+public:
+    double get_tri_variation(Face_key fkey);
 private: // For debugging
     struct tri_variation
     {
