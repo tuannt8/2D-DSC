@@ -10,11 +10,16 @@
 #define texture_h
 #include <vector>
 #include <stdlib.h>
-//#include "CImg.h"
 #include "define.h"
 #include <armadillo>
 #include <string>
 #include "sparse_mat.h"
+
+#ifdef Success
+#undef Success
+#endif
+
+#include "Eigen/SparseCore"
 
 namespace texture
 {
@@ -69,7 +74,7 @@ namespace texture
     , int treeDim[]
     );
 
-    std::vector<ij> biadjacency_matrix(
+    std::vector<Eigen::Triplet<double>> biadjacency_matrix(
                             double *A // input, assignment image
                             , int X // input, image size X
                             , int Y // input, image size Y
@@ -91,7 +96,7 @@ namespace texture
         dictionary(std::string imName);
         ~dictionary(){}
 
-        arma::vec compute_probability(const arma::vec & labeled);//{return _T2*(_T1*labeled);};
+        Eigen::VectorXd compute_probability(const Eigen::VectorXd & labeled);//{return _T2*(_T1*labeled);};
         
     private:
         // The dictionary matrix
@@ -100,13 +105,15 @@ namespace texture
         
         std::map<std::pair<long,long>, double> T21;
         
-        std::vector<ij> Bij1, Bij2;
+//        std::vector<ij> Bij1, Bij2;
         long B_width, B_height;
         
         arma::vec multiply(const std::vector<ij> &  Bij, std::vector<double> & row_val, const arma::vec & x, long num_row);
         
         void preprocess_mat();
         
+        
+        Eigen::SparseMatrix<double> _T1_s, _T2_s;
     public:
     };
 }

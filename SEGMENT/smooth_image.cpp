@@ -119,17 +119,33 @@ void smooth_image::set_value(int x, int y, double v)
     _core_img(x,height-1-y) = v;
 }
 
-arma::vec smooth_image::reshape_to_vector()
+Eigen::VectorXd smooth_image::reshape_to_vector()
 {
-    double * a = _core_img.data(0);
-    arma::vec v(a, _core_img.width()*_core_img.height());
+//    Eigen::SparseVector<double> v(_core_img.width()*_core_img.height());
+////    arma::vec v(a, _core_img.width()*_core_img.height());
+//    for (auto i = 0; i < _core_img.width(); i++)
+//    {
+//        for (auto j = 0; j < _core_img.height(); j++)
+//        {
+//            if(std::abs(_core_img(i,j)) > 0.0001)
+//            {
+//                v.insert(j*_core_img.width() + i) = _core_img(i,j);
+//            }
+//        }
+//    }
+    Eigen::Map<Eigen::VectorXd> mapv(_core_img.data(), _core_img.width()*_core_img.height());
     
-    return v;
+  //  Eigen::VectorXd v(_core_img.width()*_core_img.height());
+//    
+    
+    //return Eigen::VectorXd(_core_img.data(), _core_img.width()*_core_img.height());
+//    
+    return mapv;
 }
 
-void smooth_image::update(arma::vec prob)
+void smooth_image::update(Eigen::VectorXd prob)
 {
-    std::memcpy(_core_img.data(), prob.memptr(), prob.n_elem*sizeof(double));
+    std::memcpy(_core_img.data(), prob.data(), prob.size()*sizeof(double));
     // TODO: ????.
 //    _core_img.normalize(0, 1);
 }

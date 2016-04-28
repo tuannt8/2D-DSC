@@ -17,6 +17,7 @@
 #include <vector>
 #include <algorithm>
 #include "texture.h"
+// #include "Eigen/SparseCore"
 
 namespace texture
 {
@@ -24,7 +25,7 @@ namespace texture
 // struct containing i and j indices of a sparse matrix element
 
 
-std::vector<ij> biadjacency_matrix(
+    std::vector<Eigen::Triplet<double>> biadjacency_matrix(
                         double *A // input, assignment image
                         , int X // input, image size X
                         , int Y // input, image size Y
@@ -58,7 +59,7 @@ std::vector<ij> biadjacency_matrix(
     int s = (X-M+1)*(Y-M+1)*M*M; // number image-dict links (elements in B)
     
     /* Finding elements of B as row-column indices */
-    std::vector<ij> bij;
+    std::vector<Eigen::Triplet<double>>  bij;
     bij.reserve(s);
     int ic,i,j;
     for (int y=0+c; y<Y-c; y++){ // visiting patches centered around pixels
@@ -68,14 +69,14 @@ std::vector<ij> biadjacency_matrix(
                 for (int dx=-c; dx<=c; dx++){
                     i = (x+dx)+(y+dy)*X;
                     j = (c+dx)+(c+dy)*M+(A[ic]-1)*M*M;
-                    bij.push_back(ij(i,j));
+                    bij.push_back(Eigen::Triplet<double>(i,j,1));
                 }
             }
         }
     }
     
-    /* Sorting elements in bij columnwise */
-    std::sort (bij.begin(), bij.end());
+//    /* Sorting elements in bij columnwise */
+//    std::sort (bij.begin(), bij.end());
     
     
     return bij;

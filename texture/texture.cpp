@@ -16,6 +16,7 @@
 
 #include "profile.h"
 #include "sparse_mat.h"
+#include "profile.h"
 
 namespace texture
 {
@@ -23,44 +24,86 @@ namespace texture
     using namespace cimg_library;
     using namespace arma;
     
-    arma::vec  dictionary::compute_probability(const arma::vec & labeled)
+    Eigen::VectorXd  dictionary::compute_probability(const Eigen::VectorXd & labeled)
     {
-        arma::vec out;
-        // T1*labeled
-        out = multiply(Bij1, T1_row_count, labeled, B_height);
+//        arma::vec out;
+//        {
+//            profile t("std vector multiply");
+//        // T1*labeled
+//        out = multiply(Bij1, T1_row_count, labeled, B_height);
+//        
+//        // T2*
+//        out = multiply(Bij2, T2_row_count, out, B_width);
+//        }
         
-        // T2*
-        out = multiply(Bij2, T2_row_count, out, B_width);
+        // With Eigen
+//            profile t("eigen multiply");
+//            Eigen::SparseVector<double> label_e(labeled.n_rows);
+//            for (int i  = 0; i < labeled.n_rows; i++)
+//            {
+//                if (labeled[i] != 0)
+//                {
+//                    label_e.insert(i) = labeled[i];
+//                }
+//            }
+            
+        auto ll1 = _T1_s*labeled;
+        auto ll2 = _T2_s*ll1;
+
         
-        return out;
+        return ll2;
     }
     
     void dictionary::preprocess_mat()
     {
-        // T1;
-        T1_row_count = vector<double>(B_height, 0);
+//        // T1;
+//        T1_row_count = vector<double>(B_height, 0);
+//        
+//        for (auto & ij : Bij1)
+//        {
+//            T1_row_count[ij.i]+=1;
+//        }
+//        
+//        for (auto & tt1 : T1_row_count)
+//        {
+//            tt1 = 1.0/(tt1 + 0.00001);
+//        }
+//        
+//        // T2
+//        T2_row_count = vector<double>(B_width, 0);
+//        for (auto & ij : Bij2)
+//        {
+//            T2_row_count[ij.i]+=1;
+//        }
+//        
+//        for (auto & tt2 : T2_row_count)
+//        {
+//            tt2 = 1.0/(tt2 + 0.00001);
+//        }
         
-        for (auto & ij : Bij1)
-        {
-            T1_row_count[ij.i]+=1;
-        }
+        std::vector<double> row_count_1(B_height, 0);
+        for (int k=0; k<_T1_s.outerSize(); ++k)
+            for (Eigen::SparseMatrix<double>::InnerIterator it(_T1_s,k); it; ++it)
+            {
+                row_count_1[it.row()] += 1;
+            }
+        for (int k=0; k<_T1_s.outerSize(); ++k)
+            for (Eigen::SparseMatrix<double>::InnerIterator it(_T1_s,k); it; ++it)
+            {
+                it.valueRef() = it.value() / (row_count_1[it.row()] + 0.00001);
+            }
         
-        for (auto & tt1 : T1_row_count)
-        {
-            tt1 = 1.0/(tt1 + 0.00001);
-        }
-        
-        // T2
-        T2_row_count = vector<double>(B_width, 0);
-        for (auto & ij : Bij2)
-        {
-            T2_row_count[ij.i]+=1;
-        }
-        
-        for (auto & tt2 : T2_row_count)
-        {
-            tt2 = 1.0/(tt2 + 0.00001);
-        }
+        std::vector<double> row_count_2(B_height, 0);
+        for (int k=0; k<_T2_s.outerSize(); ++k)
+            for (Eigen::SparseMatrix<double>::InnerIterator it(_T2_s,k); it; ++it)
+            {
+                row_count_2[it.row()] += 1;
+            }
+        for (int k=0; k<_T2_s.outerSize(); ++k)
+            for (Eigen::SparseMatrix<double>::InnerIterator it(_T2_s,k); it; ++it)
+            {
+                it.valueRef() = it.value() / (row_count_1[it.row()]+ 0.00001);
+            }
     }
     
     arma::vec dictionary::multiply(const std::vector<ij> &  Bij, std::vector<double> & row_val, const arma::vec & x, long num_row)
@@ -133,7 +176,7 @@ namespace texture
         
         std::cout << "Building adjacency matrix" << std::endl;
         // Matrix B
-        Bij2 = biadjacency_matrix(A, width, height, Md);
+        auto Bij2 = biadjacency_matrix(A, width, height, Md);
         
         // Using armadillo to compute the matrix
         B_width = width*height;
@@ -147,15 +190,41 @@ namespace texture
         
         std::cout << "Build adjacency 1" << std::endl;
         
-        Bij1.reserve(Bij2.size());
-        for (auto & _ij : Bij2)
-        {
-            Bij1.push_back(ij(_ij.j, _ij.i));
-        }
-        std::sort(Bij1.begin(), Bij1.end());
+        _T2_s = Eigen::SparseMatrix<double>(B_width, B_height);
+        _T2_s.setFromTriplets(Bij2.begin(), Bij2.end());
         
-        std::cout << "Preprocess" << std::endl;
+        _T1_s = _T2_s.transpose();
+        
+        std::cout << "Post process" << std::endl;
         preprocess_mat();
+        
+//        Bij1.reserve(Bij2.size());
+//        for (auto & _ij : Bij2)
+//        {
+//            Bij1.push_back(ij(_ij.j, _ij.i));
+//        }
+//        std::sort(Bij1.begin(), Bij1.end());
+//        
+//        std::cout << "Preprocess" << std::endl;
+//        preprocess_mat();
+//        
+//        // Test with Eigen
+//        std::vector<Eigen::Triplet<double>> bb1, bb2;
+//        
+//        for (auto ije : Bij1)
+//        {
+//            bb1.push_back(Eigen::Triplet<double>(ije.i, ije.j, 1));
+//        }
+//        for (auto ije : Bij2)
+//        {
+//            bb2.push_back(Eigen::Triplet<double>(ije.i, ije.j, 1));
+//        }
+//        
+//        _T1_s = Eigen::SparseMatrix<double>(B_height,B_width);
+//        _T1_s.setFromTriplets(bb1.begin(), bb1.end());
+//        _T2_s = Eigen::SparseMatrix<double>(B_width, B_height);
+//        _T2_s.setFromTriplets(bb2.begin(), bb2.end());
+
     }
     
 

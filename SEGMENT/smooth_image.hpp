@@ -15,6 +15,12 @@
 #include "define.h"
 #include <armadillo>
 
+#ifdef Success
+#undef Success
+#endif
+
+#include "Eigen/SparseCore"
+
 /*
  Smooth image
  Access intensity by double-type coordinates
@@ -62,8 +68,9 @@ public:
     void fill(double val){ _core_img.fill(val); }
     void set_value(int x, int y, double v);
     void averaging(const std::vector<std::shared_ptr<smooth_image>> imgs);
-    arma::vec reshape_to_vector();
-    void update(arma::vec prob);
+    
+    Eigen::VectorXd reshape_to_vector();
+    void update(Eigen::VectorXd prob);
     static void area_normalization(std::vector<std::shared_ptr<smooth_image>> imgs, std::vector<double> area);
 private:
     // For OpenGL texture mapping

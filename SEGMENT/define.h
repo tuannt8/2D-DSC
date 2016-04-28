@@ -17,7 +17,12 @@
 //                           '1' to use the X-Window framework (X11).
 //                           '2' to use the Microsoft GDI32 framework.
 #define cimg_display 1
+
+#pragma clang diagnostic push
+// in reality, you will likely need to disable *more* than Wmultichar
+#pragma clang diagnostic ignored "-Wmultichar"
 #include "CImg.h"
+#pragma clang diagnostic pop
 
 // Data directory
 #ifdef WIN32

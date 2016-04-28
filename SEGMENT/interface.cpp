@@ -20,6 +20,7 @@
 #include "options_disp.h"
 #include "../texture/texture.h"
 #include "setting_file.h"
+#include "profile.h"
 
 void _check_gl_error(const char *file, int line)
 {
@@ -174,9 +175,9 @@ void interface::keyboard(unsigned char key, int x, int y){
             _tex_seg->show_all_probablity();
         }
             break;
-        case 's': // Split edge
+        case 't': // Split edge
         {
-
+            profile::close();
         }
             break;
         case 'b': // Split edge

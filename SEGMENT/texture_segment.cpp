@@ -15,7 +15,7 @@ using namespace std;
 #define INT_BIG 99999
 
 #define smallest_edge 4
-#define edge_split_thres 0.1
+#define edge_split_thres 0.05
 #define face_split_thres 0.02
 
 texture_segment::texture_segment()
@@ -25,7 +25,7 @@ texture_segment::texture_segment()
 
 texture_segment::~texture_segment()
 {
-    
+
 }
 
 void get_bounding_box(const vector<Vec2> & pts , CGLA::Vec2i & ld, CGLA::Vec2i & ru)

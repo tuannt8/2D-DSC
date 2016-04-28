@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 #include "setting_file.h"
-#include "CImg.h"
+#include "define.h"
 
 
 setting setting_file;
