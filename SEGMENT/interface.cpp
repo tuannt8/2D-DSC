@@ -486,6 +486,10 @@ void interface::init_dsc(){
     double height = imageSize[1];
     
     DISCRETIZATION = (double) height / (double)setting_file.dsc_discretization;
+    std::cout << height << "/" << setting_file.dsc_discretization<< std::endl;
+
+    
+    std::cout << "Init DSC " << width << " x " << height << " edge: " << DISCRETIZATION << std::endl;
     
     width -= 2*DISCRETIZATION;
     height -= 2*DISCRETIZATION;

@@ -12,11 +12,7 @@
 #include "helper.h"
 
 using namespace std;
-#define INT_BIG 99999
 
-#define smallest_edge 4
-#define edge_split_thres 0.05
-#define face_split_thres 0.02
 
 texture_segment::texture_segment()
 {
@@ -30,8 +26,8 @@ texture_segment::~texture_segment()
 
 void get_bounding_box(const vector<Vec2> & pts , CGLA::Vec2i & ld, CGLA::Vec2i & ru)
 {
-    ld = CGLA::Vec2i(INT_BIG);
-    ru = CGLA::Vec2i(-INT_BIG);
+    ld = CGLA::Vec2i(INFINITY);
+    ru = CGLA::Vec2i(-INFINITY);
     
     for (auto & p : pts)
     {
@@ -182,7 +178,6 @@ void texture_segment::update_dsc()
     if(adapt_count > ADAPT_MESH_FREQUENCY)
     {
         adapt_count = 0;
-//        optimize_label();
         
         std::cout <<"Probability updated \n";
         
@@ -191,10 +186,9 @@ void texture_segment::update_dsc()
         update_vertex_stable();
         adapt_edge();
         
-        compute_probability_forces();
-        update_vertex_stable();
-        adapt_tri_compare_phase();
-//        optimize_label();
+//        compute_probability_forces();
+//        update_vertex_stable();
+//        adapt_tri_compare_phase();
         
         compute_probability_forces();
         update_vertex_stable();
@@ -253,10 +247,6 @@ void texture_segment::run_single_step()
         double mean = *max_p;
         double var = _probability_imgs[max_phase]->get_variation_tri(pts, mean);
         var = var / area;
-//        double mean = 1.0 / (double)setting_file._circle_inits.size();
-//        double var = 0;
-//        for(auto p : probs)
-//            var += (p - mean)*(p - mean);
         
         _tri_variation_debug[tri] = tri_variation({max_phase, var});
     }
@@ -287,7 +277,7 @@ void texture_segment::thinning_mesh()
             auto mean = _probability_imgs[max_phase]->sum_over_tri(pts)/ area;
             double var = _probability_imgs[max_phase]->get_variation_tri(pts, mean) / area;
             
-            if (var > face_split_thres)
+            if (var > setting_file.face_split_thres)
             {
                 low_var = false;
             }
@@ -329,13 +319,10 @@ void texture_segment::adapt_tri_compare_phase()
         double mean = *max_p;
         double var = _probability_imgs[max_phase]->get_variation_tri(pts, mean);
         var = var / area;
-//        double var = 0;
-//        for(auto p : probs)
-//            var += (p - mean)*(p - mean);
         
         _tri_variation_debug[tri] = tri_variation({max_phase, var});
         
-        if (var < face_split_thres)
+        if (var < setting_file.face_split_thres)
         {
             // One phase is high
             // relabel
@@ -346,7 +333,7 @@ void texture_segment::adapt_tri_compare_phase()
         }
         else
         {
-            if (_dsc->area(tri) < smallest_edge*smallest_edge / 2.0)
+            if (_dsc->area(tri) < setting_file.min_edge_length *setting_file.min_edge_length / 2.0)
             {
                 continue;
             }
@@ -370,63 +357,6 @@ void texture_segment::adapt_tri_compare_phase()
 
 void texture_segment::adapt_tri()
 {
-//    _tri_variation_debug.resize(_dsc->get_no_faces());
-//    
-//    for (auto tri : _dsc->faces())
-//    {
-//        auto pts = _dsc->get_pos(tri);
-//        
-//        // 1. Find highest probability
-//        std::vector<double> probs;
-//        for (auto p : _probability_imgs)
-//        {
-//            probs.push_back(p->sum_over_tri(pts));
-//        }
-//        
-//        auto max_p = std::max_element(probs.begin(), probs.end());
-//        int max_phase = (int)(max_p - probs.begin());
-//        
-//        // 2. Probability variation
-//        double mean_p = (*max_p) / _dsc->area(tri);
-//        auto var = _probability_imgs[max_phase]->get_variation_tri(pts, mean_p);
-//        
-//        auto area = _dsc->area(tri);
-//        var = var / area;
-//        
-//        _tri_variation_debug[tri] = tri_variation({max_phase, var});
-//        
-//        // 3. Relabel of subdivide
-//        // Relabeling does not need stable, but subdivision need stable.
-//        if (var < face_split_thres) // relabel
-//        {
-//            if (max_phase != _dsc->get_label(tri))
-//            {
-//                _dsc->update_attributes(tri, max_phase);
-//            }
-//            
-//        }
-//        else if(max_phase != _dsc->get_label(tri))
-//        {
-//            if (area < smallest_edge*smallest_edge / 2.0)
-//            {
-//                continue;
-//            }
-//            
-//            // Only split stable triangle
-//            // Triangle with 3 stable edge
-//            int bStable = 0;
-//            for (auto w = _dsc->walker(tri); !w.full_circle(); w = w.circulate_face_ccw())
-//            {
-//                bStable += _dsc->bStable[w.vertex()];
-//            }
-//
-//            if (bStable > 1)
-//            {
-//                
-//                _dsc->split(tri);
-//            }
-//        }
-//    }
 }
 
 void texture_segment::adapt_edge()
@@ -469,10 +399,10 @@ void texture_segment::adapt_edge()
             ev += std::abs(f);
         }
         
-        ev = ev / (length + smallest_edge/10); // reasonable to dl = 1 pixel size
+        ev = ev / (length + setting_file.min_edge_length/10); // reasonable to dl = 1 pixel size
         
-        double thres = edge_split_thres;
-        double smallest_length = smallest_edge;
+        double thres = setting_file.edge_split_thres;
+        double smallest_length = setting_file.min_edge_length;
         
         if (_dsc->bStable[hew.vertex()] == 1
             and _dsc->bStable[hew.opp().vertex()] == 1)
@@ -493,40 +423,7 @@ void texture_segment::adapt_edge()
 
 void texture_segment::optimize_label()
 {
-//    _tri_variation_debug.resize(_dsc->get_no_faces());
-//    
-//    for (auto tri : _dsc->faces())
-//    {
-//        auto pts = _dsc->get_pos(tri);
-//        
-//        // 1. Find highest probability
-//        std::vector<double> probs;
-//        for (auto p : _probability_imgs)
-//        {
-//            probs.push_back(p->sum_over_tri(pts));
-//        }
-//        
-//        auto max_p = std::max_element(probs.begin(), probs.end());
-//        int max_phase = (int)(max_p - probs.begin());
-//        
-//        // 2. Probability variation
-//        double mean_p = (*max_p) / _dsc->area(tri);
-//        auto var = _probability_imgs[max_phase]->get_variation_tri(pts, mean_p);
-//        
-//        _tri_variation_debug[tri] = tri_variation({max_phase, var});
-//        
-//        if (max_phase == _dsc->get_label(tri))
-//        {
-//            continue;
-//        }
-//        
-//        // 3. Relabel of subdivide
-//        // Relabeling does not need stable, but subdivision need stable.
-//        if (var < face_split_thres) // relabel
-//        {
-//            _dsc->update_attributes(tri, max_phase);
-//        }
-//    }
+
 }
 
 void texture_segment::update_vertex_stable()
@@ -575,36 +472,7 @@ double texture_segment::get_tri_variation(Face_key fkey)
 
 void texture_segment::draw_debug()
 {
-//    if (options_disp::get_option("Triangle variation", false))
-//    {
-//        helper_t::autoColor colors;
-//        glBegin(GL_TRIANGLES);
-//        for (auto tri : _dsc->faces())
-//        {
-//            auto pts = _dsc->get_pos(tri);
-//            auto & variation = _tri_variation_debug[tri];
-//            
-//            glColor3dv(colors[variation.phase].get());
-//            glVertex2dv(pts[0].get());
-//            glVertex2dv(pts[1].get());
-//            glVertex2dv(pts[2].get());
-//            
-//        }
-//        glEnd();
-//        
-//        for (auto tri : _dsc->faces())
-//        {
-//            auto pts = _dsc->get_pos(tri);
-//            auto & variation = _tri_variation_debug[tri];
-//            glColor3f(0, 0, 0);
-//            auto c = helper_t::get_barry_center(pts);
-//            std::ostringstream os; os << variation.variation;
-//            helper_t::gl_text(c[0], c[1], os.str());
-//        }
-//       
-//
-//
-//    }
+
     
     if (options_disp::get_option("Edge energy", false))
     {
@@ -800,9 +668,7 @@ void texture_segment::init()
     // Construct dictionary
     _dict = std::unique_ptr<texture::dictionary>
                 (new texture::dictionary(setting_file._image_name));
-    
-//    _dict = std::unique_ptr<texture::dictionary>
-//                (new texture::dictionary("DATA/randen15.png"));
+
 
 }
 

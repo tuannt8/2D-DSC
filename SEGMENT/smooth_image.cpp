@@ -237,6 +237,8 @@ void smooth_image::update_gl_texgture()
     
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    
+    free(texture_buf);
 }
 
 void smooth_image::draw_image()

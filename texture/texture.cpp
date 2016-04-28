@@ -18,6 +18,8 @@
 #include "sparse_mat.h"
 #include "profile.h"
 
+#include "setting_file.h"
+
 namespace texture
 {
     using namespace std;
@@ -56,30 +58,6 @@ namespace texture
     
     void dictionary::preprocess_mat()
     {
-//        // T1;
-//        T1_row_count = vector<double>(B_height, 0);
-//        
-//        for (auto & ij : Bij1)
-//        {
-//            T1_row_count[ij.i]+=1;
-//        }
-//        
-//        for (auto & tt1 : T1_row_count)
-//        {
-//            tt1 = 1.0/(tt1 + 0.00001);
-//        }
-//        
-//        // T2
-//        T2_row_count = vector<double>(B_width, 0);
-//        for (auto & ij : Bij2)
-//        {
-//            T2_row_count[ij.i]+=1;
-//        }
-//        
-//        for (auto & tt2 : T2_row_count)
-//        {
-//            tt2 = 1.0/(tt2 + 0.00001);
-//        }
         
         std::vector<double> row_count_1(B_height, 0);
         for (int k=0; k<_T1_s.outerSize(); ++k)
@@ -93,7 +71,7 @@ namespace texture
                 it.valueRef() = it.value() / (row_count_1[it.row()] + 0.00001);
             }
         
-        std::vector<double> row_count_2(B_height, 0);
+        std::vector<double> row_count_2(B_width, 0);
         for (int k=0; k<_T2_s.outerSize(); ++k)
             for (Eigen::SparseMatrix<double>::InnerIterator it(_T2_s,k); it; ++it)
             {
@@ -144,16 +122,20 @@ namespace texture
         
 
         // Parametters
-        double Md = 15;             // batch size
-        double bd = 5;              // branching factor
-        double n_train_d = 5000;    // training patch
-        double Ld = 4;              // number of layer
+        double Md = setting_file.batch_size;             // batch size
+        double bd = setting_file.branching_factor;              // branching factor
+        double n_train_d = setting_file.num_training_patch;    // training patch
+        double Ld = setting_file.num_layer;              // number of layer
         
-        // Image information
-        //        int ndim = im.spectrum();
-        //        int dim[3] = {width, height, 3};
-        int ndim = 1;
-        int dim[3] = {width, height};
+        int ndim;
+        int dim[3] = {width, height, 3};
+        if(setting_file._b_color)
+        {
+            ndim = 3;
+        }
+        else{
+            ndim = 1;
+        }
         
         double * A;
         
@@ -197,38 +179,7 @@ namespace texture
         
         std::cout << "Post process" << std::endl;
         preprocess_mat();
-        
-//        Bij1.reserve(Bij2.size());
-//        for (auto & _ij : Bij2)
-//        {
-//            Bij1.push_back(ij(_ij.j, _ij.i));
-//        }
-//        std::sort(Bij1.begin(), Bij1.end());
-//        
-//        std::cout << "Preprocess" << std::endl;
-//        preprocess_mat();
-//        
-//        // Test with Eigen
-//        std::vector<Eigen::Triplet<double>> bb1, bb2;
-//        
-//        for (auto ije : Bij1)
-//        {
-//            bb1.push_back(Eigen::Triplet<double>(ije.i, ije.j, 1));
-//        }
-//        for (auto ije : Bij2)
-//        {
-//            bb2.push_back(Eigen::Triplet<double>(ije.i, ije.j, 1));
-//        }
-//        
-//        _T1_s = Eigen::SparseMatrix<double>(B_height,B_width);
-//        _T1_s.setFromTriplets(bb1.begin(), bb1.end());
-//        _T2_s = Eigen::SparseMatrix<double>(B_width, B_height);
-//        _T2_s.setFromTriplets(bb2.begin(), bb2.end());
-
     }
-    
-
-    
 }
 
 
