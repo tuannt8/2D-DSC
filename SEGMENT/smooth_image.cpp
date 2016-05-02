@@ -115,6 +115,12 @@ double smooth_image::get_value_i(int x, int y, int channel)
 
 void smooth_image::set_value(int x, int y, double v)
 {
+    if (x < 0 or x >= _core_img.width()
+        or y < 0 or y >= _core_img.height())
+    {
+        return;
+    }
+    
     static int height = _core_img.height();
     _core_img(x,height-1-y) = v;
 }
@@ -145,6 +151,7 @@ Eigen::VectorXd smooth_image::reshape_to_vector()
 
 void smooth_image::update(Eigen::VectorXd prob)
 {
+    
     std::memcpy(_core_img.data(), prob.data(), prob.size()*sizeof(double));
     // TODO: ????.
 //    _core_img.normalize(0, 1);

@@ -72,6 +72,7 @@ namespace texture
                     int ndim, // input, image layer
                     int *dim // input, image dimension
     , int treeDim[]
+                        , bool normalize
     );
 
     std::vector<Eigen::Triplet<double>> biadjacency_matrix(

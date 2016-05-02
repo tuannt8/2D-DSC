@@ -52,6 +52,7 @@ public:
     double branching_factor = 5;
     double num_training_patch = 5000;
     double num_layer = 4;
+    bool normalize = true;
     
     double alpha = 0.1;
     double edge_split_thres = 0.05; // The smaller, the easier for splitting
@@ -59,8 +60,6 @@ public:
     double min_edge_length = 4; // DSC parammeter
 
     double dsc_discretization = 25.0;
-    double edge_split_energy = 0.1;
-    double tri_split_energy = 0.1;
     double dt = 1.0;
     
 private:
@@ -69,6 +68,7 @@ private:
     void load_synthetic1(); // test_C.png
     void load_test_A1();
     void load_leopard();
+    void load_flower();
     
     void trick_border_image();
 };

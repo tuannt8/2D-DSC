@@ -27,8 +27,8 @@ texture_segment::~texture_segment()
 void get_bounding_box(const vector<Vec2> & pts , CGLA::Vec2i & ld, CGLA::Vec2i & ru)
 {
     ld = CGLA::Vec2i(INFINITY);
-    ru = CGLA::Vec2i(-INFINITY);
-    
+    ru = CGLA::Vec2i(-1);
+
     for (auto & p : pts)
     {
         ld[0] = (int)min((double)ld[0], p[0]);
@@ -86,6 +86,7 @@ void texture_segment::update_probability()
         int phase = _dsc->get_label(tri);
         
         auto pts = _dsc->get_pos(tri);
+        assert(pts.size()==3);
         CGLA::Vec2i ld, ru;
         get_bounding_box(pts, ld, ru);
         
@@ -103,6 +104,7 @@ void texture_segment::update_probability()
                 }
             }
         }
+        
     }
     
     // 2. Update the probability image
@@ -121,6 +123,8 @@ void texture_segment::update_probability()
         int phase = _dsc->get_label(tri);
         area[phase] += _dsc->area(tri);
     }
+    
+    
     smooth_image::area_normalization(_probability_imgs, area);
 }
 
@@ -171,6 +175,8 @@ void texture_segment::update_dsc()
     {
         count = 0;
         update_probability();
+        
+        show_all_probablity();
         
         adapt_count = INFINITY;
     }
@@ -638,8 +644,10 @@ void texture_segment::show_all_probablity()
         imglist.push_back(p->_core_img);
     }
 
-    imglist.display("Probabilities");
+    static cimg_library::CImgDisplay main_disp;
     
+    main_disp.display(imglist);
+
 }
 
 void texture_segment::init()

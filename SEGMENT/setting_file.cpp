@@ -16,30 +16,30 @@ setting setting_file;
 
 setting::setting()
 {
-     _b_color = false;
-     batch_size = 15;
-     branching_factor = 5;
-     num_training_patch = 5000;
-     num_layer = 4;
+    _b_color = false;
+    batch_size = 15;
+    branching_factor = 5;
+    num_training_patch = 5000;
+    num_layer = 4;
+    normalize = true;
     
-     alpha = 0.1;
-     edge_split_thres = 0.05; // The smaller, the easier for splitting
-     face_split_thres = 0.02; // The smaller, the eaiser for relabeling
-     min_edge_length = 4; // DSC parammeter
-    
-     dsc_discretization = 25.0;
-     edge_split_energy = 0.1;
-     tri_split_energy = 0.1;
-     dt = 1.0;
+    alpha = 0.1;
+    edge_split_thres = 0.05; // The smaller, the easier for splitting
+    face_split_thres = 0.02; // The smaller, the eaiser for relabeling
+    min_edge_length = 4; // DSC parammeter
+
+    dsc_discretization = 25.0;
+    dt = 1.0;
     
     
     
 //    load_test_A1();
 //    load_synthetic1();
 //    load_raden();
-    load_leopard();
+//    load_leopard();
+    load_flower();
     
-    trick_border_image();
+//    trick_border_image();
 }
 
 void setting::load_raden()
@@ -94,6 +94,31 @@ void setting::load_leopard()
             {Vec2(169,169), 25}
         }
     };
+    alpha = 0.2;
+    
+    batch_size = 3;
+    dt = 0.03;
+    
+    edge_split_thres = 0.2;
+    min_edge_length = 4;
+}
+
+void setting::load_flower()
+{
+    _image_name = "DATA/test_images/flower.png";
+    _b_color = true;
+    _circle_inits = {
+        {
+            {Vec2(220,150), 20}
+        }
+//        ,{
+//            {Vec2(285,185), 20}
+//        }
+//        ,{
+//            {Vec2(150,200), 50}
+//        }
+    };
+    batch_size = 3;
 }
 
 void setting::load_test_A1()

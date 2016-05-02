@@ -985,6 +985,8 @@ namespace DSC2D
             auto p2 = get_pos(hew.opp().vertex());
             
             double cos_a = Util::cos_angle(p1, p, p2);
+            
+            assert(cos_a <= 1);
             if (cos_a < min_cos)
             {
                 min_cos = cos_a;
@@ -1075,72 +1077,71 @@ namespace DSC2D
                 /* Tuan
                  In case of obtuse triangle, collapse edge is not enough.
                  We need merge the triangles
-                 See: https://goo.gl/oMxXcX The degenerated triangle should be handle by adding point
-                    to the long edge
+                 See: https://goo.gl/oMxXcX The degenerated triangle should be handle by adding point to the long edge
                  */
                 
-                HMesh::Walker hew = walker(*fi);
-                if(max_angle(*fi, hew) > M_PI * 165. / 180.)
-                {
-                    if (!unsafe_editable(hew.halfedge())) {
-                        continue;
-                    }
-                    
-                    // add point to edge
-                    face_key f1 = hew.face();
-                    node_key v1 = hew.next().vertex();
-                    face_key f2 = hew.opp().face();
-                    node_key v2 = hew.opp().next().vertex();
-                    
-                    std::cout << "Degenerated tri. Opp vertex: " << v1.get_index() << endl;
-                    
-                    
-                    // Split
-                    node_key vid = mesh->split_edge(hew.halfedge());
-                    face_key newf1 = mesh->split_face_by_edge(f1, vid, v1);
-                    face_key newf2 = mesh->split_face_by_edge(f2, vid, v2);
-                    
-                    // Update attributes
-                    auto eid = hew.halfedge();
-                    init_attributes(vid);
-                    for(auto hew = walker(vid); !hew.full_circle(); hew = hew.circulate_vertex_cw())
-                    {
-                        if(hew.halfedge() != eid && hew.opp().halfedge() != eid)
-                        {
-                            init_attributes(hew.halfedge());
-                        }
-                    }
-                    init_attributes(newf1, get_label(f1));
-                    init_attributes(newf2, get_label(f2));
-                    
-                    update_locally(vid);
-                    
-                    // merge vid and v1
-                    set_pos(vid, get_pos(v1));
-                    auto hw = walker(v1);
-                    for (; !hw.full_circle(); hw = hw.circulate_vertex_ccw())
-                    {
-                        if (hw.vertex() == vid)
-                        {
-                            break;
-                        }
-                    }
-                    mesh->collapse_edge(hw.halfedge());
-                    update_locally(hw.vertex());
-                }
-                
-                if((min_angle(*fi) < DEG_ANGLE || area(*fi) < DEG_AREA*AVG_AREA) && !collapse(*fi, true))
-                {
-                    double mm = max_angle(*fi, hew);
-                    std::cout << "Degenerated normal. face: " << fi->get_index() << " Max a = " << mm << endl;
-                    collapse(*fi, false);
-                }
-                
-//                // Old code
+//                HMesh::Walker hew = walker(*fi);
+//                if(max_angle(*fi, hew) > M_PI * 165. / 180.)
+//                {
+//                    if (!unsafe_editable(hew.halfedge())) {
+//                        continue;
+//                    }
+//                    
+//                    // add point to edge
+//                    face_key f1 = hew.face();
+//                    node_key v1 = hew.next().vertex();
+//                    face_key f2 = hew.opp().face();
+//                    node_key v2 = hew.opp().next().vertex();
+//                    
+//                    std::cout << "Degenerated tri. Opp vertex: " << v1.get_index() << endl;
+//                    
+//                    
+//                    // Split
+//                    node_key vid = mesh->split_edge(hew.halfedge());
+//                    face_key newf1 = mesh->split_face_by_edge(f1, vid, v1);
+//                    face_key newf2 = mesh->split_face_by_edge(f2, vid, v2);
+//                    
+//                    // Update attributes
+//                    auto eid = hew.halfedge();
+//                    init_attributes(vid);
+//                    for(auto hew = walker(vid); !hew.full_circle(); hew = hew.circulate_vertex_cw())
+//                    {
+//                        if(hew.halfedge() != eid && hew.opp().halfedge() != eid)
+//                        {
+//                            init_attributes(hew.halfedge());
+//                        }
+//                    }
+//                    init_attributes(newf1, get_label(f1));
+//                    init_attributes(newf2, get_label(f2));
+//                    
+//                    update_locally(vid);
+//                    
+//                    // merge vid and v1
+//                    set_pos(vid, get_pos(v1));
+//                    auto hw = walker(v1);
+//                    for (; !hw.full_circle(); hw = hw.circulate_vertex_ccw())
+//                    {
+//                        if (hw.vertex() == vid)
+//                        {
+//                            break;
+//                        }
+//                    }
+//                    mesh->collapse_edge(hw.halfedge());
+//                    update_locally(hw.vertex());
+//                }
+//                
 //                if((min_angle(*fi) < DEG_ANGLE || area(*fi) < DEG_AREA*AVG_AREA) && !collapse(*fi, true))
 //                {
+//                    double mm = max_angle(*fi, hew);
+//                    std::cout << "Degenerated normal. face: " << fi->get_index() << " Max angle = " << mm << endl;
 //                    collapse(*fi, false);
 //                }
+                
+                // Old code
+                if((min_angle(*fi) < DEG_ANGLE || area(*fi) < DEG_AREA*AVG_AREA) && !collapse(*fi, true))
+                {
+                    collapse(*fi, false);
+                }
                 
             }
         }

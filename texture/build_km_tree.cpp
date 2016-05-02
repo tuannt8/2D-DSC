@@ -293,6 +293,7 @@ double* build_tree(double *I, // image, input
                 int ndim, // input, image layer
                 int *dim // input, image dimension
     , int treeDim[]
+                   ,bool normalize
             )
 {
     // input image (I), patch size (M*M), number of nodes in the tree (n), branching
@@ -301,7 +302,7 @@ double* build_tree(double *I, // image, input
     int b, M, L, n, n_train; // variables
 //    const int *dim; // image dimensinos
     int dtree[2]; // tree dimensions
-    bool normalize = false; // decide if vectors of image patches should be normalized to unit length
+//    bool normalize = true; // decide if vectors of image patches should be normalized to unit length
     
     /*  Check for proper number of arguments. */
     /* NOTE: You do not need an else statement when using

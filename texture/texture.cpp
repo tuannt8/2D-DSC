@@ -28,37 +28,20 @@ namespace texture
     
     Eigen::VectorXd  dictionary::compute_probability(const Eigen::VectorXd & labeled)
     {
-//        arma::vec out;
-//        {
-//            profile t("std vector multiply");
-//        // T1*labeled
-//        out = multiply(Bij1, T1_row_count, labeled, B_height);
-//        
-//        // T2*
-//        out = multiply(Bij2, T2_row_count, out, B_width);
-//        }
-        
-        // With Eigen
-//            profile t("eigen multiply");
-//            Eigen::SparseVector<double> label_e(labeled.n_rows);
-//            for (int i  = 0; i < labeled.n_rows; i++)
-//            {
-//                if (labeled[i] != 0)
-//                {
-//                    label_e.insert(i) = labeled[i];
-//                }
-//            }
+
             
         auto ll1 = _T1_s*labeled;
+        
+        
+        
         auto ll2 = _T2_s*ll1;
 
-        
         return ll2;
     }
     
     void dictionary::preprocess_mat()
     {
-        
+        {
         std::vector<double> row_count_1(B_height, 0);
         for (int k=0; k<_T1_s.outerSize(); ++k)
             for (Eigen::SparseMatrix<double>::InnerIterator it(_T1_s,k); it; ++it)
@@ -70,7 +53,9 @@ namespace texture
             {
                 it.valueRef() = it.value() / (row_count_1[it.row()] + 0.00001);
             }
+        }
         
+        {
         std::vector<double> row_count_2(B_width, 0);
         for (int k=0; k<_T2_s.outerSize(); ++k)
             for (Eigen::SparseMatrix<double>::InnerIterator it(_T2_s,k); it; ++it)
@@ -80,8 +65,9 @@ namespace texture
         for (int k=0; k<_T2_s.outerSize(); ++k)
             for (Eigen::SparseMatrix<double>::InnerIterator it(_T2_s,k); it; ++it)
             {
-                it.valueRef() = it.value() / (row_count_1[it.row()]+ 0.00001);
+                it.valueRef() = it.value() / (row_count_2[it.row()]+ 0.00001);
             }
+        }
     }
     
     arma::vec dictionary::multiply(const std::vector<ij> &  Bij, std::vector<double> & row_val, const arma::vec & x, long num_row)
@@ -126,6 +112,7 @@ namespace texture
         double bd = setting_file.branching_factor;              // branching factor
         double n_train_d = setting_file.num_training_patch;    // training patch
         double Ld = setting_file.num_layer;              // number of layer
+        bool normalize = setting_file.normalize;
         
         int ndim;
         int dim[3] = {width, height, 3};
@@ -147,7 +134,7 @@ namespace texture
             
             
             int treeDim[2];
-            double * tree =  build_tree( &I[0], &Md, &bd, &n_train_d, &Ld, ndim, dim, treeDim);
+            double * tree =  build_tree( &I[0], &Md, &bd, &n_train_d, &Ld, ndim, dim, treeDim, normalize);
             
             std::cout << "Search tree" << std::endl;
             // Build matrix A; same dimension with image
