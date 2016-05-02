@@ -16,6 +16,10 @@ setting setting_file;
 
 setting::setting()
 {
+    static int inited = 0;
+    inited ++;
+    assert(inited <= 1);
+    
     _b_color = false;
     batch_size = 15;
     branching_factor = 5;
@@ -26,10 +30,11 @@ setting::setting()
     alpha = 0.1;
     edge_split_thres = 0.05; // The smaller, the easier for splitting
     face_split_thres = 0.02; // The smaller, the eaiser for relabeling
-    min_edge_length = 4; // DSC parammeter
+    min_edge_length = 5.0; // DSC parammeter
 
-    dsc_discretization = 25.0;
     dt = 1.0;
+    dsc_discretization = 25.0;
+
     
     
     
@@ -118,6 +123,7 @@ void setting::load_flower()
 //            {Vec2(150,200), 50}
 //        }
     };
+    dsc_discretization = 25.0;
     batch_size = 3;
 }
 

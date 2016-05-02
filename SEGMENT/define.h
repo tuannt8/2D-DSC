@@ -54,7 +54,7 @@ typedef unsigned char BYTE;
 
 #define DT_ 2
 //#define ADD_NOISE
-#define STABLE_MOVE 1e-2
+#define STABLE_MOVE 0.1
 
 
 using std::vector;

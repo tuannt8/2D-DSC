@@ -442,10 +442,12 @@ void texture_segment::update_vertex_stable()
         
         if ((obj->is_interface(*ni) or obj->is_crossing(*ni)))
         {
-            Vec2 dis = (obj->get_node_external_force(*ni));
+//            Vec2 dis = (obj->get_node_external_force(*ni));
+            Vec2 dis = (_dsc->get_node_internal_force(*ni)*setting_file.alpha
+                        + _dsc->get_node_external_force(*ni));
             assert(dis.length() != NAN);
             
-            double n_dt = _dt;
+            double n_dt = setting_file.dt;
             
             auto norm = obj->get_normal(*ni);
             
@@ -593,7 +595,7 @@ void texture_segment::displace_dsc()
 {
     for (auto ni = _dsc->vertices_begin(); ni != _dsc->vertices_end(); ni++)
     {
-        _dsc->bStable[*ni] = 1;
+//        _dsc->bStable[*ni] = 1;
         
         if ((_dsc->is_interface(*ni) or _dsc->is_crossing(*ni)))
         {

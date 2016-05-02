@@ -47,20 +47,21 @@ public:
     std::string _image_name; // Image to segment
     std::vector<std::vector<init_circle>> _circle_inits; // Initialization by circle
     
-    bool _b_color = false;
-    double batch_size = 15;
-    double branching_factor = 5;
-    double num_training_patch = 5000;
-    double num_layer = 4;
-    bool normalize = true;
+    bool _b_color;
+    double batch_size;
+    double branching_factor;
+    double num_training_patch;
+    double num_layer;
+    bool normalize;
     
-    double alpha = 0.1;
-    double edge_split_thres = 0.05; // The smaller, the easier for splitting
-    double face_split_thres = 0.02; // The smaller, the eaiser for relabeling
-    double min_edge_length = 4; // DSC parammeter
+    double alpha;
+    double edge_split_thres; // The smaller, the easier for splitting
+    double face_split_thres; // The smaller, the eaiser for relabeling
+    double min_edge_length; // DSC parammeter
 
-    double dsc_discretization = 25.0;
-    double dt = 1.0;
+    double dt;
+    double dsc_discretization;
+
     
 private:
     
