@@ -233,6 +233,7 @@ void smooth_image::update_gl_texgture()
     glBindTexture(GL_TEXTURE_2D, _gl_texture_ID);
     
     // Give the image to OpenGL
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _core_img.width(), _core_img.height(), 0, GL_RGB, GL_UNSIGNED_BYTE, texture_buf);
     
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

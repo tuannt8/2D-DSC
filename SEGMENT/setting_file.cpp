@@ -91,7 +91,7 @@ void setting::load_leopard()
     _b_color = true;
     _circle_inits = {
         {
-            {Vec2(169,169), 50}
+            {Vec2(169,169), 25}
         }
     };
 }
