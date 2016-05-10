@@ -32,6 +32,7 @@ namespace texture
 , int M // input, patch size
 
 ){
+    
     /* Check for proper number of input and output arguments */
 //    if ((nlhs != 1) || (nrhs != 2))
 //        mexErrMsgTxt("Usage: B = BIADJANCENCY_MATRIX(A,M) OR "
@@ -69,7 +70,7 @@ namespace texture
                 for (int dx=-c; dx<=c; dx++){
                     i = (x+dx)+(y+dy)*X;
                     j = (c+dx)+(c+dy)*M+(A[ic]-1)*M*M;
-                    bij.push_back(Eigen::Triplet<double>(i,j,1));
+                    bij.push_back(Eigen::Triplet<double>(i,j,1.0));
                 }
             }
         }

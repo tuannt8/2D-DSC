@@ -10,6 +10,8 @@
 #include "setting_file.h"
 #include "options_disp.h"
 #include "helper.h"
+#include "profile.h"
+#include <Eigen/Dense>
 
 using namespace std;
 
@@ -60,6 +62,15 @@ bool intersect_tri(const vector<Vec2> & pts, double x, double & miny, double &ma
             }
         }
         {// To make sure that we don't miss any intersection. Optimize later.
+            double t = (x+0.5-p0[0]) / (p1[0] - p0[0]);
+            if (t >= 0 and t <= 1)
+            {
+                double y = p0[1] + t*(p1[1] - p0[1]);
+                miny = min(miny, y);
+                maxy = max(maxy, y);
+            }
+        }
+        {// To make sure that we don't miss any intersection. Optimize later.
             double t = (x+0.9-p0[0]) / (p1[0] - p0[0]);
             if (t >= 0 and t <= 1)
             {
@@ -75,6 +86,110 @@ bool intersect_tri(const vector<Vec2> & pts, double x, double & miny, double &ma
 
 void texture_segment::update_probability()
 {
+
+    
+//    // 1. Update the labeled image
+//    for (auto im : _labeled_imgs)
+//    {
+//        im->fill(0.0);
+//    }
+//    for(auto tri : _dsc->faces())
+//    {
+//        int phase = _dsc->get_label(tri);
+//
+//        auto pts = _dsc->get_pos(tri);
+//        assert(pts.size()==3);
+//        CGLA::Vec2i ld, ru;
+//        get_bounding_box(pts, ld, ru);
+//
+//        // The triangle is convect. It is easy
+//        double min_y, max_y;
+//        for (int x = floor(ld[0]); x < ceil(ru[0]); x++)
+//        {
+//            // Find intersection
+//            if (intersect_tri(pts, x, min_y, max_y))
+//            {
+//                // update dictionary
+//                for (int y = floor(min_y); y < ceil(max_y); y++)
+//                {
+//                    _labeled_imgs[phase]->set_value(x,y,1.0);
+//                }
+//            }
+//        }
+//    }
+//    
+//    
+//    // 2. Update the probability image
+//    // Dividing by area
+//    std::vector<double> area(_probability_imgs.size(), 0.0);
+//    for (auto tri : _dsc->faces())
+//    {
+//        int phase = _dsc->get_label(tri);
+//        area[phase] += _dsc->area(tri);
+//    }
+//    
+//    std::vector<Eigen::VectorXd> probs1;
+//    
+//    for (int i = 0; i < _labeled_imgs.size(); i++)
+//    {
+//        auto l_m = _labeled_imgs[i]->reshape_to_vector();
+//        auto probability = _dict->compute_probability_T1(l_m) / area[i];
+//        probs1.push_back(probability);
+//    }
+//
+//    // Sum to 1 by division to total
+//    Eigen::VectorXd sum(probs1[0].size());
+//    sum.fill(1e-16);
+//    for (auto & p : probs1)
+//    {
+//        sum = sum + p;
+//    }
+//    
+//
+//    for (auto & p : probs1)
+//    {
+//        for(int i = 0; i < p.size(); i++)
+//            p(i) /= sum(i);
+//    }
+//    
+//    std::vector<Eigen::VectorXd> probs2;
+//    for (int i = 0; i < _probability_imgs.size(); i++)
+//    {
+//        auto l_m = probs1[i];
+//        auto probability = _dict->compute_probability_T2(l_m);
+//        _probability_imgs[i]->update(probability);
+//        probs2.push_back(probability);
+//    }
+//    
+//    // Relative probability
+//    std::vector<smooth_image::CImg_class> P_out_max;
+//    for (int i = 0; i < _probability_imgs.size(); i++)
+//    {
+////        cimg_library::CImgList<double> others;
+//        smooth_image::CImg_class max_out(_probability_imgs[0]->width(), _probability_imgs[0]->height(), 1, 1, 0.0);
+//        Eigen::MatrixXd mm_out(probs2[0].size(), probs2.size());
+//        int idx = 0;
+//        for (int j = 0; j < _probability_imgs.size(); j++)
+//        {
+//            if (j != i)
+//            {
+////                others.push_back(_probability_imgs[j]->_core_img);
+//                mm_out.col(idx++) = probs2[j];
+//            }
+//        }
+//        Eigen::VectorXd  maxx(probs2[0].size());
+//        maxx = mm_out.rowwise().maxCoeff();
+//        
+//        std::memcpy(max_out.data(), maxx.data(), maxx.size()*sizeof(double));
+//        P_out_max.push_back(max_out);
+//    }
+//    
+//    for (int i = 0; i < _probability_imgs.size(); i++)
+//    {
+//        _probability_imgs[i]->_core_img.div(_probability_imgs[i]->_core_img + P_out_max[i]);
+//    }
+    
+    /******************************************/
     // 1. Update the labeled image
     for (auto im : _labeled_imgs)
     {
@@ -124,8 +239,8 @@ void texture_segment::update_probability()
         area[phase] += _dsc->area(tri);
     }
     
-    
     smooth_image::area_normalization(_probability_imgs, area);
+    
 }
 
 void texture_segment::draw_test_coord()
@@ -159,10 +274,11 @@ void texture_segment::draw_probability()
     }
 }
 
-#define UPDATE_PROB_FREQUENCY 100
-#define ADAPT_MESH_FREQUENCY 200
+#define UPDATE_PROB_FREQUENCY 50
+#define ADAPT_MESH_FREQUENCY 20
 void texture_segment::update_dsc()
 {
+    profile t("Update DSC");
     
     displace_dsc();
     
@@ -176,7 +292,7 @@ void texture_segment::update_dsc()
         count = 0;
         update_probability();
         
-        show_all_probablity();
+//        show_all_probablity();
         
         adapt_count = INFINITY;
     }
@@ -192,13 +308,17 @@ void texture_segment::update_dsc()
         update_vertex_stable();
         adapt_edge();
         
-//        compute_probability_forces();
-//        update_vertex_stable();
-//        adapt_tri_compare_phase();
+        if(setting_file._bRelabel)
+        {
+            compute_probability_forces();
+            update_vertex_stable();
+            adapt_tri_compare_phase();
+        }
         
         compute_probability_forces();
         update_vertex_stable();
         thinning_mesh();
+        
         
         compute_probability_forces();
         update_vertex_stable();
@@ -281,7 +401,7 @@ void texture_segment::thinning_mesh()
             
             int max_phase = _dsc->get_label(fkey);
             auto mean = _probability_imgs[max_phase]->sum_over_tri(pts)/ area;
-            double var = _probability_imgs[max_phase]->get_variation_tri(pts, mean) / area;
+            double var = _probability_imgs[max_phase]->get_variation_tri(pts, mean) / (area + 0.01);
             
             if (var > setting_file.face_split_thres)
             {
@@ -324,7 +444,7 @@ void texture_segment::adapt_tri_compare_phase()
         // 2. Probability variation
         double mean = *max_p;
         double var = _probability_imgs[max_phase]->get_variation_tri(pts, mean);
-        var = var / area;
+        var = var / (area );
         
         _tri_variation_debug[tri] = tri_variation({max_phase, var});
         
@@ -334,7 +454,12 @@ void texture_segment::adapt_tri_compare_phase()
             // relabel
             if(max_phase != _dsc->get_label(tri))
             {
-                _dsc->update_attributes(tri, max_phase);
+//                double curP = probs[_dsc->get_label(tri)];
+//                if (std::abs(curP - *max_p) > 0.2 * std::max(curP, *max_p))
+                {
+                    _dsc->update_attributes(tri, max_phase);
+                }
+                
             }
         }
         else
@@ -405,7 +530,7 @@ void texture_segment::adapt_edge()
             ev += std::abs(f);
         }
         
-        ev = ev / (length + setting_file.min_edge_length/10); // reasonable to dl = 1 pixel size
+        ev = ev / (length + 0.1); // reasonable to dl = 1 pixel size
         
         double thres = setting_file.edge_split_thres;
         double smallest_length = setting_file.min_edge_length;
@@ -413,10 +538,13 @@ void texture_segment::adapt_edge()
         if (_dsc->bStable[hew.vertex()] == 1
             and _dsc->bStable[hew.opp().vertex()] == 1)
         {
-            if (ev > thres and length > smallest_length)
+            if (ev > thres)
             {
                 // Split the edge
-                _dsc->split_adpat_mesh(ekey);
+                if (length > smallest_length)
+                {
+                    _dsc->split_adpat_mesh(ekey);
+                }
             }
             else
             {
@@ -556,6 +684,7 @@ void texture_segment::compute_probability_forces()
         
         int phase0 = _dsc->get_label(hew.face());
         int phase1 = _dsc->get_label(hew.opp().face());
+
         
         // Loop on the edge
         auto p0 = _dsc->get_pos(hew.opp().vertex());
@@ -646,10 +775,12 @@ void texture_segment::show_all_probablity()
         imglist.push_back(p->_core_img);
     }
 
-    static cimg_library::CImgDisplay main_disp;
+    imglist.display();
     
-    main_disp.display(imglist);
-
+//    static cimg_library::CImgDisplay main_disp;
+////    main_disp.display(imglist);
+//    imglist.display(main_disp);
+//    main_disp.show();
 }
 
 void texture_segment::init()

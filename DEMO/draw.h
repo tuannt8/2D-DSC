@@ -52,7 +52,9 @@ public:
      */
     static void save_painting(int width, int height, std::string folder = std::string(""), int time_step = -1);
     
-    static void save_painting_no_overwite(int width, int height, std::string folder = std::string(""));
+    static void save_painting_no_overwite(int width, int height, std::string folder = std::string(""), int x = 0, int y = 0);
+    
+//    static void save_painting_no_overwite(int width, int height, std::string folder = std::string(""));
     
     /**
      Begins drawing.

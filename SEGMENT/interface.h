@@ -43,6 +43,7 @@ public:
     Vec2    imageSize;
     std::vector<bool> bDiplay_;
     bool    RUN = false;
+    int _iter = 0;
     
     // triangle size
     double DISCRETIZATION;

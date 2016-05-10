@@ -100,6 +100,10 @@ vector<int> randperm( int n, int n_set ) {
         rid[i] = t;
     }
     rid.resize(n_set); // set size to n_set
+
+#ifdef TUAN_TEST
+    std::sort(rid.begin(), rid.end());
+#endif
     return rid;
 }
 
@@ -213,9 +217,15 @@ int get_to( vector<im_patch>& patches, int id )
     return to+1;
 }
 
+    
+
 // Main function for building the km-tree. Takes the image and tree struct
 // and the number of training patches as argument
 void build_km_tree ( im_st& im, tree_st& tree, int n_train, bool normalize ) {
+
+    
+    
+    
     // allocate memory for the image patches
     double* im_patch_data = new double[n_train*tree.M*tree.M*im.layers];
     

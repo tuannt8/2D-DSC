@@ -10,7 +10,7 @@
 #define smooth_image_hpp
 
 #include <stdio.h>
-//#include "CImg.h"
+
 #include <GL/glew.h>
 #include "define.h"
 #include <armadillo>
@@ -53,6 +53,7 @@ public:
 public:
     // Load image from file
     void load_image(std::string file_path);
+    void from_buffer(double *buf, int witdh, int height);
     
     // Bind GL texture for rendering
     void draw_image();
@@ -71,7 +72,10 @@ public:
     
     Eigen::VectorXd reshape_to_vector();
     void update(Eigen::VectorXd prob);
+    
+    static void blur(std::vector<std::shared_ptr<smooth_image>> imgs);
     static void area_normalization(std::vector<std::shared_ptr<smooth_image>> imgs, std::vector<double> area);
+    static void display_list(std::vector<std::shared_ptr<smooth_image>> imgs);
 private:
     // For OpenGL texture mapping
     GLuint _gl_texture_ID = 0;

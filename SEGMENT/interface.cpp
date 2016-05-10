@@ -165,7 +165,22 @@ void interface::keyboard(unsigned char key, int x, int y){
         }
 
         case '\t':
-            Painter::save_painting_no_overwite(WIN_SIZE_X, WIN_SIZE_Y, "./LOG");
+        {
+            auto width = WIN_SIZE_X;
+            auto height = WIN_SIZE_Y;
+            double real_width = width - options_disp::width_view;
+            double image_ratio = imageSize[1] / imageSize[0];
+            double gl_ratio = (double)WIN_SIZE_Y / real_width;
+            
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            gluOrtho2D(0, imageSize[0], 0, imageSize[1]);
+            
+            double lx = (gl_ratio < image_ratio)? WIN_SIZE_Y/image_ratio : real_width;
+            double ly = (gl_ratio < image_ratio)? WIN_SIZE_Y : real_width*image_ratio;
+            
+            Painter::save_painting_no_overwite(lx, ly, "./LOG", options_disp::width_view + (real_width - lx)/2, (WIN_SIZE_Y - ly)/2);
+        }
             break;
         case 'i':
             dsc->increase_resolution_range();
@@ -332,6 +347,11 @@ void interface::draw()
     if (options_disp::get_option("Face intensity", false) and dsc) {
         Painter::draw_faces_intensity(*dsc);
     }
+    
+    if (options_disp::get_option("Interface", false) and dsc) {
+        glColor3f(1, 0, 0);
+        Painter::draw_interface(*dsc);
+    }
 
     if (options_disp::get_option("Edge and vertices ", true) and dsc) {
         glLineWidth(1.0);
@@ -443,6 +463,7 @@ void interface::update_title()
     if (RUN) {
         oss << " running\t";
     }
+    oss << " iter " << _iter;
 
     std::string str(oss.str());
     glutSetWindowTitle(str.c_str());
@@ -505,7 +526,7 @@ void interface::init_dsc(){
     dsc = std::shared_ptr<DeformableSimplicialComplex>(
                             new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
     
-    dsc->set_smallest_feature_size(SMALLEST_SIZE);
+    dsc->set_smallest_feature_size(setting_file.min_edge_length);
 }
 
 void interface::thres_hold_init(){
@@ -532,6 +553,7 @@ void interface::init_boundary(){
 
 void interface::dynamics_image_seg(){
 
+    _iter ++;
 //    dyn_->update_dsc(*dsc, *image_);
     _tex_seg->update_dsc();
 

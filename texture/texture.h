@@ -14,12 +14,16 @@
 #include <armadillo>
 #include <string>
 #include "sparse_mat.h"
+#include "smooth_image.hpp"
+
 
 #ifdef Success
 #undef Success
 #endif
 
 #include "Eigen/SparseCore"
+
+#define TUAN_TEST
 
 namespace texture
 {
@@ -98,6 +102,8 @@ namespace texture
         ~dictionary(){}
 
         Eigen::VectorXd compute_probability(const Eigen::VectorXd & labeled);//{return _T2*(_T1*labeled);};
+        Eigen::VectorXd compute_probability_T1(const Eigen::VectorXd & labeled);
+        Eigen::VectorXd compute_probability_T2(const Eigen::VectorXd & labeled){return _T2_s*labeled;}
         
     private:
         // The dictionary matrix
@@ -116,6 +122,7 @@ namespace texture
         
         Eigen::SparseMatrix<double> _T1_s, _T2_s;
     public:
+        smooth_image _assignment_img;
     };
 }
 

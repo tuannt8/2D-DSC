@@ -52,7 +52,7 @@ void Painter::save_painting(int width, int height, std::string folder, int time_
     }
 }
 
-void Painter::save_painting_no_overwite(int width, int height, std::string folder){
+void Painter::save_painting_no_overwite(int width, int height, std::string folder, int x, int y){
     std::ostringstream s;
     if (folder.length() == 0) {
         s << "scr";
@@ -85,7 +85,7 @@ void Painter::save_painting_no_overwite(int width, int height, std::string folde
     }
     
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
-    int success = SOIL_save_screenshot(s.str().c_str(), SOIL_SAVE_TYPE_PNG, 0, 0, width, height);
+    int success = SOIL_save_screenshot(s.str().c_str(), SOIL_SAVE_TYPE_PNG, x, y, width, height);
     if(!success)
     {
         std::cout << "ERROR: Failed to take screen shot: " << s.str().c_str() << std::endl;

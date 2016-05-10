@@ -38,6 +38,7 @@
 		A635BFA51B4A7766003F2DE4 /* adapt_mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A635BFA31B4A7766003F2DE4 /* adapt_mesh.cpp */; };
 		A64C512E1B54FFD600BDF016 /* options_disp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A64C512D1B54FFD600BDF016 /* options_disp.cpp */; };
 		A652948D1CB620C800301077 /* texture_segment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A652948B1CB620C800301077 /* texture_segment.cpp */; };
+		A657FF0D1CD8AA42004173E7 /* CImg.h in Headers */ = {isa = PBXBuildFile; fileRef = A657FF0C1CD8AA42004173E7 /* CImg.h */; };
 		A663DE681AD6B25B006CC422 /* libX11.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A663DE671AD6B25B006CC422 /* libX11.6.dylib */; };
 		A67096F01CBB8DB300A9B6BC /* setting_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A67096EF1CBB8DB300A9B6BC /* setting_file.cpp */; };
 		A67096F31CBBACEA00A9B6BC /* smooth_image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A67096F11CBBACEA00A9B6BC /* smooth_image.cpp */; };
@@ -62,7 +63,6 @@
 		A6B45F461A88F3990091F5A6 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A51F3B017D6388200A8F8F2 /* GLUT.framework */; };
 		A6B45F471A88F3D80091F5A6 /* GEL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A51F3B417D638B500A8F8F2 /* GEL.framework */; };
 		A6B460EF1A8CADF30091F5A6 /* helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B460ED1A8CADF30091F5A6 /* helper.cpp */; };
-		A6C74C1E1CBE36EB008A5288 /* CImg.h in Headers */ = {isa = PBXBuildFile; fileRef = A6C74C1D1CBE36EB008A5288 /* CImg.h */; };
 		A6C74C241CBE395F008A5288 /* Cimg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6C74C231CBE395F008A5288 /* Cimg.cpp */; };
 		A6C74C251CBE3980008A5288 /* libCimg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A6C74C121CBE36A7008A5288 /* libCimg.a */; };
 		A6E1B0241B1D9F6B00F31E48 /* libpng15.15.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A6E1B0231B1D9F6B00F31E48 /* libpng15.15.dylib */; };
@@ -153,6 +153,7 @@
 		A64C512D1B54FFD600BDF016 /* options_disp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = options_disp.cpp; sourceTree = "<group>"; };
 		A652948B1CB620C800301077 /* texture_segment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = texture_segment.cpp; sourceTree = "<group>"; };
 		A652948C1CB620C800301077 /* texture_segment.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = texture_segment.hpp; sourceTree = "<group>"; };
+		A657FF0C1CD8AA42004173E7 /* CImg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CImg.h; path = CImg/CImg.h; sourceTree = SOURCE_ROOT; };
 		A663DE671AD6B25B006CC422 /* libX11.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libX11.6.dylib; path = ../../../../../opt/X11/lib/libX11.6.dylib; sourceTree = "<group>"; };
 		A67096EF1CBB8DB300A9B6BC /* setting_file.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = setting_file.cpp; sourceTree = "<group>"; };
 		A67096F11CBBACEA00A9B6BC /* smooth_image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = smooth_image.cpp; sourceTree = "<group>"; };
@@ -177,7 +178,6 @@
 		A6B460EE1A8CADF30091F5A6 /* helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = helper.h; sourceTree = "<group>"; };
 		A6C7495D1CC7C195000C4753 /* sparse_mat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sparse_mat.h; path = texture/sparse_mat.h; sourceTree = SOURCE_ROOT; };
 		A6C74C121CBE36A7008A5288 /* libCimg.a */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libCimg.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		A6C74C1D1CBE36EB008A5288 /* CImg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CImg.h; path = CImg/CImg.h; sourceTree = SOURCE_ROOT; };
 		A6C74C231CBE395F008A5288 /* Cimg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Cimg.cpp; path = CImg/Cimg.cpp; sourceTree = SOURCE_ROOT; };
 		A6E1B0231B1D9F6B00F31E48 /* libpng15.15.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpng15.15.dylib; path = ../../../../../opt/X11/lib/libpng15.15.dylib; sourceTree = "<group>"; };
 		A6FF355C1AC2C46E001071B3 /* tri_box_overlap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tri_box_overlap.h; sourceTree = "<group>"; };
@@ -359,7 +359,7 @@
 		A6C74C131CBE36A7008A5288 /* Cimg */ = {
 			isa = PBXGroup;
 			children = (
-				A6C74C1D1CBE36EB008A5288 /* CImg.h */,
+				A657FF0C1CD8AA42004173E7 /* CImg.h */,
 				A6C74C231CBE395F008A5288 /* Cimg.cpp */,
 			);
 			path = Cimg;
@@ -382,7 +382,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A6C74C1E1CBE36EB008A5288 /* CImg.h in Headers */,
+				A657FF0D1CD8AA42004173E7 /* CImg.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -427,8 +427,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A6B45F171A88CC9B0091F5A6 /* Build configuration list for PBXNativeTarget "SEGMENT" */;
 			buildPhases = (
-				A6B45F101A88CC9B0091F5A6 /* Frameworks */,
 				A6B45F0F1A88CC9B0091F5A6 /* Sources */,
+				A6B45F101A88CC9B0091F5A6 /* Frameworks */,
 				A6B45F111A88CC9B0091F5A6 /* CopyFiles */,
 			);
 			buildRules = (

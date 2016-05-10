@@ -56,21 +56,33 @@ public:
     
     double alpha;
     double edge_split_thres; // The smaller, the easier for splitting
-    double face_split_thres; // The smaller, the eaiser for relabeling
+    double face_split_thres; // The larger, the eaiser for relabeling
     double min_edge_length; // DSC parammeter
 
     double dt;
     double dsc_discretization;
 
+    bool _bRelabel;
     
 private:
+    void load_test_case(int idx);
     
-    void load_raden(); // randen15.png image
-    void load_synthetic1(); // test_C.png
-    void load_test_A1();
-    void load_leopard();
-    void load_flower();
+    void load_leopard(); // 1
+    void load_flower(); // 2
+    void load_star_fish(); // 3
+    void load_tiger(); // 4
+    void load_tiger_group(); // 5
+    void load_tortoise(); // 6
+    void load_test_A1(); // 7
+    void load_test_A2(); // 8
+    void load_test_B1(); // 9
+    void load_test_B2(); // 10
+    void load_synthetic1(); // 11 test_C.png
+    void load_raden(); // 12 randen15.png image
     
+    void load_test();
+    
+    bool _bTrickBorder;
     void trick_border_image();
 };
 

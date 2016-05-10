@@ -25,19 +25,9 @@ void smooth_image::load_image(std::string file_path)
 
 double smooth_image::get_value_f(double x, double y)
 {
-//    static int height = _core_img.height();
-//    double y = height - 1 - y_;
-    
     
     int x_i = (int)x;
     int y_i = (int)y;
-    
-//    if (x_i < 0 or x_i >= _core_img.width()
-//        or y_i < 0 or y_i >= _core_img.height())
-//    {
-//        //    std::cout << "Out of image [" << x << ", " << y << "]\n";
-//        return 0;
-//    }
     
     double ep_x = x - x_i;
     double ep_y = y - y_i;
@@ -127,44 +117,40 @@ void smooth_image::set_value(int x, int y, double v)
 
 Eigen::VectorXd smooth_image::reshape_to_vector()
 {
-//    Eigen::SparseVector<double> v(_core_img.width()*_core_img.height());
-////    arma::vec v(a, _core_img.width()*_core_img.height());
-//    for (auto i = 0; i < _core_img.width(); i++)
-//    {
-//        for (auto j = 0; j < _core_img.height(); j++)
-//        {
-//            if(std::abs(_core_img(i,j)) > 0.0001)
-//            {
-//                v.insert(j*_core_img.width() + i) = _core_img(i,j);
-//            }
-//        }
-//    }
     Eigen::Map<Eigen::VectorXd> mapv(_core_img.data(), _core_img.width()*_core_img.height());
     
-  //  Eigen::VectorXd v(_core_img.width()*_core_img.height());
-//    
-    
-    //return Eigen::VectorXd(_core_img.data(), _core_img.width()*_core_img.height());
-//    
     return mapv;
+}
+
+void smooth_image::display_list(std::vector<std::shared_ptr<smooth_image>> imgs)
+{
+    cimg_library::CImgList<double> imglist;
+    
+    for (auto p : imgs)
+    {
+        imglist.push_back(p->_core_img);
+    }
+    
+    imglist.display();
 }
 
 void smooth_image::update(Eigen::VectorXd prob)
 {
     
     std::memcpy(_core_img.data(), prob.data(), prob.size()*sizeof(double));
-    // TODO: ????.
-//    _core_img.normalize(0, 1);
+}
+
+void smooth_image::blur(std::vector<std::shared_ptr<smooth_image>> imgs)
+{
+    for(auto & im : imgs)
+    {
+        im->_core_img.blur(1.0);
+    }
 }
 
 void smooth_image::area_normalization
     (std::vector<std::shared_ptr<smooth_image>> imgs, std::vector<double> area)
 {
-//    for (auto & p:imgs)
-//    {
-//        p->_core_img.normalize(0.0, 1.0);
-//    }
-    
     // Area normalization; from Vedrana
     int width = imgs[0]->width();
     int height = imgs[1]->height();
@@ -184,11 +170,15 @@ void smooth_image::area_normalization
     }
 }
 
+void smooth_image::from_buffer(double *buf, int w, int h)
+{
+    _core_img = CImg_class(w, h, 1, 1);
+    std::memcpy(_core_img.data(), buf, w*h*sizeof(double));
+}
+
 void smooth_image::averaging(const std::vector<std::shared_ptr<smooth_image>> imgs)
 {
-//    _core_img = imgs[1]->_core_img;
-//    update_gl_texgture();
-//    return;
+
     
     std::vector<double> color_maps = {1.0, 0.0, 0.5, 0.2, 0.8};
     

@@ -746,34 +746,34 @@ namespace DSC2D
 //        return success;
         // check quality
         
-        /*
-         TUAN: if the triangle is obtuse, split long edge
-         */
-        auto hew = walker(fid);
-        if (max_angle(fid, hew) > 120*M_PI / 180.)
+//        /*
+//         TUAN: if the triangle is obtuse, split long edge
+//         */
+//        auto hew = walker(fid);
+//        if (max_angle(fid, hew) > 120*M_PI / 180.)
         {
             return split(sorted_face_edges(fid).back());
         }
-        else
-        //--
-        {
-            
-            int fa = get_label(fid);
-            node_key vid = mesh->split_face_by_vertex(fid);
-            
-            init_attributes(vid);
-            
-            
-            for(auto hew = walker(vid); !hew.full_circle(); hew = hew.circulate_vertex_cw())
-            {
-                init_attributes(hew.halfedge());
-                init_attributes(hew.face(), fa);
-            }
-            
-            update_locally(vid);
-            
-            return true;
-        }
+//        else
+//        //--
+//        {
+//            
+//            int fa = get_label(fid);
+//            node_key vid = mesh->split_face_by_vertex(fid);
+//            
+//            init_attributes(vid);
+//            
+//            
+//            for(auto hew = walker(vid); !hew.full_circle(); hew = hew.circulate_vertex_cw())
+//            {
+//                init_attributes(hew.halfedge());
+//                init_attributes(hew.face(), fa);
+//            }
+//            
+//            update_locally(vid);
+//            
+//            return true;
+//        }
     }
     
     real DeformableSimplicialComplex::min_quality(const std::vector<edge_key>& eids, const vec2& pos_old, const vec2& pos_new)
@@ -1742,12 +1742,12 @@ namespace DSC2D
         // Length
         MAX_LENGTH = 2.;
         MIN_LENGTH = length / AVG_LENGTH /2.0;
-        DEG_LENGTH = MIN_LENGTH;// 0.2*MIN_LENGTH;
+        DEG_LENGTH = 0.2*MIN_LENGTH;
         
         // Area
         MAX_AREA = 5.;
         MIN_AREA = MIN_LENGTH*MIN_LENGTH;
-        DEG_AREA = MIN_AREA; //0.2*MIN_AREA;
+        DEG_AREA = 0.2*MIN_AREA;
     }
     
     void DeformableSimplicialComplex::refine_without_change_interface(){

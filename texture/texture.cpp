@@ -20,25 +20,31 @@
 
 #include "setting_file.h"
 
+#define EPS std::numeric_limits<double>::epsilon()
+
 namespace texture
 {
+
+    
     using namespace std;
     using namespace cimg_library;
     using namespace arma;
     
     Eigen::VectorXd  dictionary::compute_probability(const Eigen::VectorXd & labeled)
     {
-
+        profile t("Update dictionary");
             
         auto ll1 = _T1_s*labeled;
-        
-        
         
         auto ll2 = _T2_s*ll1;
 
         return ll2;
     }
     
+    Eigen::VectorXd dictionary::compute_probability_T1(const Eigen::VectorXd & labeled)
+    {
+        return _T1_s*labeled;
+    }
     void dictionary::preprocess_mat()
     {
         {
@@ -51,7 +57,7 @@ namespace texture
         for (int k=0; k<_T1_s.outerSize(); ++k)
             for (Eigen::SparseMatrix<double>::InnerIterator it(_T1_s,k); it; ++it)
             {
-                it.valueRef() = it.value() / (row_count_1[it.row()] + 0.00001);
+                it.valueRef() = it.value() / (row_count_1[it.row()] + EPS);
             }
         }
         
@@ -65,7 +71,7 @@ namespace texture
         for (int k=0; k<_T2_s.outerSize(); ++k)
             for (Eigen::SparseMatrix<double>::InnerIterator it(_T2_s,k); it; ++it)
             {
-                it.valueRef() = it.value() / (row_count_2[it.row()]+ 0.00001);
+                it.valueRef() = it.value() / (row_count_2[it.row()]+ EPS);
             }
         }
     }
@@ -97,6 +103,8 @@ namespace texture
     
     dictionary::dictionary(std::string imName)
     {
+        profile * t = new profile("Build dictionary");
+        
         std::cout << "Building dictionary" << std::endl;
         // Load test image
         imaged im;
@@ -136,6 +144,8 @@ namespace texture
             int treeDim[2];
             double * tree =  build_tree( &I[0], &Md, &bd, &n_train_d, &Ld, ndim, dim, treeDim, normalize);
             
+
+            
             std::cout << "Search tree" << std::endl;
             // Build matrix A; same dimension with image
             A = search_tree(&I[0], tree, &bd, ndim, 2, dim, treeDim);
@@ -155,7 +165,15 @@ namespace texture
                 K = A[a];
         B_height = Md*Md*K;
         
+#ifdef TUAN_TEST
+        _assignment_img.from_buffer(A, width, height);
+#endif
+        
         delete A; // release memory
+        
+        delete t;
+        
+        t = new profile("Compute T1, T2");
         
         std::cout << "Build adjacency 1" << std::endl;
         
@@ -166,6 +184,9 @@ namespace texture
         
         std::cout << "Post process" << std::endl;
         preprocess_mat();
+        
+        
+        delete t;
     }
 }
 
