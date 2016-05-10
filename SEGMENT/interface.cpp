@@ -21,6 +21,7 @@
 #include "../texture/texture.h"
 #include "setting_file.h"
 #include "profile.h"
+#include "texture.h"
 
 void _check_gl_error(const char *file, int line)
 {
@@ -488,8 +489,9 @@ interface::interface(int &argc, char** argv){
     imageSize = Vec2(_origin_img->width(), _origin_img->height());
 
     init_dsc();
+
     dsc->deform();
-    
+
     _tex_seg->_dsc = dsc;
     _tex_seg->init_dsc_phases();
     

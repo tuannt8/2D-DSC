@@ -17,13 +17,14 @@
 #include "smooth_image.hpp"
 
 
+
 #ifdef Success
 #undef Success
 #endif
 
 #include "Eigen/SparseCore"
 
-#define TUAN_TEST
+//#define TUAN_TEST
 
 namespace texture
 {
@@ -65,6 +66,7 @@ namespace texture
                      , int ndtree // input, number of tree dimension
                      , int * dim // image dimension
                      , int * dtree // tree dimension
+    , bool normalize 
     );
 
     double * build_tree(double *I, // image, input
@@ -107,7 +109,6 @@ namespace texture
         
     private:
         // The dictionary matrix
-        arma::Mat<double> _T1, _T2;
         std::vector<double> T1_row_count, T2_row_count;
         
         std::map<std::pair<long,long>, double> T21;
@@ -122,7 +123,7 @@ namespace texture
         
         Eigen::SparseMatrix<double> _T1_s, _T2_s;
     public:
-        smooth_image _assignment_img;
+        void log_mat_col_major(double *m, int nrow, int ncol, char * mes = "----");
     };
 }
 

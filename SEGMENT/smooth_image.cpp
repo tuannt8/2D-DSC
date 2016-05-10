@@ -18,7 +18,7 @@ smooth_image::smooth_image(int width, int height)
 void smooth_image::load_image(std::string file_path)
 {
     _core_img.load(file_path.data());
-    _core_img.normalize(0,1.0);
+    _core_img = _core_img/255.0;
     
     update_gl_texgture();
 }
@@ -117,7 +117,17 @@ void smooth_image::set_value(int x, int y, double v)
 
 Eigen::VectorXd smooth_image::reshape_to_vector()
 {
-    Eigen::Map<Eigen::VectorXd> mapv(_core_img.data(), _core_img.width()*_core_img.height());
+//    Eigen::Map<Eigen::VectorXd> mapv(_core_img.data(), _core_img.width()*_core_img.height());
+    // row major to column major
+    Eigen::VectorXd mapv(_core_img.width()*_core_img.height());
+    for (int c = 0; c < _core_img.width(); c++)
+    {
+        for (int r = 0; r < _core_img.height(); r++)
+        {
+            mapv(c*_core_img.height() + r) = _core_img(c,r);
+        }
+    }
+
     
     return mapv;
 }
@@ -136,8 +146,15 @@ void smooth_image::display_list(std::vector<std::shared_ptr<smooth_image>> imgs)
 
 void smooth_image::update(Eigen::VectorXd prob)
 {
-    
-    std::memcpy(_core_img.data(), prob.data(), prob.size()*sizeof(double));
+    // column major to row major
+//    std::memcpy(_core_img.data(), prob.data(), prob.size()*sizeof(double));
+    for (int c = 0; c < _core_img.width(); c++)
+    {
+        for (int r = 0; r < _core_img.height(); r++)
+        {
+            _core_img(c,r) = prob(c*_core_img.height() + r);
+        }
+    }
 }
 
 void smooth_image::blur(std::vector<std::shared_ptr<smooth_image>> imgs)
@@ -189,7 +206,7 @@ void smooth_image::averaging(const std::vector<std::shared_ptr<smooth_image>> im
         _core_img = _core_img + iptr->_core_img*color_maps[i];;
     }
 
-    _core_img.normalize(0.0, 1.0);
+//    _core_img.normalize(0.0, 1.0);
     
     update_gl_texgture();
 }

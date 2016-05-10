@@ -116,12 +116,16 @@ int search_tree(im_st& im, tree_st& tree, int& r, int& c, bool& normalize)
 // The tree search function applied to the entire image - border is zero and interior is in 1,...,n
 void search_image(im_st& im, tree_st& tree, double *A, bool& normalize)
 {
+
+    
     int idx = tree.Mh*im.rows; // increase with empty rows at border
     for ( int i = tree.Mh; i < im.cols-tree.Mh; i++ ){
         idx += tree.Mh; // first Mh pixels are border
-        for ( int j = tree.Mh; j < im.rows-tree.Mh; j++ ){           
+        for ( int j = tree.Mh; j < im.rows-tree.Mh; j++ ){
             *(A + idx) = search_tree(im, tree, i, j, normalize) + 1; // find assignment
             idx++;
+            
+
         }
         idx += tree.Mh; // last Mh pixels are border
     }
@@ -135,12 +139,13 @@ double *I // input, image
 , int ndtree // input, number of tree dimension
 , int * dim // image dimension
 , int * dtree // tree dimension
+    , bool normalize
 ){
     // input image (I), tree (tree) and output assignment (A)
 //    double *A;
     int b, M;
 //    const int *dim, *dtree;
-    bool normalize = false;
+//    bool normalize = false;
     /*  Check for proper number of arguments. */
     /* NOTE: You do not need an else statement when using
      mexErrMsgTxt within an if statement. It will never

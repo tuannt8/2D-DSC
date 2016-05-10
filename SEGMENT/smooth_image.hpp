@@ -59,8 +59,13 @@ public:
     void draw_image();
     void bind_texture(){glBindTexture(GL_TEXTURE_2D, _gl_texture_ID);}
     void ex_display(std::string name = "Image"){
-        main_disp = cimg_library::CImgDisplay(_core_img, name.c_str());
+            main_disp = cimg_library::CImgDisplay(_core_img, name.c_str());
     };
+    void ex_display_interactive(std::string name = "Image")
+    {
+            _core_img.display();
+    };
+    
     void close_display(){main_disp.close();}
 public:
     // For probability image

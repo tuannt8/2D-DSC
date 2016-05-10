@@ -45,6 +45,8 @@ namespace texture
     {
         return _T1_s*labeled;
     }
+    
+
     void dictionary::preprocess_mat()
     {
         {
@@ -73,6 +75,18 @@ namespace texture
             {
                 it.valueRef() = it.value() / (row_count_2[it.row()]+ EPS);
             }
+        }
+    }
+    
+    void dictionary::log_mat_col_major(double *m, int nrow, int ncol, char * mes)
+    {
+        for(int r = 0; r < nrow; r++)
+        {
+            for(int c = 0; c < ncol; c++)
+            {
+                cout << m[c*nrow + r] << " ";
+            }
+            cout << endl;
         }
     }
     
@@ -109,7 +123,7 @@ namespace texture
         // Load test image
         imaged im;
         im.load(imName.data());
-        im.normalize(0, 1);
+
         
         int width = im.width();
         int height = im.height();
@@ -123,7 +137,7 @@ namespace texture
         bool normalize = setting_file.normalize;
         
         int ndim;
-        int dim[3] = {width, height, 3};
+        int dim[3] = {height, width, 3};
         if(setting_file._b_color)
         {
             ndim = 3;
@@ -135,7 +149,21 @@ namespace texture
         double * A;
         
         {
-            double * I = im.data();
+//            double * I = im.data();
+            // Convert from column major to row major
+            double * I = new double[width*height*ndim];
+            for (int i = 0; i < ndim; i++)
+            {
+                int off = i*width*height;
+                for (int r = 0; r < height; r++)
+                {
+                for (int c = 0; c < width; c++)
+                {
+
+                        I[off + c*height + r] = im(c, r, 0, i);
+                    }
+                }
+            }
             
             std::cout << "Building tree" << std::endl;
             // Build tree
@@ -143,19 +171,21 @@ namespace texture
             
             int treeDim[2];
             double * tree =  build_tree( &I[0], &Md, &bd, &n_train_d, &Ld, ndim, dim, treeDim, normalize);
-            
+
 
             
             std::cout << "Search tree" << std::endl;
             // Build matrix A; same dimension with image
-            A = search_tree(&I[0], tree, &bd, ndim, 2, dim, treeDim);
+            A = search_tree(&I[0], tree, &bd, ndim, 2, dim, treeDim, normalize);
+            
+//            log_mat_col_major(A, height, width, "----A");
             
             delete tree; // release memory
         }
         
         std::cout << "Building adjacency matrix" << std::endl;
         // Matrix B
-        auto Bij2 = biadjacency_matrix(A, width, height, Md);
+        auto Bij2 = biadjacency_matrix(A, height, width, Md);
         
         // Using armadillo to compute the matrix
         B_width = width*height;
@@ -165,9 +195,7 @@ namespace texture
                 K = A[a];
         B_height = Md*Md*K;
         
-#ifdef TUAN_TEST
-        _assignment_img.from_buffer(A, width, height);
-#endif
+
         
         delete A; // release memory
         
@@ -181,10 +209,10 @@ namespace texture
         _T2_s.setFromTriplets(Bij2.begin(), Bij2.end());
         
         _T1_s = _T2_s.transpose();
-        
+ 
         std::cout << "Post process" << std::endl;
         preprocess_mat();
-        
+
         
         delete t;
     }

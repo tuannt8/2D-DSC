@@ -39,8 +39,8 @@ setting::setting()
     _bRelabel = true;
     _bTrickBorder = true;
     
-//    load_test_case(1);
-    load_test();
+    load_test_case(1);
+//    load_test();
     
     if(_bTrickBorder)
         trick_border_image();
@@ -48,12 +48,21 @@ setting::setting()
 
 void setting::load_test()
 {
-    _image_name = "DATA/test_images/10x10.png";
+    _image_name = "DATA/test_images/10x12.png";
     batch_size = 3;
     branching_factor = 2;
     num_training_patch = 100;
     num_layer = 2;
     normalize = true;
+    min_edge_length = 0.1;
+    
+    _circle_inits = { // Initialization
+        { // Phase 0
+            {Vec2(5,5), 3}
+        }
+    };
+    
+    _b_color = true;
 }
 
 void setting::load_test_case(int idx)
@@ -103,43 +112,47 @@ void setting::load_test_case(int idx)
 void setting::load_raden()
 {
     _image_name = "DATA/test_images/randen15.png";
-//    _circle_inits = { // Initialization
-//        { // Phase 0
-//            {Vec2(50,128), 20}
-//        }
-//        ,{ // Phase 1
-//            {Vec2(220,128), 20}
-//        }
-//        ,{ // Phase 2
-//            {Vec2(128,50), 20}
-//        }
-//        ,{ // Phase 3
-//            {Vec2(128,220), 20}
-//        }
-//        ,{ // Phase 4
-//            {Vec2(138,138), 20}
-//        }
-//    };
-    
-    _circle_inits =
-    {
-        {
-            {Vec2(128, 32), 30}
+    _circle_inits = { // Initialization
+        { // Phase 0
+            {Vec2(50,128), 20}
         }
-        ,{
-            {Vec2(128, 128), 30}
+        ,{ // Phase 1
+            {Vec2(220,128), 20}
         }
-        ,{
-            {Vec2(128, 225), 30}
+        ,{ // Phase 2
+            {Vec2(128,50), 20}
         }
-        ,{
-            {Vec2(32, 128), 30}
+        ,{ // Phase 3
+            {Vec2(128,220), 20}
+        }
+        ,{ // Phase 4
+            {Vec2(138,138), 20}
         }
     };
     
-    batch_size = 15;
+//    _circle_inits =
+//    {
+//        {
+//            {Vec2(128, 32), 30}
+//        }
+//        ,{
+//            {Vec2(128, 128), 30}
+//        }
+//        ,{
+//            {Vec2(128, 225), 30}
+//        }
+//        ,{
+//            {Vec2(32, 128), 30}
+//        }
+//    };
     
-    _bTrickBorder = false;
+    batch_size = 15;
+    branching_factor = 6;
+    num_training_patch = 50000;
+    num_layer = 4;
+    
+    
+    _bTrickBorder = true;
     _bRelabel = true;
 //    alpha = 0.3;
 }
@@ -183,7 +196,7 @@ void setting::load_leopard()
             {Vec2(169,169), 25}
         }
     };
-    alpha = 10;
+    alpha = 0.8;
     
     branching_factor = 7;
     num_training_patch = 50000;
@@ -191,7 +204,7 @@ void setting::load_leopard()
     normalize = true;
     
     batch_size = 3;
-    dt = 0.1;
+    dt = 1;
     
     edge_split_thres = 0.1;
     face_split_thres = 0.01;

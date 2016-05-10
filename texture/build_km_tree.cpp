@@ -100,10 +100,7 @@ vector<int> randperm( int n, int n_set ) {
         rid[i] = t;
     }
     rid.resize(n_set); // set size to n_set
-
-#ifdef TUAN_TEST
-    std::sort(rid.begin(), rid.end());
-#endif
+    
     return rid;
 }
 
@@ -194,6 +191,8 @@ void k_means( vector<im_patch>& patches, tree_st& tree, int f, int t, int node )
                     *(tree.tree_data + id) = tmp;
                     id_c++;
                     id++;
+
+                    
                 }
             }
             
@@ -223,7 +222,6 @@ int get_to( vector<im_patch>& patches, int id )
 // and the number of training patches as argument
 void build_km_tree ( im_st& im, tree_st& tree, int n_train, bool normalize ) {
 
-    
     
     
     // allocate memory for the image patches

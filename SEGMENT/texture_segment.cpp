@@ -86,86 +86,93 @@ bool intersect_tri(const vector<Vec2> & pts, double x, double & miny, double &ma
 
 void texture_segment::update_probability()
 {
+    // 1. Update the labeled image
+    for (auto im : _labeled_imgs)
+    {
+        im->fill(0.0);
+    }
+    for(auto tri : _dsc->faces())
+    {
+        int phase = _dsc->get_label(tri);
 
+        auto pts = _dsc->get_pos(tri);
+        assert(pts.size()==3);
+        CGLA::Vec2i ld, ru;
+        get_bounding_box(pts, ld, ru);
+
+        // The triangle is convect. It is easy
+        double min_y, max_y;
+        for (int x = floor(ld[0]); x < ceil(ru[0]); x++)
+        {
+            // Find intersection
+            if (intersect_tri(pts, x, min_y, max_y))
+            {
+                // update dictionary
+                for (int y = floor(min_y); y < ceil(max_y); y++)
+                {
+                    _labeled_imgs[phase]->set_value(x,y,1.0);
+                }
+            }
+        }
+    }
+//   _labeled_imgs[1]->ex_display_interactive();
     
-//    // 1. Update the labeled image
-//    for (auto im : _labeled_imgs)
-//    {
-//        im->fill(0.0);
-//    }
-//    for(auto tri : _dsc->faces())
-//    {
-//        int phase = _dsc->get_label(tri);
-//
-//        auto pts = _dsc->get_pos(tri);
-//        assert(pts.size()==3);
-//        CGLA::Vec2i ld, ru;
-//        get_bounding_box(pts, ld, ru);
-//
-//        // The triangle is convect. It is easy
-//        double min_y, max_y;
-//        for (int x = floor(ld[0]); x < ceil(ru[0]); x++)
-//        {
-//            // Find intersection
-//            if (intersect_tri(pts, x, min_y, max_y))
-//            {
-//                // update dictionary
-//                for (int y = floor(min_y); y < ceil(max_y); y++)
-//                {
-//                    _labeled_imgs[phase]->set_value(x,y,1.0);
-//                }
-//            }
-//        }
-//    }
-//    
-//    
-//    // 2. Update the probability image
-//    // Dividing by area
-//    std::vector<double> area(_probability_imgs.size(), 0.0);
-//    for (auto tri : _dsc->faces())
-//    {
-//        int phase = _dsc->get_label(tri);
-//        area[phase] += _dsc->area(tri);
-//    }
-//    
-//    std::vector<Eigen::VectorXd> probs1;
-//    
-//    for (int i = 0; i < _labeled_imgs.size(); i++)
-//    {
-//        auto l_m = _labeled_imgs[i]->reshape_to_vector();
-//        auto probability = _dict->compute_probability_T1(l_m) / area[i];
-//        probs1.push_back(probability);
-//    }
-//
-//    // Sum to 1 by division to total
-//    Eigen::VectorXd sum(probs1[0].size());
-//    sum.fill(1e-16);
-//    for (auto & p : probs1)
-//    {
-//        sum = sum + p;
-//    }
-//    
-//
-//    for (auto & p : probs1)
-//    {
-//        for(int i = 0; i < p.size(); i++)
-//            p(i) /= sum(i);
-//    }
-//    
-//    std::vector<Eigen::VectorXd> probs2;
-//    for (int i = 0; i < _probability_imgs.size(); i++)
-//    {
-//        auto l_m = probs1[i];
-//        auto probability = _dict->compute_probability_T2(l_m);
-//        _probability_imgs[i]->update(probability);
-//        probs2.push_back(probability);
-//    }
-//    
+    
+    // 2. Update the probability image
+    // Dividing by area
+    std::vector<double> area(_probability_imgs.size(), 0.0);
+    for (auto tri : _dsc->faces())
+    {
+        int phase = _dsc->get_label(tri);
+        area[phase] += _dsc->area(tri);
+    }
+    
+    cout << "Area: ";
+    for(auto a : area)
+    {
+        cout << a << " ";
+    }
+    cout << endl;
+    
+    std::vector<Eigen::VectorXd> probs1;
+    
+    for (int i = 0; i < _labeled_imgs.size(); i++)
+    {
+        auto l_m = _labeled_imgs[i]->reshape_to_vector();
+        auto probability = _dict->compute_probability_T1(l_m) / area[i];
+        probs1.push_back(probability);
+    }
+
+    // Sum to 1 by division to total
+    Eigen::VectorXd sum(probs1[0].size());
+    sum.fill(1e-16);
+    for (auto & p : probs1)
+    {
+        sum = sum + p;
+    }
+    
+
+    for (auto & p : probs1)
+    {
+        for(int i = 0; i < p.size(); i++)
+            p(i) /= sum(i);
+    }
+    
+    std::vector<Eigen::VectorXd> probs2;
+    for (int i = 0; i < _probability_imgs.size(); i++)
+    {
+        auto l_m = probs1[i];
+        auto probability = _dict->compute_probability_T2(l_m);
+        _probability_imgs[i]->update(probability);
+        probs2.push_back(probability);
+    }
+    
+    
+    
 //    // Relative probability
 //    std::vector<smooth_image::CImg_class> P_out_max;
 //    for (int i = 0; i < _probability_imgs.size(); i++)
 //    {
-////        cimg_library::CImgList<double> others;
 //        smooth_image::CImg_class max_out(_probability_imgs[0]->width(), _probability_imgs[0]->height(), 1, 1, 0.0);
 //        Eigen::MatrixXd mm_out(probs2[0].size(), probs2.size());
 //        int idx = 0;
@@ -173,7 +180,6 @@ void texture_segment::update_probability()
 //        {
 //            if (j != i)
 //            {
-////                others.push_back(_probability_imgs[j]->_core_img);
 //                mm_out.col(idx++) = probs2[j];
 //            }
 //        }
@@ -189,57 +195,27 @@ void texture_segment::update_probability()
 //        _probability_imgs[i]->_core_img.div(_probability_imgs[i]->_core_img + P_out_max[i]);
 //    }
     
-    /******************************************/
-    // 1. Update the labeled image
-    for (auto im : _labeled_imgs)
-    {
-        im->fill(0.0);
-    }
-    
-    for(auto tri : _dsc->faces())
-    {
-        int phase = _dsc->get_label(tri);
-        
-        auto pts = _dsc->get_pos(tri);
-        assert(pts.size()==3);
-        CGLA::Vec2i ld, ru;
-        get_bounding_box(pts, ld, ru);
-        
-        // The triangle is convect. It is easy
-        double min_y, max_y;
-        for (int x = floor(ld[0]); x < ceil(ru[0]); x++)
-        {
-            // Find intersection
-            if (intersect_tri(pts, x, min_y, max_y))
-            {
-                // update dictionary
-                for (int y = floor(min_y); y < ceil(max_y); y++)
-                {
-                    _labeled_imgs[phase]->set_value(x,y,1.0);
-                }
-            }
-        }
-        
-    }
-    
-    // 2. Update the probability image
-    for (int i = 0; i < _labeled_imgs.size(); i++)
-    {
-        auto l_m = _labeled_imgs[i]->reshape_to_vector();
-        auto probability = _dict->compute_probability(l_m);
-        
-        _probability_imgs[i]->update(probability);
-    }
-    
-    // Normalize the probability
-    std::vector<double> area(_probability_imgs.size(), 0.0);
-    for (auto tri : _dsc->faces())
-    {
-        int phase = _dsc->get_label(tri);
-        area[phase] += _dsc->area(tri);
-    }
-    
-    smooth_image::area_normalization(_probability_imgs, area);
+//    /******************************************/
+//    
+//    // 2. Update the probability image
+//    for (int i = 0; i < _labeled_imgs.size(); i++)
+//    {
+//        auto l_m = _labeled_imgs[i]->reshape_to_vector();
+//        
+//        auto probability = _dict->compute_probability(l_m);
+//        
+//        _probability_imgs[i]->update(probability);
+//    }
+//    
+//    // Normalize the probability
+//    std::vector<double> area(_probability_imgs.size(), 0.0);
+//    for (auto tri : _dsc->faces())
+//    {
+//        int phase = _dsc->get_label(tri);
+//        area[phase] += _dsc->area(tri);
+//    }
+//    
+//    smooth_image::area_normalization(_probability_imgs, area);
     
 }
 
