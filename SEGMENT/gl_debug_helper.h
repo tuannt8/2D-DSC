@@ -39,7 +39,7 @@ private:
     Vec2 scale_gl_over_win_;
     double WIN_HEIGHT_;
     
-    Vec2 to_gl_coord(Vec2 win_coord);
+    
     
     dsc_obj * s_dsc_;
 public:
@@ -66,6 +66,7 @@ public:
     
     static void draw();
     
+    Vec2 to_gl_coord(Vec2 win_coord);
 private:
     static void update_dsc();
 };

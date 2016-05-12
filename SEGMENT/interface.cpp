@@ -180,7 +180,11 @@ void interface::keyboard(unsigned char key, int x, int y){
             double lx = (gl_ratio < image_ratio)? WIN_SIZE_Y/image_ratio : real_width;
             double ly = (gl_ratio < image_ratio)? WIN_SIZE_Y : real_width*image_ratio;
             
-            Painter::save_painting_no_overwite(lx, ly, "./LOG", options_disp::width_view + (real_width - lx)/2, (WIN_SIZE_Y - ly)/2);
+            double b = setting_file.border_length;
+            b = b * ((gl_ratio < image_ratio)? WIN_SIZE_Y / imageSize[1] : WIN_SIZE_X/imageSize[0]);
+
+            
+            Painter::save_painting_no_overwite(lx-2*b, ly-2*b, "./LOG", options_disp::width_view + (real_width - lx)/2 + b, (WIN_SIZE_Y - ly)/2 + b);
         }
             break;
         case 'i':
@@ -191,6 +195,11 @@ void interface::keyboard(unsigned char key, int x, int y){
             _tex_seg->show_all_probablity();
         }
             break;
+        case 'm':
+        {
+            _tex_seg->show_mapping_mat();
+        }
+        break;
         case 't': // Split edge
         {
             profile::close();

@@ -171,9 +171,11 @@ void texture_segment::update_probability()
     
 //    // Relative probability
 //    std::vector<smooth_image::CImg_class> P_out_max;
+//     std::vector<Eigen::VectorXd> max_out;
 //    for (int i = 0; i < _probability_imgs.size(); i++)
 //    {
-//        smooth_image::CImg_class max_out(_probability_imgs[0]->width(), _probability_imgs[0]->height(), 1, 1, 0.0);
+////        smooth_image::CImg_class max_out(_probability_imgs[0]->width(), _probability_imgs[0]->height(), 1, 1, 0.0);
+//        
 //        Eigen::MatrixXd mm_out(probs2[0].size(), probs2.size());
 //        int idx = 0;
 //        for (int j = 0; j < _probability_imgs.size(); j++)
@@ -186,13 +188,19 @@ void texture_segment::update_probability()
 //        Eigen::VectorXd  maxx(probs2[0].size());
 //        maxx = mm_out.rowwise().maxCoeff();
 //        
-//        std::memcpy(max_out.data(), maxx.data(), maxx.size()*sizeof(double));
-//        P_out_max.push_back(max_out);
+//        max_out.push_back(maxx);
+////        std::memcpy(max_out.data(), maxx.data(), maxx.size()*sizeof(double));
+//        
+////        P_out_max.push_back(max_out);
 //    }
 //    
 //    for (int i = 0; i < _probability_imgs.size(); i++)
 //    {
-//        _probability_imgs[i]->_core_img.div(_probability_imgs[i]->_core_img + P_out_max[i]);
+////        _probability_imgs[i]->_core_img.div(_probability_imgs[i]->_core_img + P_out_max[i]);
+//        for(int j = 0; j < max_out[i].size(); j++)
+//            probs2[i](j) = probs2[i](j) / (probs2[i](j) + max_out[i](j));
+//        
+//        _probability_imgs[i]->update(probs2[i]);
 //    }
     
 //    /******************************************/
@@ -250,20 +258,19 @@ void texture_segment::draw_probability()
     }
 }
 
-#define UPDATE_PROB_FREQUENCY 50
-#define ADAPT_MESH_FREQUENCY 20
+
 void texture_segment::update_dsc()
 {
     profile t("Update DSC");
     
     displace_dsc();
     
-    static int count = UPDATE_PROB_FREQUENCY;
+    static int count = setting_file.update_prob_frequency;
     static int adapt_count = 0;
     count ++;
     adapt_count++;
     
-    if (count > UPDATE_PROB_FREQUENCY)
+    if (count > setting_file.update_prob_frequency)
     {
         count = 0;
         update_probability();
@@ -273,7 +280,7 @@ void texture_segment::update_dsc()
         adapt_count = INFINITY;
     }
     
-    if(adapt_count > ADAPT_MESH_FREQUENCY)
+    if(adapt_count > setting_file.adapt_mesh_frequency)
     {
         adapt_count = 0;
         
@@ -741,6 +748,10 @@ void texture_segment::compute_curvature_force()
     }
 }
 
+void texture_segment::show_mapping_mat()
+{
+    _dict->mapping_img.ex_display_interactive();
+}
 
 void texture_segment::show_all_probablity()
 {

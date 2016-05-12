@@ -23,8 +23,8 @@
 
 #define FORCE_SCALE 10
 
-const static double POINT_SIZE = 0.05;
-const static double LINE_WIDTH = 0.03;
+const static double POINT_SIZE = 0.1;
+const static double LINE_WIDTH = 0.1;
 
 const static DSC2D::vec3 BACKGROUND_COLOR = DSC2D::vec3(0.7); // DSC2D::vec3(1.0);
 const static DSC2D::vec3 INVISIBLE = DSC2D::vec3(-1.);

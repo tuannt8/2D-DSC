@@ -190,7 +190,13 @@ void smooth_image::area_normalization
 void smooth_image::from_buffer(double *buf, int w, int h)
 {
     _core_img = CImg_class(w, h, 1, 1);
-    std::memcpy(_core_img.data(), buf, w*h*sizeof(double));
+    for (int c = 0; c < _core_img.width(); c++)
+    {
+        for (int r = 0; r < _core_img.height(); r++)
+        {
+            _core_img(c,r) = buf[c*_core_img.height() + r];
+        }
+    }
 }
 
 void smooth_image::averaging(const std::vector<std::shared_ptr<smooth_image>> imgs)

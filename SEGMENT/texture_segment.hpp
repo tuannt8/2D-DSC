@@ -36,6 +36,7 @@ public:
     void init_dsc_phases();
     
     void show_all_probablity();
+    void show_mapping_mat();
     
     void draw_debug();
     

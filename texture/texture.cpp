@@ -196,7 +196,7 @@ namespace texture
         B_height = Md*Md*K;
         
 
-        
+        mapping_img.from_buffer(A, width, height);
         delete A; // release memory
         
         delete t;

@@ -124,6 +124,7 @@ namespace texture
         Eigen::SparseMatrix<double> _T1_s, _T2_s;
     public:
         void log_mat_col_major(double *m, int nrow, int ncol, char * mes = "----");
+        smooth_image mapping_img;
     };
 }
 

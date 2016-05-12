@@ -31,6 +31,9 @@ setting::setting()
     edge_split_thres = 0.1; // The smaller, the easier for splitting
     face_split_thres = 0.02; // The larger, the eaiser for relabeling
     min_edge_length = 5.0; // DSC parammeter
+    
+    update_prob_frequency = 50;
+    adapt_mesh_frequency = 20;
 
     dt = 1.0;
     dsc_discretization = 25.0;
@@ -39,7 +42,9 @@ setting::setting()
     _bRelabel = true;
     _bTrickBorder = true;
     
-    load_test_case(1);
+    border_length = 0.0;
+    
+    load_test_case(12);
 //    load_test();
     
     if(_bTrickBorder)
@@ -112,39 +117,39 @@ void setting::load_test_case(int idx)
 void setting::load_raden()
 {
     _image_name = "DATA/test_images/randen15.png";
-    _circle_inits = { // Initialization
-        { // Phase 0
-            {Vec2(50,128), 20}
-        }
-        ,{ // Phase 1
-            {Vec2(220,128), 20}
-        }
-        ,{ // Phase 2
-            {Vec2(128,50), 20}
-        }
-        ,{ // Phase 3
-            {Vec2(128,220), 20}
-        }
-        ,{ // Phase 4
-            {Vec2(138,138), 20}
-        }
-    };
-    
-//    _circle_inits =
-//    {
-//        {
-//            {Vec2(128, 32), 30}
+//    _circle_inits = { // Initialization
+//        { // Phase 0
+//            {Vec2(50,128), 20}
 //        }
-//        ,{
-//            {Vec2(128, 128), 30}
+//        ,{ // Phase 1
+//            {Vec2(220,128), 20}
 //        }
-//        ,{
-//            {Vec2(128, 225), 30}
+//        ,{ // Phase 2
+//            {Vec2(128,50), 20}
 //        }
-//        ,{
-//            {Vec2(32, 128), 30}
+//        ,{ // Phase 3
+//            {Vec2(128,220), 20}
+//        }
+//        ,{ // Phase 4
+//            {Vec2(138,138), 20}
 //        }
 //    };
+    
+    _circle_inits =
+    {
+        {
+            {Vec2(128, 32), 30}
+        }
+        ,{
+            {Vec2(128, 128), 30}
+        }
+        ,{
+            {Vec2(128, 225), 30}
+        }
+        ,{
+            {Vec2(32, 128), 30}
+        }
+    };
     
     batch_size = 15;
     branching_factor = 6;
@@ -152,9 +157,9 @@ void setting::load_raden()
     num_layer = 4;
     
     
-    _bTrickBorder = true;
+    _bTrickBorder = false;
     _bRelabel = true;
-//    alpha = 0.3;
+    alpha = 0.3;
 }
 
 void setting::load_synthetic1()
@@ -211,7 +216,7 @@ void setting::load_leopard()
     min_edge_length = 5;
     
     _bTrickBorder = false;
-    _bRelabel = false;
+    _bRelabel = true;
 }
 // 4
 void setting::load_tiger()
@@ -223,6 +228,11 @@ void setting::load_tiger()
         }
     };
     batch_size = 5;
+    
+    branching_factor = 5;
+    num_training_patch = 10000;
+    num_layer = 4;
+    normalize = true;
     
     _bTrickBorder = false;
     _b_color = true;
@@ -240,33 +250,41 @@ void setting::load_star_fish()
     };
     batch_size = 3;
     
-    alpha = 0.3;
+    branching_factor = 7;
+    num_training_patch = 10000;
+    num_layer = 4;
+    
+    alpha = 0.1;
     edge_split_thres = 0.2;
     min_edge_length = 5;
-    dt = 2;
+    dt = 1;
     
     _bTrickBorder = false;
     _b_color = true;
     _bRelabel = false;
+    
+    update_prob_frequency = 50;
+    adapt_mesh_frequency = 20;
 }
 
 // 5
 void setting::load_tiger_group()
 {
-    // Fail
-    //
-    
     _image_name = "DATA/test_images/105053.png";
     _circle_inits = {
         {
-            {Vec2(170,146), 20}
+            {Vec2(201,119), 30}
         }
     };
-    batch_size = 5;
+    batch_size = 8;
+
+    branching_factor = 7;
+    num_training_patch = 50000;
+    num_layer = 4;
     
-    alpha = 0.3;
+    alpha = 0.4;
     edge_split_thres = 0.01;
-    face_split_thres = 0.001;
+    face_split_thres = 0.0001;
     min_edge_length = 10;
     dt = 1;
     
@@ -300,12 +318,14 @@ void setting::load_test_A2()
         }
     };
     
-    batch_size = 15;
+    batch_size = 9;
     
     min_edge_length = 20.;
     edge_split_thres = 0.1;
-    face_split_thres = 0.05;
-    alpha = 0.3;
+    face_split_thres = 0.008;
+    alpha = 1;
+    
+    _bTrickBorder = true;
 }
 
 // 8
@@ -329,13 +349,24 @@ void setting::load_flower()
             {Vec2(220,150), 50}
         }
     };
-    dsc_discretization = 25.0;
-    batch_size = 3;
-    dt = 2;
+    
+    
+    min_edge_length = 3;
+    batch_size = 5;
+    dt = 3;
     face_split_thres = 0.02;
-    alpha = 0.6;
+    alpha = 0.1;
+    
+    branching_factor = 7;
+    num_training_patch = 10000;
+    num_layer = 4;
     
     _bTrickBorder = false;
+    
+    dsc_discretization = 25.0;
+    
+    update_prob_frequency = 50;
+    adapt_mesh_frequency = 20;
 }
 
 void setting::load_test_A1()
@@ -358,7 +389,7 @@ void setting::load_test_A1()
 //    };
     _circle_inits = {
         {
-            {Vec2(95,504), 25}
+            {Vec2(85,504), 25}
         }
         ,{
             {Vec2(115,504),25}
@@ -367,7 +398,7 @@ void setting::load_test_A1()
             {Vec2(504,95),25}
         }
         ,{
-            {Vec2(504,115),25}
+            {Vec2(534,125),25}
         }
         ,{
             {Vec2(250,350),50}
@@ -382,6 +413,8 @@ void setting::load_test_A1()
     edge_split_thres = 0.1;
     face_split_thres = 0.1;
     alpha = 0.3;
+    
+//    _bTrickBorder = false;
 }
 void setting::trick_border_image()
 {
@@ -418,6 +451,8 @@ void setting::trick_border_image()
                     c._center += Vec2(border, border);
                 }
             }
+            
+            border_length = border;
         }
         else
         {
@@ -448,6 +483,8 @@ void setting::trick_border_image()
                     c._center += Vec2(border, border);
                 }
             }
+            
+            border_length = border;
         }
     }
     catch (const std::exception& e)

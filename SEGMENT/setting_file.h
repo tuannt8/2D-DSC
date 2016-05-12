@@ -58,12 +58,17 @@ public:
     double edge_split_thres; // The smaller, the easier for splitting
     double face_split_thres; // The larger, the eaiser for relabeling
     double min_edge_length; // DSC parammeter
+    
+    int update_prob_frequency;
+    int adapt_mesh_frequency;
 
     double dt;
     double dsc_discretization;
 
     bool _bRelabel;
     
+    bool _bTrickBorder;
+    double border_length;
 private:
     void load_test_case(int idx);
     
@@ -82,7 +87,7 @@ private:
     
     void load_test();
     
-    bool _bTrickBorder;
+
     void trick_border_image();
 };
 

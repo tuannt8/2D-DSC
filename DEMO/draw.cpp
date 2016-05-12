@@ -232,7 +232,7 @@ void Painter::draw_face_label(const DSC2D::DeformableSimplicialComplex& complex)
 
 void Painter::draw_interface(const DeformableSimplicialComplex& dsc, vec3 color)
 {
-    glPointSize(std::max(std::floor(POINT_SIZE*dsc.get_avg_edge_length()), 1.));
+    glPointSize(std::max(std::floor(POINT_SIZE*dsc.get_avg_edge_length()), 2.));
 	glBegin(GL_POINTS);
     vec3 p;
     glColor3d(static_cast<double>(color[0]), static_cast<double>(color[1]), static_cast<double>(color[2]));
@@ -244,8 +244,10 @@ void Painter::draw_interface(const DeformableSimplicialComplex& dsc, vec3 color)
         }
     }
 	glEnd();
-    glLineWidth(std::max(std::floor(LINE_WIDTH*dsc.get_avg_edge_length()), 1.));
+    glLineWidth(std::max(std::floor(LINE_WIDTH*dsc.get_avg_edge_length()), 2.));
+    
     vec3 p1, p2;
+    glColor3f(1.0, 0.0, 0.0);
 	glBegin(GL_LINES);
     for(auto hei = dsc.halfedges_begin(); hei != dsc.halfedges_end(); ++hei)
     {
