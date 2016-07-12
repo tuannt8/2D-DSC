@@ -633,6 +633,8 @@ interface::interface(int &argc, char** argv){
     
     init_dsc();
     
+    threshold_initialization();
+    
     gl_debug_helper::set_dsc(&(*dsc));
 //    init_sqaure_boundary();
 //   init_boundary();
@@ -672,6 +674,33 @@ void interface::init_dsc(){
 #endif
     
     printf("Average edge length: %f ; # faces: %d\n", dsc->get_avg_edge_length(), dsc->get_no_faces());
+}
+
+void interface::threshold_initialization()
+{
+    double c[2] = {0.3, 0.7};
+    for (auto fkey : dsc->faces())
+    {
+        
+        auto pts = dsc->get_pos(fkey);
+        auto sumIntensity = image_->get_sum_on_tri_intensity(pts);
+        double area = dsc->area(fkey);
+        
+        double average = sumIntensity / area;
+        
+        int new_label = 0;
+        if (std::abs(c[0] - average) < 0.1)
+        {
+            new_label = 1;
+        }else if(std::abs(c[1] - average) < 0.1)
+        {
+            new_label = 2;
+        }
+        
+        dsc->set_label(fkey, new_label);
+    }
+    
+    dsc->clean_attributes();
 }
 
 void interface::thres_hold_init(){

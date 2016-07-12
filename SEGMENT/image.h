@@ -11,6 +11,9 @@
 #include <stdio.h>
 #include <GL/glew.h>
 #include "define.h"
+
+
+
 #include "CImg.h"
 
 typedef unsigned char BYTE;

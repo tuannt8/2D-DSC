@@ -91,6 +91,8 @@ private:
 #pragma mark - data
 public:
     void init_dsc();
+    void threshold_initialization();
+    
     void init_sqaure_boundary();
     void init_boundary();
     void init_boundary_brain();
