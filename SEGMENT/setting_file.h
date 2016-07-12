@@ -69,6 +69,8 @@ public:
     
     bool _bTrickBorder;
     double border_length;
+    
+    void load_setting_from_file(std::string path);
 private:
     void load_test_case(int idx);
     
@@ -84,9 +86,11 @@ private:
     void load_test_B2(); // 10
     void load_synthetic1(); // 11 test_C.png
     void load_raden(); // 12 randen15.png image
+    void load_corn_13();
+    void load_kanguru_14();
+    void load_leopard_stand_15();
     
     void load_test();
-    
 
     void trick_border_image();
 };

@@ -1,0 +1,3 @@
+test:image
+log:12
+discretize:12

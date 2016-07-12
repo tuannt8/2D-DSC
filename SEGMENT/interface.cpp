@@ -485,6 +485,12 @@ interface::interface(int &argc, char** argv){
     WIN_SIZE_X = 900;
     WIN_SIZE_Y = 600;
     
+    if(argc > 1)
+    {
+        std::string path = argv[1];
+        setting_file.load_setting_from_file(path);
+    }
+    
     bDiplay_.resize(10);
     std::fill(bDiplay_.begin(), bDiplay_.end(), true);
     

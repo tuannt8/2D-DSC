@@ -11,7 +11,7 @@
 #include "setting_file.h"
 #include "define.h"
 
-
+using namespace std;
 setting setting_file;
 
 setting::setting()
@@ -21,15 +21,15 @@ setting::setting()
     assert(inited <= 1);
     
     
-    batch_size = 15;
-    branching_factor = 5;
-    num_training_patch = 5000;
+    batch_size = 5;
+    branching_factor = 7;
+    num_training_patch = 20000;
     num_layer = 4;
     normalize = true;
     
     alpha = 0.1;
-    edge_split_thres = 0.1; // The smaller, the easier for splitting
-    face_split_thres = 0.02; // The larger, the eaiser for relabeling
+    edge_split_thres = 0.05; // The smaller, the easier for splitting
+    face_split_thres = 0.01; // The larger, the eaiser for relabeling
     min_edge_length = 5.0; // DSC parammeter
     
     update_prob_frequency = 50;
@@ -44,30 +44,13 @@ setting::setting()
     
     border_length = 0.0;
     
-    load_test_case(12);
+    load_test_case(15);
 //    load_test();
+//    load_setting_from_file("DATA/test_images/test.txt");
+
     
     if(_bTrickBorder)
         trick_border_image();
-}
-
-void setting::load_test()
-{
-    _image_name = "DATA/test_images/10x12.png";
-    batch_size = 3;
-    branching_factor = 2;
-    num_training_patch = 100;
-    num_layer = 2;
-    normalize = true;
-    min_edge_length = 0.1;
-    
-    _circle_inits = { // Initialization
-        { // Phase 0
-            {Vec2(5,5), 3}
-        }
-    };
-    
-    _b_color = true;
 }
 
 void setting::load_test_case(int idx)
@@ -109,8 +92,164 @@ void setting::load_test_case(int idx)
         case 12:
             load_raden();
             break;
+        case 13:
+            load_corn_13();
+            break;
+        case 14:
+            load_kanguru_14();
+            break;
+        case 15:{ // leopard stand
+            _image_name = "DATA/test_images/Tuan/134035.png";
+            _circle_inits ={{{Vec2(184, 115), 30}}};
+            batch_size = 3;
+            branching_factor = 8;
+            num_training_patch = 50000;
+            num_layer = 4;
+            _b_color = true;
+            _bRelabel = false;
+            _bTrickBorder = false;
+            face_split_thres = 0.01;
+            min_edge_length = 10.0;
+            alpha = 0.5; // relabeling? 1.5 : 0.5
+        } break;
+        case 16:{ // zebra
+            _image_name = "DATA/test_images/Tuan/253027.png";
+            _circle_inits ={{{Vec2(161, 151), 30}}};
+            _bRelabel = false;
+            if(_bRelabel)
+            {
+                batch_size = 15;
+                branching_factor = 7;
+                num_training_patch = 50000;
+                num_layer = 4;
+                _b_color = true;
+
+                _bTrickBorder = false;
+                face_split_thres = 0.01;
+                min_edge_length = 6.0;
+                alpha = 3;
+            }else{
+                batch_size = 15;
+                branching_factor = 7;
+                num_training_patch = 50000;
+                num_layer = 4;
+                _b_color = true;
+                
+                _bTrickBorder = false;
+                face_split_thres = 0.1;
+                min_edge_length = 4.0;
+                alpha = 2.5;
+                
+                dt = 1;
+            }
+        }break;
+        case 17:{//raden
+            _image_name = "DATA/test_images/Tuan/texture06_16.png";
+            _circle_inits ={{{Vec2(145, 30), 30}}, {{Vec2(397, 29), 30}}, {{Vec2(39, 137), 30}},
+            {{Vec2(146, 135), 30}}, {{Vec2(253, 133), 30}}, {{Vec2(333, 140), 30}},
+            {{Vec2(481, 159), 30}}, {{Vec2(140, 252), 30}}, {{Vec2(296, 253), 30}},
+            {{Vec2(38, 377), 30}}, {{Vec2(136, 372), 30}}, {{Vec2(254, 376), 30}},
+            {{Vec2(365, 365), 30}}, {{Vec2(484, 372), 30}}, {{Vec2(134, 478), 30}}
+//            ,{{Vec2(380, 479), 30}}
+            };
+            
+            batch_size = 19;
+            branching_factor = 7;
+            num_training_patch = 50000;
+            num_layer = 4;
+            _b_color = false;
+            _bTrickBorder = false;
+        }break;
         default:
             break;
+    }
+}
+
+void setting::load_test()
+{
+    _image_name = "DATA/test_images/253027.png";
+    batch_size = 5;
+    branching_factor = 7;
+    num_training_patch = 50000;
+    num_layer = 5;
+    normalize = true;
+    min_edge_length = 5;
+    
+    _circle_inits = { // Initialization
+        { // Phase 0
+            {Vec2(105,148), 30}
+        }
+    };
+    
+    _b_color = true;
+    _bTrickBorder = false;
+}
+
+void setting::load_kanguru_14()
+{
+    _image_name = "DATA/test_images/Tuan/69020.png";
+    _circle_inits =
+    {
+        {
+            {Vec2(209, 200), 30}
+        }
+    };
+    
+    _b_color = true;
+    _bTrickBorder = false;
+
+    
+    _bRelabel = true;
+    
+    if (_bRelabel)
+    {
+        batch_size = 5;
+        branching_factor = 7;
+        num_training_patch = 50000;
+        num_layer = 5;
+        face_split_thres = 0.01;
+        min_edge_length = 10.0;
+        
+        alpha = 2.0;
+    }
+    else{
+        batch_size = 5;
+        branching_factor = 7;
+        num_training_patch = 50000;
+        num_layer = 5;
+        face_split_thres = 0.01;
+        min_edge_length = 10.0;
+        
+        alpha = 2.0;
+    }
+}
+
+void setting::load_corn_13()
+{
+    _image_name = "DATA/test_images/Tuan/58060.png";
+    _circle_inits = {{{Vec2(209, 165), 30}}};
+    
+    _b_color = true;
+    _bTrickBorder = false;
+
+    
+    _bRelabel = false;
+    
+    if (_bRelabel)
+    {
+        batch_size = 19;
+        branching_factor = 7;
+        num_training_patch = 20000;
+        num_layer = 4;
+        alpha = 16.0;
+    }
+    else
+    {
+        batch_size = 15;
+        branching_factor = 7;
+        num_training_patch = 20000;
+        num_layer = 4;
+        alpha = 1;
     }
 }
 
@@ -201,7 +340,7 @@ void setting::load_leopard()
             {Vec2(169,169), 25}
         }
     };
-    alpha = 0.8;
+    alpha = 4;
     
     branching_factor = 7;
     num_training_patch = 50000;
@@ -209,11 +348,11 @@ void setting::load_leopard()
     normalize = true;
     
     batch_size = 3;
-    dt = 1;
+    dt = 0.3;
     
     edge_split_thres = 0.1;
-    face_split_thres = 0.01;
-    min_edge_length = 5;
+    face_split_thres = 0.1;
+    min_edge_length = 10;
     
     _bTrickBorder = false;
     _bRelabel = true;
@@ -256,12 +395,15 @@ void setting::load_star_fish()
     
     alpha = 0.1;
     edge_split_thres = 0.2;
+    face_split_thres = 0.1;
     min_edge_length = 5;
     dt = 1;
     
     _bTrickBorder = false;
     _b_color = true;
-    _bRelabel = false;
+    _bRelabel = true;
+    
+    alpha = 16.0;
     
     update_prob_frequency = 50;
     adapt_mesh_frequency = 20;
@@ -276,7 +418,7 @@ void setting::load_tiger_group()
             {Vec2(201,119), 30}
         }
     };
-    batch_size = 8;
+    batch_size = 9;
 
     branching_factor = 7;
     num_training_patch = 50000;
@@ -290,13 +432,40 @@ void setting::load_tiger_group()
     
     _bTrickBorder = false;
     _b_color = true;
-    _bRelabel = true;
+    _bRelabel = false;
 }
 
 // 6
 void setting::load_tortoise()
 {
     _image_name = "DATA/test_images/tortoise.png";
+    _circle_inits = {
+        {
+            {Vec2(216,113), 50}
+        }
+//        ,{
+//            {Vec2(424,35),20}
+//        }
+//        ,{
+//            {Vec2(23,64),20}
+//        }
+    };
+    batch_size = 3;
+    
+    _bRelabel = false;
+    _bTrickBorder = false;
+    if (_bRelabel)
+    {
+        face_split_thres = 0.01;
+        alpha = 4.0;
+        min_edge_length = 20;
+    }
+    else{
+        face_split_thres = 0.01;
+        alpha = 4.0;
+        min_edge_length = 20;
+        dt = 3;
+    }
 }
 
 // 8
@@ -362,6 +531,7 @@ void setting::load_flower()
     num_layer = 4;
     
     _bTrickBorder = false;
+    _bRelabel = false;
     
     dsc_discretization = 25.0;
     
@@ -414,6 +584,7 @@ void setting::load_test_A1()
     face_split_thres = 0.1;
     alpha = 0.3;
     
+    _bRelabel = false;
 //    _bTrickBorder = false;
 }
 void setting::trick_border_image()
@@ -491,4 +662,46 @@ void setting::trick_border_image()
     {
         std::cout << e.what();
         exit(1);
-    }}
+    }
+}
+
+#define _COLOR "color"
+#define _PATH_SIZE "patch size"
+#define _BRANCHING_FACTOR "branching factor"
+#define _NUM_TRAINING_PATCH "Number of training patches"
+#define _NUM_LAYER  "Number of layer"
+#define _NORMALIZE  "normalize"
+
+#define _ALPHA          "alpha"
+#define _EDGE_SPLIT     "Edge split thres"
+#define _FACE_RELABEL   "Face relabel thres"
+#define _MIN_EDGE       "min edge"
+#define _PROB_FREQUENCY "update probability frequency"
+#define _ADAPT_MESH_FREQUENCY "adapt mesh frequency"
+
+
+void setting::load_setting_from_file(string path)
+{
+    std::ifstream f(path);
+    map<string, string> setting_map;
+    if (f.is_open())
+    {
+        std::string line;
+        while (f >> line)
+        {
+            if (line.substr(0,2) == "//")
+            {
+                continue;
+            }
+            string left = line.substr(0, line.find(":"));
+            string right = line.substr(left.size(), line.size() - left.size());
+            setting_map.insert(make_pair(left, right));
+        }
+        f.close();
+        
+        
+    }
+    else{
+        throw "Setting file not exit";
+    }
+}
