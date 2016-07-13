@@ -237,9 +237,9 @@ namespace DSC2D
                 min_t = Util::min(t, min_t);
             }
         }
-#ifdef DEBUG
-        assert(min_t < INFINITY);
-#endif
+//#ifdef DEBUG
+//        assert(min_t < INFINITY);
+//#endif
         return min_t;
     }
     
@@ -254,14 +254,23 @@ namespace DSC2D
         }
         
         real max_l = l*intersection_with_link(vid, destination) - 1e-4 * AVG_LENGTH;
-        l = Util::max(Util::min(0.5*max_l, l), 0.);
-        set_pos(vid, pos + l*Util::normalize(destination - pos));
         
-        if(Util::length(destination - get_pos(vid)) < 1e-4 * AVG_LENGTH)
+        if (max_l < INFINITY)
         {
-            return true;
+            l = Util::max(Util::min(0.5*max_l, l), 0.);
+            set_pos(vid, pos + l*Util::normalize(destination - pos));
+            
+            if(Util::length(destination - get_pos(vid)) < 1e-4 * AVG_LENGTH)
+            {
+                return true;
+            }
+            return false;
         }
-        return false;
+        else
+        {
+            return false;
+        }
+
     }
     
     DeformableSimplicialComplex * DeformableSimplicialComplex::clone(){
@@ -362,6 +371,7 @@ namespace DSC2D
             return false;
         }
     }
+    
     bool DeformableSimplicialComplex::load(char * filePath)
     {
         std::ifstream myfile(filePath);
@@ -1036,6 +1046,10 @@ namespace DSC2D
     real DeformableSimplicialComplex::min_angle(face_key fid)
     {
         std::vector<vec2> p = get_pos(fid);
+        if (p.size() != 3)
+        {
+            throw std::invalid_argument("Get tri vertex error");
+        }
         return Util::min_angle(p[0], p[1], p[2]);
     }
     
@@ -1145,12 +1159,21 @@ namespace DSC2D
                     update_locally(hw.vertex());
                 }
                 
-                if((min_angle(*fi) < DEG_ANGLE || area(*fi) < DEG_AREA*AVG_AREA) && !collapse(*fi, true))
+                try
                 {
-                    double mm = max_angle(*fi, hew);
-                    std::cout << "Degenerated normal. face: " << fi->get_index() << " Max a = " << mm << endl;
-                    collapse(*fi, false);
+                    if((min_angle(*fi) < DEG_ANGLE || area(*fi) < DEG_AREA*AVG_AREA) && !collapse(*fi, true))
+                    {
+                        double mm = max_angle(*fi, hew);
+                        std::cout << "Degenerated normal. face: " << fi->get_index() << " Max a = " << mm << endl;
+                        collapse(*fi, false);
+                    }
                 }
+                catch (std::exception e)
+                {
+                    cout << e.what();
+                }
+                
+
                 
                 /** Old code
                 if((min_angle(*fi) < DEG_ANGLE || area(*fi) < DEG_AREA*AVG_AREA) && !collapse(*fi, true))
