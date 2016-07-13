@@ -34,7 +34,7 @@
             BlueprintIdentifier = "A6B45F121A88CC9B0091F5A6"
             BuildableName = "SEGMENT"
             BlueprintName = "SEGMENT"
-            ReferencedContainer = "container:DSC_texture_seg.xcodeproj">
+            ReferencedContainer = "container:DSC_texture_seg_cinema.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -58,7 +58,7 @@
             BlueprintIdentifier = "A6B45F121A88CC9B0091F5A6"
             BuildableName = "SEGMENT"
             BlueprintName = "SEGMENT"
-            ReferencedContainer = "container:DSC_texture_seg.xcodeproj">
+            ReferencedContainer = "container:DSC_texture_seg_cinema.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>

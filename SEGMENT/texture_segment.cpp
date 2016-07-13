@@ -794,10 +794,15 @@ void texture_segment::init()
                         new smooth_image(_origin_img->width(), _origin_img->height())
                                                           );
     // Construct dictionary
-//    _dict = std::unique_ptr<texture::dictionary>
-//                (new texture::dictionary(setting_file._image_name));
+    _dict = std::unique_ptr<texture::dictionary>
+                (new texture::dictionary(setting_file._image_name));
 
 
+}
+
+void texture_segment::threshold_init()
+{
+    
 }
 
 void texture_segment::init_dsc_phases()
@@ -844,3 +849,5 @@ void texture_segment::init_dsc_phases()
     }
     _dsc->deform();
 }
+
+

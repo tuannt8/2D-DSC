@@ -44,7 +44,7 @@ setting::setting()
     
     border_length = 0.0;
     
-    load_test_case(15);
+    load_test_case(-1);
 //    load_test();
 //    load_setting_from_file("DATA/test_images/test.txt");
 
@@ -56,6 +56,9 @@ setting::setting()
 void setting::load_test_case(int idx)
 {
     switch (idx) {
+        case -1:
+            load_test();
+            break;
         case 1:
             load_leopard();
             break;
@@ -167,7 +170,7 @@ void setting::load_test_case(int idx)
 
 void setting::load_test()
 {
-    _image_name = "DATA/test_images/253027.png";
+    _image_name = "DATA/carbon-filber/slice22.png";
     batch_size = 5;
     branching_factor = 7;
     num_training_patch = 50000;

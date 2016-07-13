@@ -17,10 +17,18 @@ smooth_image::smooth_image(int width, int height)
 
 void smooth_image::load_image(std::string file_path)
 {
-    _core_img.load(file_path.data());
-    _core_img = _core_img/255.0;
-    
-    update_gl_texgture();
+    try
+    {
+        _core_img.load(file_path.data());
+        _core_img = _core_img/255.0;
+        
+        update_gl_texgture();
+    }
+    catch (std::exception e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+
 }
 
 double smooth_image::get_value_f(double x, double y)

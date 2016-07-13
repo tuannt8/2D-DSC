@@ -34,6 +34,7 @@ public:
     
     void init(); // Load image and construct dictionary
     void init_dsc_phases();
+    void threshold_init();
     
     void show_all_probablity();
     void show_mapping_mat();

@@ -508,7 +508,8 @@ interface::interface(int &argc, char** argv){
     dsc->deform();
 
     _tex_seg->_dsc = dsc;
-    _tex_seg->init_dsc_phases();
+//    _tex_seg->init_dsc_phases();
+    _tex_seg->threshold_init();
     
     gl_debug_helper::set_dsc(&(*dsc));
     
