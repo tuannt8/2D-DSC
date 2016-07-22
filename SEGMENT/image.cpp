@@ -531,6 +531,8 @@ void image::set_gl_texture() {
             *(ptr++) = color;
         }
     }
+    
+    
 
     glGenTextures(1, &tex_ID);
 

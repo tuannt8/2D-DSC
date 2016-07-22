@@ -678,7 +678,7 @@ void interface::init_dsc(){
 
 void interface::threshold_initialization()
 {
-    double c[2] = {0.3, 0.7};
+    double c[2] = {0.3, 0.8};
     for (auto fkey : dsc->faces())
     {
         
@@ -691,10 +691,10 @@ void interface::threshold_initialization()
         int new_label = 0;
         if (std::abs(c[0] - average) < 0.1)
         {
-            new_label = 1;
+            new_label = 0;
         }else if(std::abs(c[1] - average) < 0.1)
         {
-            new_label = 2;
+            new_label = 1;
         }
         
         dsc->set_label(fkey, new_label);

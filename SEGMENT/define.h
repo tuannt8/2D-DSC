@@ -96,10 +96,10 @@
  * Carbon filber
  */
 // Coefficient
-#define IMAGE_PATH "carbon-filber/slice22.png"
+#define IMAGE_PATH "../../Large_data/Filber/filber.png"
 // Mesh control
 #define DISCRETIZE_RES 50.0
-#define SMALLEST_SIZE   0.3
+#define SMALLEST_SIZE   1
 // Adaptive mesh
 #define SPLIT_FACE_COEFFICIENT  0.08 // split thres = coe*(1-coe)*(ci-cj)^2
 #define SPLIT_EDGE_COEFFICIENT 10    // Split thres = coe*(ci-cj)^2
