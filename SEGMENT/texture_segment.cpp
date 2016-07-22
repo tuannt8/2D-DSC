@@ -3,7 +3,6 @@
 //  DSC_texture_seg
 //
 //  Created by Tuan Nguyen Trung on 4/7/16.
-//  Copyright © 2016 Asger Nyman Christiansen. All rights reserved.
 //
 
 #include "texture_segment.hpp"
@@ -560,23 +559,31 @@ void texture_segment::update_vertex_stable()
             
             double n_dt = setting_file.dt;
             
-            auto norm = obj->get_normal(*ni);
-            
-            double move = DSC2D::Util::dot(dis, norm)*n_dt;
-            if (obj->is_crossing(*ni))
+            try
             {
-                move = dis.length() * n_dt;
+                auto norm = obj->get_normal(*ni);
+                
+                double move = DSC2D::Util::dot(dis, norm)*n_dt;
+                if (obj->is_crossing(*ni))
+                {
+                    move = dis.length() * n_dt;
+                }
+                
+                if (move < STABLE_MOVE) // stable
+                {
+                    // std::cout << "Stable : " << ni->get_index() << std::endl;
+                    obj->bStable[*ni] = 1;
+                }
+                else
+                {
+                    obj->bStable[*ni] = 0;
+                }
             }
-            
-            if (move < STABLE_MOVE) // stable
-            {
-                // std::cout << "Stable : " << ni->get_index() << std::endl;
-                obj->bStable[*ni] = 1;
-            }
-            else
+            catch (std::exception e)
             {
                 obj->bStable[*ni] = 0;
             }
+
         }
     }
 }
@@ -705,6 +712,7 @@ void texture_segment::compute_probability_forces()
 
 void texture_segment::displace_dsc()
 {
+    double max = -INFINITY;
     for (auto ni = _dsc->vertices_begin(); ni != _dsc->vertices_end(); ni++)
     {
 //        _dsc->bStable[*ni] = 1;
@@ -712,14 +720,20 @@ void texture_segment::displace_dsc()
         if ((_dsc->is_interface(*ni) or _dsc->is_crossing(*ni)))
         {
             Vec2 dis = (_dsc->get_node_internal_force(*ni)*setting_file.alpha
-                        + _dsc->get_node_external_force(*ni));
+                        + _dsc->get_node_external_force(*ni))*setting_file.dt;
             assert(dis.length() != NAN);
             
+            if (max < dis.length())
+            {
+                max = dis.length();
+            }
             
             _dsc->set_destination(*ni, _dsc->get_pos(*ni) + dis* _dt);
             
         }
     }
+    
+    std::cout << " Max displace: " << max << std::endl;
     
     _dsc->deform();
 }
@@ -802,7 +816,33 @@ void texture_segment::init()
 
 void texture_segment::threshold_init()
 {
-    
+    double c[2] = {0.3, 0.7};
+    for (auto fkey : _dsc->faces())
+    {
+        
+        auto pts = _dsc->get_pos(fkey);
+        auto sumIntensity = _origin_img->sum_over_tri(pts);
+        double area = _dsc->area(fkey);
+        
+        double average = sumIntensity / area;
+        
+        int new_label = 0;
+        
+        double var = _origin_img->get_variation_tri(pts, average);
+        
+        if(var < 0.1)
+        {
+            if (std::abs(c[0] - average) < 0.1)
+            {
+                new_label = 0;
+            }else if(std::abs(c[1] - average) < 0.1)
+            {
+                new_label = 1;
+            }
+        }
+        
+        _dsc->update_attributes(fkey, new_label);
+    }
 }
 
 void texture_segment::init_dsc_phases()
@@ -832,7 +872,7 @@ void texture_segment::init_dsc_phases()
         if (_dsc->is_interface(v))
         {
             auto pt = _dsc->get_pos(v);
-            // check if it belong to any circle
+            // check if it belongs to any circle
             for (int i = 0; i < circle_init.size(); i++)
             {
                 auto & circles = circle_init[i];

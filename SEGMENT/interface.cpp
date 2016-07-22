@@ -505,7 +505,7 @@ interface::interface(int &argc, char** argv){
 
     init_dsc();
 
-    dsc->deform();
+//    dsc->deform();
 
     _tex_seg->_dsc = dsc;
 //    _tex_seg->init_dsc_phases();

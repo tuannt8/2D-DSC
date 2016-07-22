@@ -1022,6 +1022,10 @@ namespace DSC2D
     real DeformableSimplicialComplex::min_angle(face_key fid)
     {
         std::vector<vec2> p = get_pos(fid);
+        if(p.size() != 3)
+        {
+            throw std::invalid_argument("Get tri vertex error");
+        }
         return Util::min_angle(p[0], p[1], p[2]);
     }
     
@@ -1130,12 +1134,21 @@ namespace DSC2D
                     update_locally(hw.vertex());
                 }
                 
-                if((min_angle(*fi) < DEG_ANGLE || area(*fi) < DEG_AREA*AVG_AREA) && !collapse(*fi, true))
+                try
                 {
-                    double mm = max_angle(*fi, hew);
-                    std::cout << "Degenerated normal. face: " << fi->get_index() << " Max angle = " << mm << endl;
-                    collapse(*fi, false);
+                    if((min_angle(*fi) < DEG_ANGLE || area(*fi) < DEG_AREA*AVG_AREA) && !collapse(*fi, true))
+                    {
+                        double mm = max_angle(*fi, hew);
+                        std::cout << "Degenerated normal. face: " << fi->get_index() << " Max angle = " << mm << endl;
+                        collapse(*fi, false);
+                    }
                 }
+                catch (std::exception e)
+                {
+                    std::cout << e.what();
+                }
+                
+
                 
 //                // Old code
 //                if((min_angle(*fi) < DEG_ANGLE || area(*fi) < DEG_AREA*AVG_AREA) && !collapse(*fi, true))
@@ -1303,8 +1316,11 @@ namespace DSC2D
             }
         }
 #ifdef DEBUG
-        assert(i == 2);
-        assert(!Util::isnan(n[0]) && !Util::isnan(n[1]));
+        if( !(i == 2 and !Util::isnan(n[0]) && !Util::isnan(n[1]) ))
+            throw std::runtime_error("Invalid vertex to get normal");
+        
+//        assert(i == 2);
+//        assert(!Util::isnan(n[0]) && !Util::isnan(n[1]));
 #endif
         if(sqr_length(n) > EPSILON)
         {

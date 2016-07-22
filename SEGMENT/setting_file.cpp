@@ -170,22 +170,29 @@ void setting::load_test_case(int idx)
 
 void setting::load_test()
 {
-    _image_name = "DATA/carbon-filber/slice22.png";
+    _image_name = "DATA/carbon-filber/slice2.png";
     batch_size = 5;
     branching_factor = 7;
-    num_training_patch = 50000;
+    num_training_patch = 5000;
     num_layer = 5;
     normalize = true;
     min_edge_length = 5;
     
     _circle_inits = { // Initialization
         { // Phase 0
-            {Vec2(105,148), 30}
+            {Vec2(105,148), 10}
         }
+//        ,{ // Phase 1
+//            {Vec2(105,148), 10}
+//        }
     };
     
-    _b_color = true;
+    _b_color = false;
     _bTrickBorder = false;
+    
+    dt = 0.2;
+    dsc_discretization = 100.0;
+    min_edge_length = 0.3;
 }
 
 void setting::load_kanguru_14()
@@ -200,7 +207,7 @@ void setting::load_kanguru_14()
     
     _b_color = true;
     _bTrickBorder = false;
-
+    
     
     _bRelabel = true;
     
