@@ -94,7 +94,7 @@ int debug_num[10] = {-1};
  */
 dynamics_param g_param(ALPHA, // alpha
                        BETA, // beta
-                       1. // dt
+                       DT_ // dt
                        );
 
 std::string IMAGE_NAME = IMAGE_PATH;

@@ -119,6 +119,8 @@ void dynamics_mul::update_dsc_with_adaptive_mesh()
     
     if (count > nb_displace)
     {
+        std::cout << "\n \n Adapt mesh --------------------- \n ";
+        
         count = 0;
         
         update_vertex_stable();
@@ -129,8 +131,8 @@ void dynamics_mul::update_dsc_with_adaptive_mesh()
         compute_intensity_force();
         compute_curvature_force();
         
-        update_vertex_stable();
-        am.split_face(*s_dsc, *s_img);
+//        update_vertex_stable();
+//        am.split_face(*s_dsc, *s_img);
         
         compute_mean_intensity(mean_inten_);
         g_param.mean_intensity = mean_inten_;
@@ -1872,6 +1874,12 @@ void dynamics_mul::compute_mean_intensity(dsc_obj &dsc, image &img)
 
 void dynamics_mul::compute_mean_intensity(std::map<int, double> & mean_inten_o){
 
+    // hardcode
+    mean_inten_o.insert(std::make_pair(1, 0.5));
+    mean_inten_o.insert(std::make_pair(0, 0.85));
+    return;
+    
+    
     std::map<int, double> total_inten_;
     std::map<int, double> total_area;
     

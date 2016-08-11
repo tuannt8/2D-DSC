@@ -262,8 +262,6 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
             continue;
         }
         
-
-        
         double ev = 0;
         double c0 = mean_inten_[dsc.get_label(hew.face())];
         double c1 = mean_inten_[dsc.get_label(hew.opp().face())];
@@ -306,7 +304,7 @@ void adapt_mesh::split_edge(DSC2D::DeformableSimplicialComplex &dsc, image &img)
                 
                 if(dsc.collapse(ekey, true))
                 {
-                    cout << "Adapt mesh: Collapse edge " << ekey.get_index() << endl;
+             //       cout << "Adapt mesh: Collapse edge " << ekey.get_index() << endl;
                 }
             }
         }

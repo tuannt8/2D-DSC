@@ -532,7 +532,7 @@ void image::set_gl_texture() {
         }
     }
     
-    
+    glPixelStorei ( GL_UNPACK_ALIGNMENT,   1 );
 
     glGenTextures(1, &tex_ID);
 

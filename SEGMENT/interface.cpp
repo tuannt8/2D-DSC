@@ -678,7 +678,7 @@ void interface::init_dsc(){
 
 void interface::threshold_initialization()
 {
-    double c[2] = {0.3, 0.8};
+    double c[2] = {0.6, 0.85};
     for (auto fkey : dsc->faces())
     {
         
@@ -689,10 +689,10 @@ void interface::threshold_initialization()
         double average = sumIntensity / area;
         
         int new_label = 0;
-        if (std::abs(c[0] - average) < 0.1)
+        if (average > 0.8)
         {
             new_label = 0;
-        }else if(std::abs(c[1] - average) < 0.1)
+        }else
         {
             new_label = 1;
         }
