@@ -64,7 +64,8 @@ public:
     
     static void draw();
     
-private:
+public:
+    static int label_count;
     static void update_dsc();
 };
 

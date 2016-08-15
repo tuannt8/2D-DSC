@@ -58,6 +58,8 @@ namespace temp_gdh {
     }
 }
 
+int gl_debug_helper::label_count = 0;
+
 gl_debug_helper & gl_debug_helper::get_instance(){
     static gl_debug_helper instance;
     return instance;
@@ -89,7 +91,7 @@ void gl_debug_helper::update_dsc(){
     
     
     
-    static int label_count = 0;
+    
     int new_label = ++label_count;
     for (auto fid = dsc->faces_begin(); fid != dsc->faces_end(); fid++) {
         auto pts = dsc->get_pos(*fid);

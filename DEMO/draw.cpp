@@ -409,7 +409,8 @@ void Painter::draw_faces(const DeformableSimplicialComplex& dsc, const HMesh::Fa
     
 	for(auto fi = dsc.faces_begin(); fi != dsc.faces_end(); ++fi)
     {
-        vec3 c = colors[*fi];
+//        vec3 c = colors[*fi];
+        vec3 c = colors_[dsc.get_label(*fi)];
         glColor4f(c[0], c[1], c[2], 0.5);
    
    //     glColor4f(c[0], c[1], c[2], 0.0);

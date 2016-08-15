@@ -175,13 +175,16 @@ void interface::keyboard(unsigned char key, int x, int y){
             am.split_face_and_relabel(*dsc, *image_);
         }
             break;
-        case 's': // Split edge
-        {
-            adapt_mesh am;
-            am.split_edge(*dsc, *image_);
+        case 's': // Save mesh
+        {   std::ostringstream os;
+            os << LOG_PATH << "dsc.dsc";
+            if(dsc->save(os.str().c_str()))
+            {
+                std::cout << "Successfully saved" << std::endl;
+            }
         }
             break;
-        case 'b': // Split edge
+        case 'b': // Load mesh
         {
             back_up_dsc();
         }
@@ -189,6 +192,25 @@ void interface::keyboard(unsigned char key, int x, int y){
         case 'l': // Split edge
         {
             load_dsc();
+        }
+            break;
+        case 'z': // semi-supervised classification
+        {
+            semi_supervised_classification();
+        }
+            break;
+        case 'c': // supervised classification
+        {
+            supervised_classification();
+        }
+            break;
+        case 'v': // clean
+        {
+            for (auto fkey : dsc->faces())
+            {
+                dsc->update_attributes(fkey, 0);
+            }
+            gl_debug_helper::label_count = 0;
         }
             break;
         case 'w': // Split edge
@@ -228,16 +250,19 @@ void interface::load_dsc()
         myfile >> nb_vertice;
         myfile >> nb_face;
         
-        std::vector<double> points(3*nb_vertice, 0);
+        std::vector<real> points(3*nb_vertice, 0);
         for (int i = 0; i < nb_vertice; i++) {
             myfile >> points[3*i];
             myfile >> points[3*i+1];
         }
         std::vector<int> faces; faces.resize(3*nb_face);
+        std::vector<int> phases(nb_face, 0);
         for (int i = 0; i < nb_face; i++) {
             myfile >> faces[3*i];
             myfile >> faces[3*i + 1];
             myfile >> faces[3*i + 2];
+            
+            myfile >> phases[i];
         }
         
         // Init DSC
@@ -633,7 +658,7 @@ interface::interface(int &argc, char** argv){
     
     init_dsc();
     
-    threshold_initialization();
+//    threshold_initialization();
     
     gl_debug_helper::set_dsc(&(*dsc));
 //    init_sqaure_boundary();
@@ -649,6 +674,9 @@ interface::interface(int &argc, char** argv){
 using namespace DSC2D;
 
 void interface::init_dsc(){
+    load_dsc();
+    return;
+    
     double width = imageSize[0];
     double height = imageSize[1];
     
@@ -796,3 +824,96 @@ void interface::init_boundary_brain(){
         std::cout << labels_list[i].size() << " in phase " << i << std::endl;
     }
 }
+
+////////////////////////////////////////////////////////
+// Summer school
+
+// Classification by intensity mean clustering
+// Nearest mean classifier
+void interface::supervised_classification()
+{
+
+    
+    // 1. Compute mean intensity
+    std::vector<double> mean_i(2, 0.0);
+    std::vector<double> sum_a(2, 0.0);
+    
+    for (auto fkey : dsc->faces())
+    {
+        if (dsc->get_label(fkey) != 0)
+        {
+            auto pts = dsc->get_pos(fkey);
+            double area;
+            double mi = image_->get_tri_intensity_f(pts, &area);
+            
+            mean_i[dsc->get_label(fkey) - 1] += mi;
+            sum_a[dsc->get_label(fkey) - 1]  += area;
+        }
+
+    }
+    
+    mean_i[0] = mean_i[0] / sum_a[0];
+    mean_i[1] = mean_i[1] / sum_a[1];
+    
+    // 2. Clustering
+    for (auto fkey : dsc->faces())
+    {
+        auto pts = dsc->get_pos(fkey);
+        double area;
+        double mi = image_->get_tri_intensity_f(pts, &area);
+        mi = mi / area;
+            
+        int new_label = (std::abs(mi - mean_i[0]) < std::abs(mi - mean_i[1])) ? 1 : 2;
+        dsc->update_attributes(fkey, new_label);
+    }
+    
+    return;
+    
+    double threshold = 0.122;
+    
+    double mean_inten = 0.0;
+    double sum_area = 0.0;
+    for (auto fkey : dsc->faces())
+    {
+        if (dsc->get_label(fkey) == 1)
+        {
+            auto pts = dsc->get_pos(fkey);
+            double area;
+            double mi = image_->get_tri_intensity_f(pts, &area);
+            
+            mean_inten += mi;
+            sum_area += area;
+        }
+    }
+    
+    mean_inten = mean_inten / sum_area;
+    
+    // 2. Clustering
+    for (auto fkey : dsc->faces())
+    {
+        if (dsc->get_label(fkey) == 0)
+        {
+            auto pts = dsc->get_pos(fkey);
+            double area;
+            double mi = image_->get_tri_intensity_f(pts, &area);
+            mi = mi / area;
+            
+            if (std::abs(mi - mean_inten) < threshold)
+            {
+                dsc->update_attributes(fkey, 1);
+            }
+        }
+    }
+}
+
+
+void interface::semi_supervised_classification()
+{
+    
+}
+
+
+
+
+
+
