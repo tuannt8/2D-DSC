@@ -21,24 +21,41 @@
 
 #define PI_V1 3.14159
 
-///*
-// * Two phase synthetics image
-// */
-//// Coefficient
-//#define IMAGE_PATH "test.png"
-//// Mesh control
-//#define DISCRETIZE_RES 10.0
-//#define SMALLEST_SIZE   10
-//// Adaptive mesh
-//#define SPLIT_FACE_COEFFICIENT  0.2 // split thres = coe*(1-coe)*(ci-cj)^2
-//#define SPLIT_EDGE_COEFFICIENT 0.03    // Split thres = coe*(ci-cj)^2
-//// Mumford
-//#define ALPHA 1  // internal force
-//#define BETA    1.0 // external force
-//
-//#define DT_ 0.2
-////#define ADD_NOISE
-//#define STABLE_MOVE 1e-2
+#define USE_SETTING_FILE
+
+#ifdef USE_SETTING_FILE
+
+extern std::string IMAGE_PATH;
+extern int DISCRETIZE_RES;
+extern float SMALLEST_SIZE;
+extern float SPLIT_FACE_COEFFICIENT;
+extern float SPLIT_EDGE_COEFFICIENT;
+extern float ALPHA;
+extern float DT_;
+
+#define STABLE_MOVE 1e-2
+#define BETA    1.0 // external force
+
+#else
+
+/*
+ * Two phase synthetics image
+ */
+// Coefficient
+#define IMAGE_PATH "test.png"
+// Mesh control
+#define DISCRETIZE_RES 10.0
+#define SMALLEST_SIZE   10
+// Adaptive mesh
+#define SPLIT_FACE_COEFFICIENT  0.2 // split thres = coe*(1-coe)*(ci-cj)^2
+#define SPLIT_EDGE_COEFFICIENT 0.03    // Split thres = coe*(ci-cj)^2
+// Mumford
+#define ALPHA 1  // internal force
+#define BETA    1.0 // external force
+
+#define DT_ 0.2
+//#define ADD_NOISE
+#define STABLE_MOVE 1e-2
 
 ///*
 // * Sound
@@ -92,22 +109,22 @@
 //#define DT_ 0.5
 //#define STABLE_MOVE 1e-2
 
-/*
- * Carbon filber
- */
-// Coefficient
-#define IMAGE_PATH "../../Large_data/Filber/filber.png"
-// Mesh control
-#define DISCRETIZE_RES 30.0
-#define SMALLEST_SIZE   1
-// Adaptive mesh
-#define SPLIT_FACE_COEFFICIENT  0.1 // split thres = coe*(1-coe)*(ci-cj)^2
-#define SPLIT_EDGE_COEFFICIENT 4    // Split thres = coe*(ci-cj)^2
-// Mumford
-#define ALPHA 0.3  // internal force
-#define BETA    1.0 // external force
-#define DT_ 1
-#define STABLE_MOVE 1e-2
+///*
+// * Carbon filber
+// */
+//// Coefficient
+//#define IMAGE_PATH "../../Large_data/Filber/filber.png"
+//// Mesh control
+//#define DISCRETIZE_RES 30.0
+//#define SMALLEST_SIZE   1
+//// Adaptive mesh
+//#define SPLIT_FACE_COEFFICIENT  0.1 // split thres = coe*(1-coe)*(ci-cj)^2
+//#define SPLIT_EDGE_COEFFICIENT 4    // Split thres = coe*(ci-cj)^2
+//// Mumford
+//#define ALPHA 0.3  // internal force
+//#define BETA    1.0 // external force
+//#define DT_ 1
+//#define STABLE_MOVE 1e-2
 
 ///*
 // * Star
@@ -196,6 +213,8 @@
 //#define BETA    1.0 // external force
 //#define DT_ 0.5
 //#define STABLE_MOVE 1e-2
+
+#endif
 
 using std::vector;
 using std::cout;

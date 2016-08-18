@@ -636,13 +636,33 @@ interface::interface(int &argc, char** argv){
     threshold_initialization();
     
     gl_debug_helper::set_dsc(&(*dsc));
-//    init_sqaure_boundary();
-//   init_boundary();
-    
-//    init_boundary_brain();
     
     reshape(WIN_SIZE_X, WIN_SIZE_Y);
     display();
+    
+    
+    // test
+    setting_io io;
+    try
+    {
+        io.load("test.txt");
+        
+        int ss = io.get_int("shortest_edge");
+        std::string p = io.get_string("file_path");
+        
+        std::cout << ss << " " << p << std::endl;
+        
+        int s1 = io.get_int("crash");
+        
+        std::cout << s1;
+    }
+    catch (std::exception & ee)
+    {
+        std::cout << ee.what() << std::endl;
+        exit(1);
+    }
+    
+    
 }
 
 #pragma mark - Data

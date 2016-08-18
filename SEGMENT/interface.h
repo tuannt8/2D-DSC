@@ -12,6 +12,7 @@
 #include "DSC.h"
 #include "log.h"
 #include "texture_helper.h"
+#include "setting_io.hpp"
 
 #ifdef WIN32
 #include <GL/glew.h>
