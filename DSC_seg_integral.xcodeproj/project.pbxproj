@@ -39,7 +39,6 @@
 		A64C512E1B54FFD600BDF016 /* options_disp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A64C512D1B54FFD600BDF016 /* options_disp.cpp */; };
 		A663DE681AD6B25B006CC422 /* libX11.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A663DE671AD6B25B006CC422 /* libX11.6.dylib */; };
 		A67962501AB965D400EACF40 /* DSC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A51F3A517D6386100A8F8F2 /* DSC.cpp */; };
-		A67B0CED1BC569950060D2A8 /* libarmadillo.5.000.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A67B0CEC1BC569950060D2A8 /* libarmadillo.5.000.1.dylib */; };
 		A699B3681AE4E7B500522DA2 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A699B3671AE4E7B500522DA2 /* Accelerate.framework */; };
 		A69B8AD71AF7B3690031E45D /* polygon_f.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A69B8AD51AF7B3690031E45D /* polygon_f.cpp */; };
 		A6B45F1F1A88CE120091F5A6 /* interface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A6B45F1E1A88CE120091F5A6 /* interface.cpp */; };
@@ -163,7 +162,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A67B0CED1BC569950060D2A8 /* libarmadillo.5.000.1.dylib in Frameworks */,
 				A6E1B0241B1D9F6B00F31E48 /* libpng15.15.dylib in Frameworks */,
 				A699B3681AE4E7B500522DA2 /* Accelerate.framework in Frameworks */,
 				A663DE681AD6B25B006CC422 /* libX11.6.dylib in Frameworks */,
