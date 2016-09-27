@@ -259,7 +259,7 @@ void interface::keyboard(unsigned char key, int x, int y){
     
     int dis = (int)key - 48;
     if (dis <= 10 and dis >= 0) {
-        bDiplay_[dis] = ! bDiplay_[dis];
+        gl_debug_helper::_idx = dis;
     }
     g_param.bDisplay = bDiplay_;
     

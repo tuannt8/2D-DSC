@@ -21,6 +21,8 @@
 using std::cout;
 using std::endl;
 
+int gl_debug_helper::_idx = 1;
+
 namespace temp_gdh {
     
     inline bool is_greater(Vec2 g, Vec2 l){
@@ -88,9 +90,7 @@ void gl_debug_helper::update_dsc(){
     dsc_obj * dsc = get_instance().s_dsc_;
     
     
-    
-    static int label_count = 0;
-    int new_label = ++label_count;
+    int new_label = _idx;
     for (auto fid = dsc->faces_begin(); fid != dsc->faces_end(); fid++) {
         auto pts = dsc->get_pos(*fid);
         if (temp_gdh::tri_box_overlap(ld, ru, pts)) {

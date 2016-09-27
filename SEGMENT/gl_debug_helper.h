@@ -40,6 +40,7 @@ private:
     double WIN_HEIGHT_;
     
     
+
     
     dsc_obj * s_dsc_;
 public:
@@ -67,6 +68,8 @@ public:
     static void draw();
     
     Vec2 to_gl_coord(Vec2 win_coord);
+    
+    static int _idx;
 private:
     static void update_dsc();
 };

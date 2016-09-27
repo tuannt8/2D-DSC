@@ -45,8 +45,6 @@ setting::setting()
     border_length = 0.0;
     
     load_test_case(15);
-//    load_test();
-//    load_setting_from_file("DATA/test_images/test.txt");
 
     
     if(_bTrickBorder)
@@ -276,10 +274,10 @@ void setting::load_raden()
     
     _circle_inits =
     {
-        {
-            {Vec2(128, 32), 30}
+        { // Phase 1
+            {Vec2(128, 32), 30} // (center), radius. Can be more than one circle
         }
-        ,{
+        ,{ // Phase 2
             {Vec2(128, 128), 30}
         }
         ,{
