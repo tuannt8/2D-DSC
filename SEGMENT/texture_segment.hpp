@@ -37,6 +37,7 @@ public:
     
     void show_all_probablity();
     void show_mapping_mat();
+    void show_label();
     
     void draw_debug();
     

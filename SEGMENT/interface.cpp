@@ -66,9 +66,36 @@ void animate_(){
     interface::get_instance()->animate();
 }
 
+
+#define PROBABILITY_DRAW "Show all probability"
+#define LABELED_IMAGE "Show label image"
+#define MAPPING_MAT "Show mapping matrix"
+std::vector<std::string> X11_dis_opt = {PROBABILITY_DRAW, MAPPING_MAT, LABELED_IMAGE};
+
 void glutMouseFunc_(int button, int state, int x, int y){
     gl_debug_helper::mouseDown(button, state, x, y);
     options_disp::mouse_func(button, state, x, y);
+    
+    // Display
+    if (options_disp::get_option(PROBABILITY_DRAW))
+    {
+        interface::get_instance()->_tex_seg->show_all_probablity();
+    }
+    
+    if (options_disp::get_option(MAPPING_MAT))
+    {
+        interface::get_instance()->_tex_seg->show_mapping_mat();
+    }
+    
+    if (options_disp::get_option(LABELED_IMAGE))
+    {
+        interface::get_instance()->_tex_seg->show_label();
+    }
+    
+    for (auto x : X11_dis_opt)
+    {
+        options_disp::map_options[x] = false;
+    }
 };;
 
 
@@ -338,24 +365,9 @@ void interface::draw()
         _origin_img->draw_image();
     }
     
-    if (options_disp::get_option("Test corrdinate", false) and _tex_seg) {
-        _tex_seg->draw_test_coord();
-    }
-    
-    if (options_disp::get_option("Labeled", false) and _origin_img) {
-        _tex_seg->draw_dictionary();
-    }
-    
-    if (options_disp::get_option("Probability", false) and _origin_img) {
-        _tex_seg->draw_probability();
-    }
     
     if (options_disp::get_option("DSC faces", true) and dsc) {
         Painter::draw_faces(*dsc);
-    }
-    
-    if (options_disp::get_option("Face intensity", false) and dsc) {
-        Painter::draw_faces_intensity(*dsc);
     }
     
     if (options_disp::get_option("Interface", false) and dsc) {
@@ -371,30 +383,6 @@ void interface::draw()
     //    Painter::draw_vertices(*dsc);
     }
 
-    if(options_disp::get_option("Phase index", false)){
-        Painter::draw_face_label(*dsc);
-    }
-
-    if (options_disp::get_option("External force", false))
-    {
-        Painter::draw_external_force(*dsc);
-    }
-    
-    if(options_disp::get_option("Vertices index", false)){
-        glColor3f(1, 0, 0);
-        Painter::draw_vertices_index(*dsc);
-    }
-    
-    if(options_disp::get_option("Edge index", false)){
-        glColor3f(1, 0, 0);
-        // Painter::draw_vertices_index(*dsc);
-        // Painter::draw_faces_index(*dsc);
-        Painter::draw_edges_index(*dsc);
-    }
-    
-    if (options_disp::get_option("Face index")){
-        Painter::draw_faces_index(*dsc);
-    }
 
     
     gl_debug_helper::draw();
@@ -496,6 +484,12 @@ interface::interface(int &argc, char** argv){
     
     glutInit(&argc, argv);
     initGL();
+    
+    // Button
+    for (auto x:X11_dis_opt)
+    {
+        options_disp::get_option(x, false);
+    }
     
     _tex_seg = std::shared_ptr<texture_segment>(new texture_segment);
     _tex_seg->init();
