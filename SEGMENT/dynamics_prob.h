@@ -13,7 +13,6 @@
 #include <stdio.h>
 #include "define.h"
 #include "image.h"
-#include <armadillo>
 
 #define num_phase 2
 
@@ -40,7 +39,7 @@ private:
     image * img_;
     
 private:
-    arma::colvec C_vec; // Phase intensity
+//    arma::colvec C_vec; // Phase intensity
     double dt = 0.001;
 public:
     dynamics_prob(){};

@@ -45,22 +45,22 @@ void dynamics_prob::update_dsc(dsc_obj & obj, image & img){
 }
 
 void dynamics_prob::update_xac_suat(){
-    double max = 0;
-    for (auto fkey : dsc_->faces()) {
-        double f = -dsc_->face_att[fkey][xac_suat_force][0];
-        double area = dsc_->area(fkey);
-        
-        double s = dsc_->face_att[fkey][xac_suat][0];
-        
-        double dis = f/area*dt;
-        dsc_->face_att[fkey][xac_suat] = Vec2(s + dis);
-        
-        if (dis > max) {
-            max = dis;
-        }
-    }
-    
-    printf("Max: %f ; %f x %f \n", max, C_vec(0), C_vec(1));
+//    double max = 0;
+//    for (auto fkey : dsc_->faces()) {
+//        double f = -dsc_->face_att[fkey][xac_suat_force][0];
+//        double area = dsc_->area(fkey);
+//        
+//        double s = dsc_->face_att[fkey][xac_suat][0];
+//        
+//        double dis = f/area*dt;
+//        dsc_->face_att[fkey][xac_suat] = Vec2(s + dis);
+//        
+//        if (dis > max) {
+//            max = dis;
+//        }
+//    }
+//    
+//    printf("Max: %f ; %f x %f \n", max, C_vec(0), C_vec(1));
 }
 
 void dynamics_prob::update_lambda(){
@@ -77,43 +77,43 @@ void dynamics_prob::update_lambda(){
 
 void dynamics_prob::compute_xac_suat_force(){
     /*
-     intensity
-     */
-    for (auto fkey : dsc_->faces()){
+//     intensity
+//     */
+//    for (auto fkey : dsc_->faces()){
+//
+//        // Force is independent to each triangle
+//
+//        double ui = dsc_->face_att[fkey][intensity][0];
+//        double differ = 0.0;
+//        auto tris = dsc_->get_pos(fkey);
+//        Vec2 min(INFINITY, INFINITY), max(-INFINITY, -INFINITY);
+//        for (auto p: tris){
+//            min[0] = std::min(min[0], p[0]);
+//            min[1] = std::min(min[1], p[1]);
+//            max[0] = std::max(max[0], p[0]);
+//            max[1] = std::max(max[1], p[1]);
+//        }
+//        for (int i = floor(min[0]); i < ceil(max[0]); i++) {
+//            for (int j = floor(min[1]); j < ceil(max[1]); j++) {
+//                if (helper_t::is_point_in_tri(Vec2(i,j), tris)) {
+//                    differ += 2 * (ui - img_->get_intensity(i, j));
+//                }
+//            }
+//        }
+//        
+//        double derivative = 0.;
+//        double s = dsc_->face_att[fkey][xac_suat][0];
+//        for (int i = 0; i < num_phase; i++) {
+//            double diff = XI_f::diff(s, i);
+//            derivative += diff * C_vec(i);
+//        }
+//        
+//        double area = dsc_->area(fkey);
+//        double f1 = differ * derivative;
+//        
+//        dsc_->face_att[fkey][xac_suat_force] += Vec2(f1);
 
-        // Force is independent to each triangle
-
-        double ui = dsc_->face_att[fkey][intensity][0];
-        double differ = 0.0;
-        auto tris = dsc_->get_pos(fkey);
-        Vec2 min(INFINITY, INFINITY), max(-INFINITY, -INFINITY);
-        for (auto p: tris){
-            min[0] = std::min(min[0], p[0]);
-            min[1] = std::min(min[1], p[1]);
-            max[0] = std::max(max[0], p[0]);
-            max[1] = std::max(max[1], p[1]);
-        }
-        for (int i = floor(min[0]); i < ceil(max[0]); i++) {
-            for (int j = floor(min[1]); j < ceil(max[1]); j++) {
-                if (helper_t::is_point_in_tri(Vec2(i,j), tris)) {
-                    differ += 2 * (ui - img_->get_intensity(i, j));
-                }
-            }
-        }
-        
-        double derivative = 0.;
-        double s = dsc_->face_att[fkey][xac_suat][0];
-        for (int i = 0; i < num_phase; i++) {
-            double diff = XI_f::diff(s, i);
-            derivative += diff * C_vec(i);
-        }
-        
-        double area = dsc_->area(fkey);
-        double f1 = differ * derivative;
-        
-        dsc_->face_att[fkey][xac_suat_force] += Vec2(f1);
-
-    }
+//    }
     
 //    /*
 //     Edge force
@@ -231,85 +231,21 @@ void dynamics_prob::init_xac_suat(){
 
 void dynamics_prob::update_tri_intensity(){
 
-    for (auto fkey: dsc_->faces()) {
-        double x = dsc_->face_att[fkey][xac_suat][0];
-        
-        double inten = 0.;
-        for (int i = 0; i < num_phase; i++) {
-            double XI_i = XI_f::value(x, i);
-            double C_i = C_vec(i);
-            inten += XI_i * C_i;
-        }
-        dsc_->face_att[fkey][intensity] = Vec2(inten);
-    }
+//    for (auto fkey: dsc_->faces()) {
+//        double x = dsc_->face_att[fkey][xac_suat][0];
+//        
+//        double inten = 0.;
+//        for (int i = 0; i < num_phase; i++) {
+//            double XI_i = XI_f::value(x, i);
+//            double C_i = C_vec(i);
+//            inten += XI_i * C_i;
+//        }
+//        dsc_->face_att[fkey][intensity] = Vec2(inten);
+//    }
 }
 
 void dynamics_prob::compute_c(){
-    arma::mat A_mat(num_phase, num_phase); A_mat.fill(0.0);
-    arma::colvec B_vec(num_phase); B_vec.fill(0.0);
-    
-    /*
-     1. Compute A
-     */
-    for (auto fkey : dsc_->faces()){
-        double area = dsc_->area(fkey);
-        double x = dsc_->get_phase_attr(fkey, xac_suat)[0];
-        
-        for (int i = 0; i < num_phase; i++){
-            double XI_i = XI_f::value(x, i);
-            for (int j = 0; j < num_phase; j++){
-                // Contribute to A(i,j)
-                double XI_j = XI_f::value(x, j);
-                A_mat(i,j) += area * XI_i * XI_j;
-            }
-        }
-    }
-    
-    /*
-     2. Compute B
-     */
-    for (auto fkey: dsc_->faces()){
-        auto tris = dsc_->get_pos(fkey);
-        
-        Vec2 min(INFINITY, INFINITY), max(-INFINITY, -INFINITY);
-        for (auto p: tris){
-            min[0] = std::min(min[0], p[0]);
-            min[1] = std::min(min[1], p[1]);
-            max[0] = std::max(max[0], p[0]);
-            max[1] = std::max(max[1], p[1]);
-        }
-        
-        double total_g = 0.;
-        
-        for (int i = floor(min[0]); i < ceil(max[0]); i++) {
-            for (int j = floor(min[1]); j < ceil(max[1]); j++) {
-                if (helper_t::is_point_in_tri(Vec2(i,j), tris)) {
-                    total_g += img_->get_intensity(i, j);
-                }
-            }
-        }
-        
-        double x = dsc_->get_phase_attr(fkey, xac_suat)[0];
-        for (int i = 0; i < num_phase; i++) {
-            double XI_i = XI_f::value(x, i);
-            B_vec(i) += total_g * XI_i;
-        }
-    }
-    
-    /*
-     Solve for c
-     */
-    // Some time the matrix A is singular
-    C_vec = arma::solve(A_mat, B_vec);
-    
-    if (arma::det(A_mat) < 0.001){
-        cout << "Singular" << endl;
-        if (A_mat(0,0) + A_mat(0,1) != 0.) {
-            C_vec(0) = B_vec(0) / (A_mat(0,0) + A_mat(0,1));
-        }
-        if(A_mat(0,0) + A_mat(0,1) != 0.)
-           C_vec(1) = B_vec(1) / (A_mat(1,0) + A_mat(1,1));
-    }
+
 
 }
 

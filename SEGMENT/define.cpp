@@ -43,7 +43,7 @@ double DISCRETIZE_RES = 20;//11.0
 #elif defined TEST_BMP
 dynamics_param g_param(1.0,1.0,1.);
 
-std::string IMAGE_NAME = "test.png";
+std::string IMAGE_NAME = "tuesday/im_1.png";
 double DISCRETIZE_RES =15;//11.0
 
 /************************/
