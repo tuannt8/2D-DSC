@@ -171,7 +171,9 @@ namespace DSC2D
     {
         mesh = new HMesh::Manifold();
         std::vector<int> temp(faces.size()/3,3);
-        mesh->build(points.size()/3, &points[0], temp.size(), &temp[0], &faces[0]);
+        
+        HMesh::build(*mesh, points.size()/3, &points[0], temp.size(), &temp[0], &faces[0]);
+//        mesh->build(points.size()/3, &points[0], temp.size(), &temp[0], &faces[0]);
     }
     
     void DeformableSimplicialComplex::validity_check()
