@@ -48,7 +48,7 @@ namespace DSC2D
     DeformableSimplicialComplex::DeformableSimplicialComplex(real AVG_EDGE_LENGTH, const std::vector<real>& points, const std::vector<int>& faces, DesignDomain *domain): design_domain(domain)
     {
         set_avg_edge_length(AVG_EDGE_LENGTH);
-        MIN_ANGLE = M_PI * 10./180.;
+        MIN_ANGLE = M_PI * 20./180.;
         COS_MIN_ANGLE = cos(MIN_ANGLE);
         DEG_ANGLE = 0.2*MIN_ANGLE;
         
@@ -104,6 +104,402 @@ namespace DSC2D
         bStable.cleanup(cleanup_map.vmap);
 
         
+    }
+    
+    std::vector<HMesh::VertexID> DeformableSimplicialComplex::get_neighbor_interface_node(node_key n)
+    {
+        std::vector<HMesh::VertexID> neighbor_interface_vertices;
+        if (!is_interface(n)) {
+            return neighbor_interface_vertices;
+        }
+        
+        for (auto hew = walker(n); !hew.full_circle(); hew = hew.circulate_vertex_ccw()) {
+            if (is_interface(hew.halfedge())) {
+                neighbor_interface_vertices.push_back(hew.vertex());
+            }
+        }
+        
+        return neighbor_interface_vertices;
+    }
+    
+    std::vector<HMesh::HalfEdgeID> DeformableSimplicialComplex::get_interface_edges(node_key n)
+    {
+        std::vector<HMesh::HalfEdgeID> neighbor_interface_edges;
+        if (!is_interface(n)) {
+            return neighbor_interface_edges;
+        }
+        
+        for (auto hew = walker(n); !hew.full_circle(); hew = hew.circulate_vertex_ccw()) {
+            if (is_interface(hew.halfedge())) {
+                neighbor_interface_edges.push_back(hew.halfedge());
+            }
+        }
+        
+        return neighbor_interface_edges;
+    }
+    
+    vec2 DeformableSimplicialComplex::line_approximating(node_key origin, node_key p1, node_key p2)
+    {
+        auto p01 = Util::normalize(get_pos(p1) - get_pos(origin));
+        auto p02 = Util::normalize(get_pos(p2) - get_pos(origin));
+        
+        return Util::normalize(p01 + p02);
+    }
+    
+    double DeformableSimplicialComplex::quadratic_curvature(node_key n) // rerturn -INFINITY if invalid
+    {
+        // ANTI_ALIASING
+        if(is_interface(n) && !HMesh::boundary(*mesh, n))
+        {
+            // Find 5 points along this curve
+            std::vector<node_key> vertex_5_list;
+            vertex_5_list.resize(5);
+            auto nn = get_neighbor_interface_node(n);
+            if (nn.size() == 2) {
+                vertex_5_list[2] = n;
+                vertex_5_list[1] = nn[0];
+                vertex_5_list[3] = nn[1];
+                auto nn0 = get_neighbor_interface_node(nn[0]);
+                auto nn1 = get_neighbor_interface_node(nn[1]);
+                
+                if (nn0.size() == 2 && nn1.size()== 2) {
+                    vertex_5_list[0] = (nn0[0].get_index() == vertex_5_list[1].get_index())? nn0[1] : nn0[0];
+                    vertex_5_list[4] = (nn1[0].get_index() == vertex_5_list[3].get_index())? nn1[1] : nn1[0];
+                    
+                    // Now compute curvature
+                    auto n1 = line_approximating(vertex_5_list[2], vertex_5_list[3], vertex_5_list[4]);
+                    auto n0 = line_approximating(vertex_5_list[2], vertex_5_list[1], vertex_5_list[0]);
+                    
+                    return Util::dot(n0, n1);
+                }
+            }
+        }
+        
+        return -INFINITY;
+    }
+    
+    void DeformableSimplicialComplex::smooth_boundary()
+    {
+        for(auto vid : vertices())
+        {
+            if(HMesh::boundary(*mesh, vid)
+               && !is_interface(vid))
+            {
+                // consider move it for better mesh quality
+                // Boundary
+                // Collapse the shortest edge
+                std::vector<HMesh::Walker> edges;
+                std::vector<node_key> neighbors;
+                for (auto hew = walker(vid); !hew.full_circle(); hew = hew.circulate_vertex_cw())
+                {
+                    if (HMesh::boundary(*mesh, hew.halfedge())
+                        && !is_interface(hew.vertex()))
+                    {
+                        edges.push_back(hew);
+                        neighbors.push_back(hew.vertex());
+                    }
+                }
+                
+                if(neighbors.size()!=2){
+                    continue;
+                }
+                
+                auto cangle = Util::cos_angle(
+                                         get_pos(neighbors[0]),
+                                         get_pos(vid),
+                                         get_pos(neighbors[1]));
+                
+                if (std::abs(cangle) > 0.9 ) {
+                    // QUALIFIED
+                    double eps = 0.7;
+                    auto new_pos = (get_pos(neighbors[0]) + get_pos(neighbors[1]))*0.5*(1-eps) + get_pos(vid) * eps;
+                    
+                    // check quality
+                    std::vector<edge_key> eids0;
+                    for(auto hw = walker(vid); !hw.full_circle(); hw = hw.circulate_vertex_cw())
+                    {
+                        if(hw.face() != HMesh::InvalidFaceID)
+                        {
+                            eids0.push_back(hw.next().halfedge());
+                        }
+                    }
+                    
+                    double q_old = min_quality(eids0, get_pos(vid), get_pos(vid));
+                    double q_new = min_quality(eids0, get_pos(vid), new_pos);
+                    
+                    if(q_new > q_old)
+                        set_pos(vid, new_pos);
+                }
+            }
+        }
+    }
+    
+    int DeformableSimplicialComplex::thin_interial(double flat_angle, bool boundary_collapse, int * nb_interface_collapse)
+    {
+        // Collapse interior vertices
+        int count_internal = 0, counter_interface = 0, count_boundary = 0;
+        int cc = 0;
+        auto s_dsc = this;
+        for(auto vid : s_dsc->vertices())
+        {
+            cc++;
+            
+            if(s_dsc->is_interface(vid))
+            {
+                double dis = (s_dsc->get_destination(vid) - get_pos(vid)).length();
+                
+                if(boundary_collapse &&
+                   dis < 0.001 && // TODO: accuracy
+                   !s_dsc->is_crossing(vid))
+                {
+                    if(!HMesh::boundary(*s_dsc->mesh, vid))
+                    {
+                        // only collapse flat edges
+                        std::vector<HMesh::Walker> edges;
+                        for (auto hew = s_dsc->walker(vid); !hew.full_circle(); hew = hew.circulate_vertex_cw())
+                        {
+                            if (s_dsc->is_interface(hew.halfedge()))
+                            {
+                                edges.push_back(hew);
+                            }
+                        }
+                        
+                        if(edges.size()!=2){
+                            continue;
+                        }
+                        
+                        auto cangle = DSC2D::Util::cos_angle(
+                                                             s_dsc->get_pos(edges[0].vertex()),
+                                                             s_dsc->get_pos(edges[0].opp().vertex()),
+                                                             s_dsc->get_pos(edges[1].vertex()));
+                        
+                        auto shortest_edge =
+                        s_dsc->length(edges[0].halfedge()) <  s_dsc->length(edges[1].halfedge())?
+                        edges[0] : edges[1];
+                        
+                        double thres = cos(flat_angle*M_PI/180.);
+                        
+//                        // ANTI_ALIASING
+//                        if(length(edges[0].halfedge()) < 1.5 || length(edges[1].halfedge()) < 1.5 )
+//                        {
+//                            thres = cos(0*M_PI/180.);
+//                        }
+                        
+                        if(cangle < thres)
+                        {
+                            if(collapse_edge(shortest_edge.halfedge(), vid, false))
+                                counter_interface++;
+                        }
+                        else
+                        {
+                            // ANTI_ALIASING
+//                            double c_quad = quadratic_curvature(vid);
+//                            double thres1 = cos(170*M_PI/180.);
+//                            if(c_quad > -1 && c_quad < thres1)
+//                            {
+//                                if(collapse_edge(shortest_edge.halfedge(), vid, false))
+//                                    counter_interface++;
+//                            }
+                            
+                            
+                            
+                            //                        // anti aliasing
+                            //#ifdef ANTI_ALIASING
+                            //                        if(length(edges[0].halfedge()) < 2 && length(edges[1].halfedge()) < 2 )
+                            //                        {
+                            //                            thres = cos(150*M_PI/180.);
+                            //                        }
+                            //#endif
+                            //
+                            
+                            // Quadratic curvature
+                            // We are currently using linear curvature
+                            // If linear curvature does not help in case of ANTI_ALIASING
+                        }
+                    }
+                    else // interface on boundary
+                    {
+                        // TODO
+                    }
+                }
+            }
+            else // Not interface
+            {
+                if(!HMesh::boundary(*s_dsc->mesh, vid))
+                {
+                    // Interial vertex
+                    // Collapse the shortest edge
+                    // Not the optimal choice, but we priorize performance
+                    double shortest_length = INFINITY;
+                    edge_key shortest_edge;
+                    for(auto hew = s_dsc->walker(vid); !hew.full_circle(); hew = hew.circulate_vertex_ccw())
+                    {
+                        auto length = s_dsc->length(hew.halfedge());
+                        if(length < shortest_length)
+                        {
+                            shortest_length = length;
+                            shortest_edge = hew.halfedge();
+                        }
+                    }
+                    
+                    if(DeformableSimplicialComplex::collapse(shortest_edge, true))
+                        count_internal++;
+                }
+                else
+                {
+                    // Boundary
+                    // Collapse the shortest edge
+                    std::vector<HMesh::Walker> edges;
+                    for (auto hew = s_dsc->walker(vid); !hew.full_circle(); hew = hew.circulate_vertex_cw())
+                    {
+                        if (HMesh::boundary(*s_dsc->mesh, hew.halfedge()))
+                        {
+                            edges.push_back(hew);
+                        }
+                    }
+                    
+                    if(edges.size()!=2){
+                        continue;
+                    }
+                    
+                    auto cangle = DSC2D::Util::cos_angle(
+                                                         s_dsc->get_pos(edges[0].vertex()),
+                                                         s_dsc->get_pos(edges[0].opp().vertex()),
+                                                         s_dsc->get_pos(edges[1].vertex()));
+                    
+                    auto shortest_edge =
+                    s_dsc->length(edges[0].halfedge()) <  s_dsc->length(edges[1].halfedge())?
+                    edges[0] : edges[1];
+                    double thres = cos(flat_angle*M_PI/180.);
+                    
+                    if(cangle < thres
+                       && collapse_edge(shortest_edge.halfedge(), vid, false))
+                        count_boundary++;
+                }
+            }
+            
+        }
+        
+        s_dsc->update_attributes();
+        
+        smooth();
+        
+        if(nb_interface_collapse)
+            *nb_interface_collapse = counter_interface;
+        
+        return count_internal + counter_interface + count_boundary;
+    }
+    
+    void DeformableSimplicialComplex::smooth_1_ter(HMesh::VertexAttributeVector<vec2>& old_pos,
+                                     HMesh::VertexAttributeVector<vec2>& final_pos,
+                                     HMesh::VertexAttributeVector<std::vector<node_key>> & topo,
+                                     double lamda)
+    {
+        for (int i = 0; i < topo.size(); i++)
+        {
+            auto vid = node_key(i);
+            auto neighbors = topo[vid];
+            if(neighbors.size() == 2)
+            {
+                vec2 new_pos = (old_pos[neighbors[0]] + old_pos[neighbors[1]])/2.0;
+                new_pos = old_pos[vid] * (1-lamda) + new_pos*lamda;
+                final_pos[vid] = new_pos;
+            }
+        }
+    }
+    
+    void DeformableSimplicialComplex::smooth_interface()
+    {
+        // taubin
+        double lamda = 0.5;
+        double mu = -0.52;
+        
+        HMesh::VertexAttributeVector<std::vector<node_key>> topo;
+        HMesh::VertexAttributeVector<vec2> old_pos;
+        for(auto vid : vertices())
+        {
+            old_pos[vid] = get_pos(vid);
+            
+            if(is_interface(vid)
+               && ! is_crossing(vid)
+               && ! HMesh::boundary(*mesh, vid))
+            {
+                for (auto hew = walker(vid); !hew.full_circle(); hew = hew.circulate_vertex_ccw())
+                {
+                    if (is_interface(hew.halfedge()))
+                    {
+                        topo[vid].push_back(hew.vertex());
+                    }
+                }
+                assert(topo[vid].size() == 2);
+            }
+        }
+        
+        HMesh::VertexAttributeVector<vec2> final_pos = old_pos;
+        for (int i = 0; i < 20; i++)
+        {
+            old_pos = final_pos;
+             smooth_1_ter(old_pos, final_pos, topo, lamda);
+            old_pos = final_pos;
+            smooth_1_ter(old_pos, final_pos, topo, mu);
+        }
+        
+        for(auto vid : vertices())
+        {
+            if(is_interface(vid)
+               && ! is_crossing(vid)
+               )
+            {
+                DeformableSimplicialComplex::set_destination(vid, final_pos[vid]);
+            }
+        }
+        
+        deform();
+    }
+    
+    bool DeformableSimplicialComplex::collapse_edge(edge_key ek, node_key n_to_remove, bool safe)
+    {
+        auto s_dsc = this;
+        
+        auto hew = s_dsc->walker(ek);
+        if(hew.vertex().get_index() == n_to_remove.get_index())
+            hew = hew.opp();
+        
+        if (!precond_collapse_edge(*s_dsc->mesh, hew.halfedge()) )
+        {
+            return false;
+        }
+        
+        if(!s_dsc->is_collapsable(hew, safe))
+        {
+            return false;
+        }
+        
+        // Find neighbors
+        std::vector<face_key> e_fids = {hew.face(), hew.opp().face()};
+        std::vector<edge_key> eids0;
+        
+        for(auto hw = s_dsc->walker(n_to_remove); !hw.full_circle(); hw = hw.circulate_vertex_cw())
+        {
+            if(hw.face() != e_fids[0] && hw.face() != e_fids[1])
+            {
+                eids0.push_back(hw.next().halfedge());
+            }
+        }
+        
+        
+        // Check the quality after collapsing
+        vec2 p_new = s_dsc->get_pos(hew.vertex());
+        double q = s_dsc->min_quality(eids0, s_dsc->get_pos(n_to_remove), p_new);
+        
+        double min_angle = MIN_ANGLE;
+        if(q > min_angle)
+        {
+            auto result = collapse(hew, 0, safe);
+            return result;
+        }
+        
+        return false;
     }
     
     
@@ -173,7 +569,11 @@ namespace DSC2D
         std::vector<int> temp(faces.size()/3,3);
         
         HMesh::build(*mesh, points.size()/3, &points[0], temp.size(), &temp[0], &faces[0]);
-//        mesh->build(points.size()/3, &points[0], temp.size(), &temp[0], &faces[0]);
+
+        // Our own build function
+        // to avoid the overhead of stitch mesh
+        // TODO
+        
     }
     
     void DeformableSimplicialComplex::validity_check()

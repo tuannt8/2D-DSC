@@ -36,6 +36,8 @@
 class image;
 #endif
 
+#define ANTI_ALIASING
+
 #define NB_FORCES 10
 
 struct node_atrr{
@@ -671,7 +673,20 @@ namespace DSC2D {
         void deform(bool adaptive = false);
         
     public:
+        vec2 line_approximating(node_key origin, node_key p1, node_key p2);
+        std::vector<node_key> get_neighbor_interface_node(node_key n);
+        std::vector<HMesh::HalfEdgeID> get_interface_edges(node_key n);
+        double quadratic_curvature(node_key n); // rerturn -INFINITY if invalid
         
+        
+        void smooth_boundary();//By moving vertex
+        int thin_interial(double flat_angle, bool boundary_collapse, int * nb_interface_collapse = nullptr);
+        bool collapse_edge(edge_key ek, node_key n_to_remove, bool safe);
+        void smooth_interface();
+        void smooth_1_ter(HMesh::VertexAttributeVector<vec2>& old_pos,
+                          HMesh::VertexAttributeVector<vec2>& final_pos,
+                          HMesh::VertexAttributeVector<std::vector<node_key>> & topo,
+                                                       double lamda);
         /**
          Moves a the vertex with ID vid to its new position. Returns whether the vertex was succesfully moved to its new position.
          */
@@ -740,7 +755,7 @@ namespace DSC2D {
          */
         void smooth(real t = 1.);
     
-    private:
+    public:
         /**
          Remove needles, triangles with one very short edge, by splitting the face (inserting a vertex at the barycenter of the face).
          */

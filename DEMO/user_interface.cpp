@@ -166,6 +166,8 @@ void UI::display()
             }
         }
     }
+    
+    
     check_gl_error();
 }
 
