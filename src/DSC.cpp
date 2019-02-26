@@ -249,7 +249,7 @@ namespace DSC2D
                 double dis = (s_dsc->get_destination(vid) - get_pos(vid)).length();
                 
                 if(boundary_collapse &&
-                   dis < 0.001 && // TODO: accuracy
+//                   dis < 0.1 && // TODO: accuracy
                    !s_dsc->is_crossing(vid))
                 {
                     if(!HMesh::boundary(*s_dsc->mesh, vid))
@@ -280,10 +280,10 @@ namespace DSC2D
                         double thres = cos(flat_angle*M_PI/180.);
                         
 //                        // ANTI_ALIASING
-//                        if(length(edges[0].halfedge()) < 1.5 || length(edges[1].halfedge()) < 1.5 )
-//                        {
-//                            thres = cos(0*M_PI/180.);
-//                        }
+                        if(length(edges[0].halfedge()) < 5 || length(edges[1].halfedge()) < 5 )
+                        {
+                            thres = cos(0*M_PI/180.);
+                        }
                         
                         if(cangle < thres)
                         {
@@ -293,13 +293,13 @@ namespace DSC2D
                         else
                         {
                             // ANTI_ALIASING
-//                            double c_quad = quadratic_curvature(vid);
-//                            double thres1 = cos(170*M_PI/180.);
-//                            if(c_quad > -1 && c_quad < thres1)
-//                            {
-//                                if(collapse_edge(shortest_edge.halfedge(), vid, false))
-//                                    counter_interface++;
-//                            }
+                            double c_quad = quadratic_curvature(vid);
+                            double thres1 = cos(150*M_PI/180.);
+                            if(c_quad > -1 && c_quad < thres1)
+                            {
+                                if(collapse_edge(shortest_edge.halfedge(), vid, false))
+                                    counter_interface++;
+                            }
                             
                             
                             
