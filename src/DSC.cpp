@@ -237,7 +237,7 @@ namespace DSC2D
     int DeformableSimplicialComplex::thin_interial(double flat_angle, bool boundary_collapse, int * nb_interface_collapse)
     {
         // Collapse interior vertices
-        int count_internal = 0, counter_interface = 0, count_boundary = 0;
+        int count_internal = 0, counter_interface = 0, count_boundary = 0, count_interface_quad = 0;
         int cc = 0;
         auto s_dsc = this;
         for(auto vid : s_dsc->vertices())
@@ -249,7 +249,7 @@ namespace DSC2D
                 double dis = (s_dsc->get_destination(vid) - get_pos(vid)).length();
                 
                 if(boundary_collapse &&
-//                   dis < 0.1 && // TODO: accuracy
+//                   dis < 0.0001 && // TODO: accuracy
                    !s_dsc->is_crossing(vid))
                 {
                     if(!HMesh::boundary(*s_dsc->mesh, vid))
@@ -280,10 +280,10 @@ namespace DSC2D
                         double thres = cos(flat_angle*M_PI/180.);
                         
 //                        // ANTI_ALIASING
-                        if(length(edges[0].halfedge()) < 5 || length(edges[1].halfedge()) < 5 )
-                        {
-                            thres = cos(0*M_PI/180.);
-                        }
+//                        if(length(edges[0].halfedge()) < 5 || length(edges[1].halfedge()) < 5 )
+//                        {
+//                            thres = cos(120*M_PI/180.);
+//                        }
                         
                         if(cangle < thres)
                         {
@@ -294,11 +294,14 @@ namespace DSC2D
                         {
                             // ANTI_ALIASING
                             double c_quad = quadratic_curvature(vid);
-                            double thres1 = cos(150*M_PI/180.);
+                            double thres1 = cos(160*M_PI/180.);
                             if(c_quad > -1 && c_quad < thres1)
                             {
                                 if(collapse_edge(shortest_edge.halfedge(), vid, false))
+                                {
+                                    count_interface_quad++;
                                     counter_interface++;
+                                }
                             }
                             
                             
@@ -386,6 +389,8 @@ namespace DSC2D
         
         if(nb_interface_collapse)
             *nb_interface_collapse = counter_interface;
+        
+        std::cout << count_interface_quad << "Removed by quad \n" << std::endl;
         
         return count_internal + counter_interface + count_boundary;
     }
