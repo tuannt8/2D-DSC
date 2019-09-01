@@ -645,6 +645,10 @@ namespace DSC2D {
         
     private:
     public:
+        
+        void remove_degenerate_needle(face_key fkey);
+        void remove_degenerate_needle2(face_key fkey);
+        
         /**
          Maximize minimum angles using greedy approach by flipping edges.
          */
@@ -717,6 +721,11 @@ namespace DSC2D {
          Returns the minimum angle of the face with ID fid.
          */
         real min_angle(face_key fid) const;
+        
+        /**
+         Returns the max angle of the face with ID fid.
+         */
+        real max_angle(face_key fid, HMesh::Walker &hmax);
         
         /**
          Returns the minimum edge length of the edges of the face with ID fid.
