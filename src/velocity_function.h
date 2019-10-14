@@ -154,10 +154,14 @@ namespace DSC2D {
     public:
         void take_time_step(DeformableSimplicialComplex& complex)
         {
+            static int iter = 0;
+            
             compute_time = 0.;
             deform_time = 0.;
             deform(complex);
             time_step++;
+            
+            std::cout << "Iter: " << iter++ << " ; time: " << get_total_compute_time() << std::endl;
         }
         
         /**
