@@ -177,76 +177,76 @@ namespace DSC2D {
             }
         }
         
-        DesignDomain(DESIGN_DOMAIN_TYPE design, int SIZE_X, int SIZE_Y, real boundary) : DesignDomain(design, SIZE_X, SIZE_Y, boundary, boundary)
-        {
-            
-        }
-
-//        DesignDomain(DESIGN_DOMAIN_TYPE design, int SIZE_X, int SIZE_Y, real boundary)
+//        DesignDomain(DESIGN_DOMAIN_TYPE design, int SIZE_X, int SIZE_Y, real boundary) : DesignDomain(design, SIZE_X, SIZE_Y, boundary, boundary)
 //        {
-//            mWidth = SIZE_X;
-//            mHeight = SIZE_Y;
-//            switch (design)
-//            {
-//                case RECTANGLE:
-//                    name = "RECTANGLE";
-//                    corners.push_back(vec2(0.,0.));
-//                    corners.push_back(vec2(0., SIZE_Y));
-//                    corners.push_back(vec2(SIZE_X, SIZE_Y));
-//                    corners.push_back(vec2(SIZE_X, 0.));
-//                    subdomain_corners.push_back(corners);
-//                    break;
-//                case L:
-//                    name = "L";
-//                    corners.push_back(vec2(0.,0.));
-//                    corners.push_back(vec2(0., SIZE_Y));
-//                    corners.push_back(vec2(0.4*SIZE_X, SIZE_Y));
-//                    corners.push_back(vec2(0.4*SIZE_X, 0.4*SIZE_Y));
-//                    corners.push_back(vec2(SIZE_X, 0.4*SIZE_Y));
-//                    corners.push_back(vec2(SIZE_X, 0.));
-//                    subdomain_corners.push_back(corners);
-//                    break;
-//                case ESO:
-//                    name = "ESO";
-//                    corners.push_back(vec2(0.,0.));
-//                    corners.push_back(vec2(0., 3.*SIZE_Y/7.));
-//                    corners.push_back(vec2(30.*SIZE_X/32., 3.*SIZE_Y/7.));
-//                    corners.push_back(vec2(30.*SIZE_X/32., SIZE_Y));
-//                    corners.push_back(vec2(31.*SIZE_X/32., SIZE_Y));
-//                    corners.push_back(vec2(31.*SIZE_X/32., 3.*SIZE_Y/7.));
-//                    corners.push_back(vec2(SIZE_X, 3.*SIZE_Y/7.));
-//                    corners.push_back(vec2(SIZE_X, 0.));
-//                    subdomain_corners.push_back(corners);
-//                    break;
-//                case PORTAL:
-//                    name = "PORTAL";
-//                    corners.push_back(vec2(0.,0.));
-//                    corners.push_back(vec2(0., SIZE_Y));
-//                    corners.push_back(vec2(SIZE_X, SIZE_Y));
-//                    corners.push_back(vec2(SIZE_X, 0));
-//                    corners.push_back(vec2(0.95*SIZE_X, 0));
-//                    corners.push_back(vec2(0.5*SIZE_X, 0.65*SIZE_Y));
-//                    corners.push_back(vec2(0.05*SIZE_X, 0));
-//                    subdomain_corners.push_back({vec2(0.5*SIZE_X, 0.65*SIZE_Y), vec2(0.05*SIZE_X, 0), vec2(0.,0.), vec2(0., SIZE_Y), vec2(0.5*SIZE_X, SIZE_Y)});
-//                    subdomain_corners.push_back({ vec2(0.5*SIZE_X, 0.65*SIZE_Y), vec2(0.5*SIZE_X, SIZE_Y), vec2(SIZE_X, SIZE_Y), vec2(SIZE_X, 0.),  vec2(0.95*SIZE_X, 0) });
-//                    break;
-//            }
-//            
-//            for(auto &c : corners)
-//            {
-//                c[0] += boundary;
-//                c[1] += boundary;
-//            }
-//            
-//            for(auto &subdomain : subdomain_corners)
-//            {
-//                for(auto &sub_corner : subdomain)
-//                {
-//                    sub_corner[0] += boundary;
-//                    sub_corner[1] += boundary;
-//                }
-//            }
+//
 //        }
+
+        DesignDomain(DESIGN_DOMAIN_TYPE design, int SIZE_X, int SIZE_Y, real boundary)
+        {
+            mWidth = SIZE_X;
+            mHeight = SIZE_Y;
+            switch (design)
+            {
+                case RECTANGLE:
+                    name = "RECTANGLE";
+                    corners.push_back(vec2(0.,0.));
+                    corners.push_back(vec2(0., SIZE_Y));
+                    corners.push_back(vec2(SIZE_X, SIZE_Y));
+                    corners.push_back(vec2(SIZE_X, 0.));
+                    subdomain_corners.push_back(corners);
+                    break;
+                case L:
+                    name = "L";
+                    corners.push_back(vec2(0.,0.));
+                    corners.push_back(vec2(0., SIZE_Y));
+                    corners.push_back(vec2(0.4*SIZE_X, SIZE_Y));
+                    corners.push_back(vec2(0.4*SIZE_X, 0.4*SIZE_Y));
+                    corners.push_back(vec2(SIZE_X, 0.4*SIZE_Y));
+                    corners.push_back(vec2(SIZE_X, 0.));
+                    subdomain_corners.push_back(corners);
+                    break;
+                case ESO:
+                    name = "ESO";
+                    corners.push_back(vec2(0.,0.));
+                    corners.push_back(vec2(0., 3.*SIZE_Y/7.));
+                    corners.push_back(vec2(30.*SIZE_X/32., 3.*SIZE_Y/7.));
+                    corners.push_back(vec2(30.*SIZE_X/32., SIZE_Y));
+                    corners.push_back(vec2(31.*SIZE_X/32., SIZE_Y));
+                    corners.push_back(vec2(31.*SIZE_X/32., 3.*SIZE_Y/7.));
+                    corners.push_back(vec2(SIZE_X, 3.*SIZE_Y/7.));
+                    corners.push_back(vec2(SIZE_X, 0.));
+                    subdomain_corners.push_back(corners);
+                    break;
+                case PORTAL:
+                    name = "PORTAL";
+                    corners.push_back(vec2(0.,0.));
+                    corners.push_back(vec2(0., SIZE_Y));
+                    corners.push_back(vec2(SIZE_X, SIZE_Y));
+                    corners.push_back(vec2(SIZE_X, 0));
+                    corners.push_back(vec2(0.95*SIZE_X, 0));
+                    corners.push_back(vec2(0.5*SIZE_X, 0.65*SIZE_Y));
+                    corners.push_back(vec2(0.05*SIZE_X, 0));
+                    subdomain_corners.push_back({vec2(0.5*SIZE_X, 0.65*SIZE_Y), vec2(0.05*SIZE_X, 0), vec2(0.,0.), vec2(0., SIZE_Y), vec2(0.5*SIZE_X, SIZE_Y)});
+                    subdomain_corners.push_back({ vec2(0.5*SIZE_X, 0.65*SIZE_Y), vec2(0.5*SIZE_X, SIZE_Y), vec2(SIZE_X, SIZE_Y), vec2(SIZE_X, 0.),  vec2(0.95*SIZE_X, 0) });
+                    break;
+            }
+            
+            for(auto &c : corners)
+            {
+                c[0] += boundary;
+                c[1] += boundary;
+            }
+            
+            for(auto &subdomain : subdomain_corners)
+            {
+                for(auto &sub_corner : subdomain)
+                {
+                    sub_corner[0] += boundary;
+                    sub_corner[1] += boundary;
+                }
+            }
+        }
 
         DesignDomain(std::string design, int SIZE_X, int SIZE_Y, real boundary) : DesignDomain(design, SIZE_X, SIZE_Y, boundary, boundary)
         {

@@ -72,8 +72,8 @@ UI* UI::instance = NULL;
 UI::UI(int &argc, char** argv)
 {
     instance = this;
-	WIN_SIZE_X = 500;
-    WIN_SIZE_Y = 500;
+	WIN_SIZE_X = 1000;
+    WIN_SIZE_Y = 1000;
 
     glutInit(&argc, argv);
     glutInitWindowSize(WIN_SIZE_X,WIN_SIZE_Y);
@@ -175,7 +175,7 @@ void UI::reshape(int width, int height)
     {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluOrtho2D(0, WIN_SIZE_X, 0, WIN_SIZE_Y);
+        gluOrtho2D(0, 200, 0, 30);
     }
     
     glViewport(0, 0, WIN_SIZE_X, WIN_SIZE_Y);
@@ -341,19 +341,58 @@ using namespace DSC2D;
 void UI::rotate_square()
 {
     stop();
-    int width = 450;
-    int height = 450;
+    int width = 153;
+    int height = 28;
     
-    std::vector<real> points;
+    DISCRETIZATION = 1;
+    
+//    std::vector<real> points;
+//    std::vector<int> faces;
+//    Trializer::trialize(width, height, DISCRETIZATION, points, faces);
+    
+    std::string path = "out.dsc";
+    std::vector<DSC2D::real> points;
     std::vector<int> faces;
-    Trializer::trialize(width, height, DISCRETIZATION, points, faces);
+    std::vector<int> label;
+    
+    std::ifstream f(path);
+    if (f.is_open()) {
+        int nb_p, nb_f;
+        f >> nb_p >> nb_f;
+        
+        double p;
+        for (int i = 0; i < nb_p; i++) {
+            f >> p; points.push_back(p);
+            f >> p; points.push_back(p);
+            points.push_back(0);
+        }
+        int pidx;
+        for (int i = 0; i < nb_f; i++) {
+            f >> pidx; faces.push_back(pidx);
+            f >> pidx; faces.push_back(pidx);
+            f >> pidx; faces.push_back(pidx);
+            
+            f >> pidx; label.push_back(pidx);
+        }
+    }
+    
     
     DesignDomain *domain = new DesignDomain(DesignDomain::RECTANGLE, width, height, DISCRETIZATION);
     
     dsc = std::unique_ptr<DeformableSimplicialComplex>(new DeformableSimplicialComplex(DISCRETIZATION, points, faces, domain));
     vel_fun = std::unique_ptr<VelocityFunc<>>(new RotateFunc(VELOCITY, ACCURACY));
     
-    ObjectGenerator::create_square(*dsc, vec2(150., 150.), vec2(200., 200.), 1);
+//    ObjectGenerator::create_square(*dsc, vec2(150., 150.), vec2(200., 200.), 1);
+    
+    for (auto fit : dsc->faces()) {
+        dsc->update_attributes(fit, label[fit.get_index()]);
+    }
+    
+    for (auto vit : dsc->vertices()) {
+        dsc->set_destination(vit, dsc->get_pos(vit));
+    }
+    
+    dsc->deform();
     
     reshape(width + 2*DISCRETIZATION, height + 2*DISCRETIZATION);
     start();

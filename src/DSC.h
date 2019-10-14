@@ -28,11 +28,14 @@
 #include <GEL/HMesh/mesh_optimization.h>
 #endif
 
-#define EPSILON 1e-9
+//#ifdef EPSILON
+//#undef EPSILON
+//#endif
+
 
 namespace DSC2D {
 
-    
+    #define EPSILON 1e-9
     /**
      The base class representing a simplicial complex.
      */

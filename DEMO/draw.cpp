@@ -214,6 +214,8 @@ void Painter::draw_edges(const DeformableSimplicialComplex& dsc)
     {
         glColor3d(static_cast<double>(colors[*hei][0]), static_cast<double>(colors[*hei][1]), static_cast<double>(colors[*hei][2]));
         
+        glColor3b(1, 0, 0);
+        
         auto hew = dsc.walker(*hei);
         p1 = vec3(dsc.get_pos(hew.vertex())[0], dsc.get_pos(hew.vertex())[1], 0.);
         p2 = vec3(dsc.get_pos(hew.opp().vertex())[0], dsc.get_pos(hew.opp().vertex())[1], 0.);
